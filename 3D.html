@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Link Hijau - Same Tab</title>
+    <style>
+        /* Reset & Font */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Container Logo */
+        .logo-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .logo-container img {
+            width: 40%; 
+            height: auto;
+            max-width: 400px;
+            border-radius: 12px;
+        }
+
+        /* Container Tombol */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 90%;
+            max-width: 350px;
+        }
+
+        /* Desain Tombol */
+        .btn {
+            display: block;
+            width: 100%;
+            background-color: #2e7d32;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #1b5e20;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 480px) {
+            .logo-container img {
+                width: 60%;
+            }
+            .btn {
+                font-size: 16px;
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-container">
+        <img src="3D-logo.png" alt="Logo">
+    </div>
+
+    <div class="button-container">
+        <a href="https://www.google.com" class="btn">Aa</a>
+        
+        <button onclick="auth('deni123', 'https://www.yahoo.com')" class="btn">Bb</button>
+        <button onclick="auth('deni1234', 'https://www.facebook.com')" class="btn">Cc</button>
+        <button onclick="auth('deni12345', 'https://www.amazon.com')" class="btn">DD</button>
+    </div>
+
+    <script>
+        function auth(correctPassword, targetUrl) {
+            var inputPass = prompt("Masukkan Password:");
+            
+            if (inputPass === correctPassword) {
+                // Mengarahkan di halaman yang sama
+                window.location.href = targetUrl;
+            } else if (inputPass !== null) {
+                alert("Password Salah!");
+            }
+        }
+    </script>
+
+</body>
+</html>
