@@ -145,6 +145,13 @@
   </div>
 
 
+
+
+
+
+
+
+
     <style>
     #customModal {
         display: none;
@@ -187,6 +194,41 @@
         <button id="submitBtn">OK</button>
     </div>
 </div>
+
+
+
+
+
+<script>
+    function auth(correctPassword, targetUrl) {
+        var modal = document.getElementById("customModal");
+        var input = document.getElementById("passInput");
+        var btn = document.getElementById("submitBtn");
+
+        // Tampilkan modal
+        modal.style.display = "block";
+        input.focus();
+
+        // Logika pengecekan
+        btn.onclick = function() {
+            if (input.value === correctPassword) {
+                window.location.href = targetUrl;
+            } else {
+                alert("Password Salah Bro!");
+                input.value = ""; // Reset input
+            }
+        };
+
+        // Menutup modal jika klik di luar kotak (opsional)
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    }
+</script>
+
+
 
 
 
