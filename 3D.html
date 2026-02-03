@@ -146,17 +146,34 @@
 
 
     <script>
-        function auth(correctPassword, targetUrl) {
-            var inputPass = prompt("Masukkan Password:");
-            
-            if (inputPass === correctPassword) {
-                // Mengarahkan di halaman yang sama
+    function auth(correctPassword, targetUrl) {
+        var modal = document.getElementById("customModal");
+        var input = document.getElementById("passInput");
+        var btn = document.getElementById("submitBtn");
+
+        // Tampilkan modal
+        modal.style.display = "block";
+        input.focus();
+
+        // Logika pengecekan
+        btn.onclick = function() {
+            if (input.value === correctPassword) {
                 window.location.href = targetUrl;
-            } else if (inputPass !== null) {
+            } else {
                 alert("Password Salah Bro!");
+                input.value = ""; // Reset input
+            }
+        };
+
+        // Menutup modal jika klik di luar kotak (opsional)
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
             }
         }
-    </script>
+    }
+</script>
+
 
 </body>
 
