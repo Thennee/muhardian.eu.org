@@ -148,120 +148,111 @@
 
 
 
-// start tombol popup psw
 
 <style>
+    /* Backdrop/Background Overlay */
     #customModal {
         display: none;
         position: fixed;
         z-index: 9999;
         left: 0; top: 0; width: 100%; height: 100%;
-        background-color: rgba(0,0,0,0.6); /* Overlay sedikit lebih gelap */
+        background-color: rgba(0,0,0,0.5);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+
+    /* Kotak Modal */
     .modal-content {
-        background-color: white;
+        background-color: #f0f0f0;
         margin: 15% auto;
-        padding: 20px;
-        border-radius: 12px;
-        width: 300px;
-        text-align: center;
-        position: relative; /* Penting untuk posisi tombol X */
-        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        font-family: sans-serif;
+        padding: 0;
+        border: 1px solid #888;
+        border-radius: 4px;
+        width: 350px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        overflow: hidden;
+        position: relative;
     }
-    /* Style Tombol X */
-    .close-btn {
+
+    /* Tombol Close ala Windows */
+    .close-container {
         position: absolute;
-        right: 15px;
-        top: 10px;
-        font-size: 24px;
-        font-weight: bold;
-        color: #aaa;
+        top: 0;
+        right: 0;
+        width: 45px;
+        height: 30px;
+        background-color: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
-        line-height: 1;
+        transition: background-color 0.2s;
     }
-    .close-btn:hover {
-        color: #ff0000;
+
+    .close-container:hover {
+        background-color: #e81123; /* Merah khas Windows */
     }
-    .modal-content input {
-        width: 85%;
-        padding: 12px;
-        margin: 15px 0;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        outline: none;
+
+    .close-container:hover .close-icon {
+        color: white;
     }
-    .modal-content button {
-        width: 93%;
+
+    .close-icon {
+        font-size: 18px;
+        color: #333;
+        font-weight: lighter;
+    }
+
+    /* Isi Dalam Modal */
+    .modal-body {
+        padding: 30px 20px 20px 20px;
+        text-align: center;
+    }
+
+    .modal-body h3 {
+        margin: 0 0 15px 0;
+        font-size: 18px;
+        color: #333;
+    }
+
+    .modal-body input {
+        width: 90%;
         padding: 10px;
-        cursor: pointer;
-        background: #28a745;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 2px;
+    }
+
+    .modal-body button {
+        padding: 8px 25px;
+        background-color: #0078d7; /* Biru Windows */
         color: white;
         border: none;
-        border-radius: 6px;
-        font-weight: bold;
+        cursor: pointer;
+        font-size: 14px;
     }
-    .modal-content button:hover {
-        background: #218838;
+
+    .modal-body button:hover {
+        background-color: #005a9e;
     }
 </style>
 
 <div id="customModal">
     <div class="modal-content">
-        <span class="close-btn" id="closeModal">&times;</span>
-        <h3 style="margin-top:10px;">Security Check</h3>
-        <p style="font-size: 14px; color: #666;">Silakan masukkan password</p>
-        <input type="password" id="passInput" placeholder="Password...">
-        <button id="submitBtn">Lanjutkan</button>
+        <div class="close-container" id="closeBtn">
+            <span class="close-icon">&times;</span>
+        </div>
+        
+        <div class="modal-body">
+            <h3>Security Check</h3>
+            <input type="password" id="passInput" placeholder="Masukkan Password">
+            <br>
+            <button id="submitBtn">Login</button>
+        </div>
     </div>
 </div>
 
 
 
-<script>
-    function auth(correctPassword, targetUrl) {
-        const modal = document.getElementById("customModal");
-        const input = document.getElementById("passInput");
-        const btn = document.getElementById("submitBtn");
-        const closeX = document.getElementById("closeModal");
-
-        // Tampilkan modal
-        modal.style.display = "block";
-        input.value = ""; // Bersihkan input setiap dibuka
-        input.focus();
-
-        // Fungsi Menutup Modal
-        const closeModal = () => {
-            modal.style.display = "none";
-        };
-
-        // Klik Tombol X
-        closeX.onclick = closeModal;
-
-        // Klik di luar kotak modal
-        window.onclick = (event) => {
-            if (event.target == modal) closeModal();
-        };
-
-        // Tekan Enter untuk Submit
-        input.onkeypress = (e) => {
-            if (e.key === 'Enter') btn.click();
-        };
-
-        // Logika Verifikasi
-        btn.onclick = function() {
-            if (input.value === correctPassword) {
-                window.location.href = targetUrl;
-            } else {
-                alert("Password Salah Bro!");
-                input.value = "";
-                input.focus();
-            }
-        };
-    }
-</script>
-
-// end tombol popup psw
 
 
 
