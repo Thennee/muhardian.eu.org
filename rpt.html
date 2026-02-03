@@ -98,5 +98,43 @@
     </div>
   </div>
 
+<!-- SCRIPT CLEAR CACHE -->
+  <script>
+    function clearAppCache() {
+      try {
+        // Clear Web Storage
+        localStorage.clear();
+        sessionStorage.clear();
+
+        // Clear Cache API (Service Worker cache)
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            for (let name of names) {
+              caches.delete(name);
+            }
+          });
+        }
+
+        console.log("Cache berhasil dibersihkan");
+      } catch (e) {
+        console.warn("Gagal clear cache:", e);
+      }
+    }
+
+    // Saat tab/browser ditutup atau refresh
+    window.addEventListener("beforeunload", function () {
+      clearAppCache();
+    });
+
+    // Saat user pindah halaman (mobile friendly)
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "hidden") {
+        clearAppCache();
+      }
+    });
+  </script>
+
+  
 </body>
 </html>
+
