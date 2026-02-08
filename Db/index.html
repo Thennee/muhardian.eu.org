@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Green Mobile</title>
+    <style>
+        :root {
+            --primary-color: #2e7d32; /* Hijau Tua */
+            --secondary-color: #4caf50; /* Hijau Terang */
+            --bg-color: #f1f8e9;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .container {
+            background: white;
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-top: 8px solid var(--primary-color);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            background-color: #f9fff9;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            background-color: #ccc;
+        }
+
+        #status {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+            font-weight: bold;
+        }
+
+        .success { background: #dcedc8; color: #33691e; display: block !important; }
+        .error { background: #ffcdd2; color: #b71c1c; display: block !important; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📦 Inventaris Barang</h2>
+    
+    <form id="inventoryForm">
+        <div class="form-group">
+            <label>Tanggal</label>
+            <input type="date" id="tanggal" required>
+        </div>
+
+        <div class="form-group">
+            <label>Nama Barang</label>
+            <input type="text" id="nama_barang" placeholder="Masukkan nama barang" required>
+        </div>
+
+        <div class="form-group" style="display: flex; gap: 10px;">
+            <div style="flex: 2;">
+                <label>Jumlah</label>
+                <input type="number" id="jumlah" placeholder="0" required>
+            </div>
+            <div style="flex: 1;">
+                <label>Satuan</label>
+                <select id="satuan" required>
+                    <option value="Pcs">Pcs</option>
+                    <option value="Kg">Kg</option>
+                    <option value="Liter">Liter</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Jenis Transaksi (Kode)</label>
+            <select id="kode" required>
+                <option value="">-- Pilih Jenis --</option>
+                <option value="BM">Barang Masuk (BM)</option>
+                <option value="BK">Barang Keluar (BK)</option>
+            </select>
+        </div>
+
+        <button type="submit" id="btnSubmit">SIMPAN KE DATA</button>
+    </form>
+
+    <div id="status"></div>
+</div>
+
+<script>
+    // MASUKKAN URL WEB APP ANDA DI SINI
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzGTyV0UGcIVIYF2lf4wHKT5rbAarK8Lp1d4Zccaxw9b4aoXmydsO82xkBrN_vq8IpAmg/exec'; 
+
+    const form = document.getElementById('inventoryForm');
+    const statusDiv = document.getElementById('status');
+    const btn = document.getElementById('btnSubmit');
+
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        
+        btn.disabled = true;
+        btn.innerHTML = "Mengirim...";
+        statusDiv.className = "";
+        statusDiv.innerHTML = "";
+
+        const data = {
+            tanggal: document.getElementById('tanggal').value,
+            nama_barang: document.getElementById('nama_barang').value,
+            jumlah: document.getElementById('jumlah').value,
+            satuan: document.getElementById('satuan').value,
+            kode: document.getElementById('kode').value
+        };
+
+        fetch(scriptURL, { 
+            method: 'POST', 
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            statusDiv.innerHTML = "✅ Data berhasil disimpan!";
+            statusDiv.className = "success";
+            form.reset();
+            btn.disabled = false;
+            btn.innerHTML = "SIMPAN KE DATA";
+        })
+        .catch(error => {
+            statusDiv.innerHTML = "❌ Gagal: " + error.message;
+            statusDiv.className = "error";
+            btn.disabled = false;
+            btn.innerHTML = "SIMPAN KE DATA";
+        });
+    });
+</script>
+
+</body>
+</html>
