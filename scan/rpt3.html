@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data 3D Project - Responsive Height</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #f2f2f2;
+    }
+
+    .box {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+      /* Memastikan box juga mengikuti tinggi konten */
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 16px;
+      color: #2e7d32;
+    }
+
+    /* PERUBAHAN UTAMA: Menggunakan 85vh */
+    /* Ini artinya tinggi iframe akan selalu 85% dari tinggi layar perangkat apapun */
+    .sheet-frame {
+      width: 100%;
+      height: 85vh; 
+      border: none;
+      border-radius: 8px;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 24px;
+    }
+
+    .btn-home {
+      background-color: #2e7d32;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 12px 28px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: bold;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-home:hover {
+      background-color: #1b5e20;
+      transform: translateY(-2px);
+    }
+
+    /* Di HP, kita buat sedikit lebih tinggi agar area baca lebih luas */
+    @media (max-width: 480px) {
+      .sheet-frame {
+        height: 80vh; 
+      }
+      .btn-home {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="box">
+    <h1>Data Scan</h1>
+
+    <iframe
+      class="sheet-frame"
+      src="https://docs.google.com/spreadsheets/d/e/2PACX-1vR5OZIjC-vHARV8a-MH5lHBMA2z3Xt_EnvRjOd9eFbkaapXaZOeZJuJ2K2uhMNUyDxt0vn4I6VEABh_/pubhtml?gid=0&single=true"
+      scrolling="yes"
+      frameborder="0">
+    </iframe>
+
+    <div class="button-container">
+      <a href="https://muhardian.eu.org/3D.html" class="btn-home">
+        Home
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function clearAppCache() {
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            for (let name of names) {
+              caches.delete(name);
+            }
+          });
+        }
+      } catch (e) {
+        console.warn("Gagal clear cache:", e);
+      }
+    }
+    window.addEventListener("beforeunload", clearAppCache);
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "hidden") {
+        clearAppCache();
+      }
+    });
+  </script>
+
+</body>
+</html>
