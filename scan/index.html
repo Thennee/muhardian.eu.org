@@ -1,1 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Scanner App</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        :root {
+            --primary-green: #2e7d32;
+            --light-green: #4caf50;
+            --bg-color: #f1f8e9;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        h2 { color: var(--primary-green); margin-bottom: 30px; }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            text-decoration: none;
+            box-sizing: border-box;
+        }
+
+        .btn-input {
+            background-color: var(--primary-green);
+            color: white;
+        }
+
+        .btn-view {
+            background-color: white;
+            color: var(--primary-green);
+            border: 2px solid var(--primary-green);
+        }
+
+        .btn:active { transform: scale(0.98); }
+
+        /* Scanner Styling */
+        #reader {
+            width: 100%;
+            display: none;
+            margin-top: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #status {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>QR Qode Scanner</h2>
+        
+        <div id="reader"></div>
+        <div id="status"></div>
+
+        <button class="btn btn-input" onclick="startScanner()">SCAN</button>
+        
+        <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vR5OZIjC-vHARV8a-MH5lHBMA2z3Xt_EnvRjOd9eFbkaapXaZOeZJuJ2K2uhMNUyDxt0vn4I6VEABh_/pubhtml?gid=0&single=true" target="_blank" class="btn btn-view">LIHAT HASIL INPUT</a>
+    </div>
+
+    <script>
+        // GANTI DENGAN URL WEB APP DARI GOOGLE APPS SCRIPT ANDA
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwlfO664BmSoraPMebB7ttgbD_ceMgHM-g7xulM8aEWFEsfGQ9QKyFb6DrvAU1BGjlvWQ/exec";
+
+        const html5QrCode = new Html5Qrcode("reader");
+        const statusDiv = document.getElementById('status');
+
+        function startScanner() {
+            document.getElementById('reader').style.display = 'block';
+            
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            // Membuka kamera belakang secara otomatis
+            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+            .catch(err => {
+                alert("Gagal membuka kamera: " + err);
+            });
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            // Berhenti scan setelah dapet data
+            html5QrCode.stop();
+            document.getElementById('reader').style.display = 'none';
+            statusDiv.innerText = "Mengirim data: " + decodedText;
+            statusDiv.style.color = "blue";
+
+            // Kirim data ke Google Sheets via Apps Script
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ data: decodedText, timestamp: new Date() })
+            })
+            .then(() => {
+                statusDiv.innerText = "✅ Berhasil tersimpan di Sheet!";
+                statusDiv.style.color = "green";
+                alert("Data berhasil tersimpan!");
+            })
+            .catch(err => {
+                statusDiv.innerText = "❌ Gagal kirim data";
+                statusDiv.style.color = "red";
+                console.error(err);
+            });
+        }
+    </script>
+</body>
+</html>
