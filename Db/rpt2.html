@@ -20,6 +20,9 @@
       padding: 20px;
       max-width: 1200px;
       margin: auto;
+      /* Memastikan box juga mengikuti tinggi konten */
+      display: flex;
+      flex-direction: column;
     }
 
     h1 {
@@ -28,9 +31,11 @@
       color: #2e7d32;
     }
 
+    /* PERUBAHAN UTAMA: Menggunakan 85vh */
+    /* Ini artinya tinggi iframe akan selalu 85% dari tinggi layar perangkat apapun */
     .sheet-frame {
       width: 100%;
-      height: 80%;
+      height: 85vh; 
       border: none;
       border-radius: 8px;
     }
@@ -58,17 +63,11 @@
       transform: translateY(-2px);
     }
 
-    @media (max-width: 768px) {
-      .sheet-frame {
-        height: 480px;
-      }
-    }
-
+    /* Di HP, kita buat sedikit lebih tinggi agar area baca lebih luas */
     @media (max-width: 480px) {
       .sheet-frame {
-        height: 360px;
+        height: 80vh; 
       }
-
       .btn-home {
         width: 100%;
         text-align: center;
@@ -82,7 +81,6 @@
   <div class="box">
     <h1>Data Report</h1>
 
-    <!-- Embed Google Sheet -->
     <iframe
       class="sheet-frame"
       src="https://docs.google.com/spreadsheets/d/e/2PACX-1vS9odyEV2SehVVTrQWIomMYgKMqWlrACgWw9x1tXPaNLitBLdt2DRfCUdLcM06d0S-bG0_bjFpDP413/pubhtml?gid=0&single=true"
@@ -90,7 +88,6 @@
       frameborder="0">
     </iframe>
 
-    <!-- Tombol Home -->
     <div class="button-container">
       <a href="https://muhardian.eu.org/3D.html" class="btn-home">
         Home
@@ -98,15 +95,11 @@
     </div>
   </div>
 
-<!-- SCRIPT CLEAR CACHE -->
   <script>
     function clearAppCache() {
       try {
-        // Clear Web Storage
         localStorage.clear();
         sessionStorage.clear();
-
-        // Clear Cache API (Service Worker cache)
         if ('caches' in window) {
           caches.keys().then(function(names) {
             for (let name of names) {
@@ -114,19 +107,11 @@
             }
           });
         }
-
-        console.log("Cache berhasil dibersihkan");
       } catch (e) {
         console.warn("Gagal clear cache:", e);
       }
     }
-
-    // Saat tab/browser ditutup atau refresh
-    window.addEventListener("beforeunload", function () {
-      clearAppCache();
-    });
-
-    // Saat user pindah halaman (mobile friendly)
+    window.addEventListener("beforeunload", clearAppCache);
     document.addEventListener("visibilitychange", function () {
       if (document.visibilityState === "hidden") {
         clearAppCache();
@@ -134,8 +119,5 @@
     });
   </script>
 
-  
 </body>
 </html>
-
-
