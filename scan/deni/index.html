@@ -11,3 +11,86 @@
       --btn-radius:8px;
       --shadow:0 6px 20px rgba(0,0,0,0.12);
     }
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:18px;
+  background:var(--bg);
+  font-family:system-ui,Segoe UI,Roboto,Arial;
+  padding:24px;
+  box-sizing:border-box;
+}
+
+.image-wrapper{
+  max-width:900px;
+  width:90%;
+  max-height:70vh;
+  display:block;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  background:#000;
+  position:relative;
+}
+
+.image-wrapper img{
+  display:block;
+  width:100%;
+  height:auto;
+  object-fit:cover;
+  transform-origin:center;
+  /* transmisi opacity untuk fade */
+  transition: opacity 600ms ease;
+  opacity:1;
+  filter:none; /* filter akan diubah lewat JS */
+  display:block;
+}
+
+/* Kontrol */
+.controls{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  background:transparent;
+}
+
+.controls button{
+  background:var(--btn-bg);
+  border:1px solid var(--btn-border);
+  padding:8px 12px;
+  border-radius:var(--btn-radius);
+  cursor:pointer;
+  box-shadow:var(--shadow);
+  font-size:14px;
+}
+
+.controls button:active{ transform:translateY(1px); }
+.controls .label{
+  font-size:14px;
+  color:#333;
+  padding:6px 10px;
+  border-radius:8px;
+  background:#fff;
+  border:1px solid var(--btn-border);
+}
+
+.speed{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.meta{
+  font-size:13px;
+  color:#333;
+}
+
+@media (max-width:480px){
+  .controls{ flex-wrap:wrap; justify-content:center; }
+  .controls button{ padding:8px; font-size:13px; }
+}
