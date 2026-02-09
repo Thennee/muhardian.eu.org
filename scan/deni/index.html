@@ -120,3 +120,153 @@ body{
 
 <div id="filterName" class="meta" style="margin-left:8px;">Filter: none</div>
 
+
+  <script>
+    // Elemen
+    const img = document.getElementById('colorImg');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const intervalRange = document.getElementById('intervalRange');
+    const intervalLabel = document.getElementById('intervalLabel');
+    const filterNameEl = document.getElementById('filterName');
+
+    // Daftar filter diskrit (nama + value). Sesuaikan sesuai selera.
+    const filters = [
+      { name: 'none', value: 'none' },
+      { name: 'grayscale', value: 'grayscale(100%)' },
+      { name: 'sepia', value: 'sepia(100%)' },
+      { name: 'hue-60', value: 'hue-rotate(60deg) saturate(1.2)' },
+      { name: 'hue-120', value: 'hue-rotate(120deg) saturate(1.2)' },
+      { name: 'hue-180', value: 'hue-rotate(180deg) saturate(1.2)' },
+      { name: 'invert', value: 'invert(100%)' },
+      { name: 'contrast+', value: 'contrast(140%)' },
+      { name: 'brightness+', value: 'brightness(140%)' },
+      { name: 'vivid', value: 'saturate(200%) hue-rotate(200deg)' }
+    ];
+
+    // Pengaturan
+    let index = 0;
+    let intervalMs = parseInt(intervalRange.value, 10) || 2000;
+    const fadeMs = 600; // durasi fade (harus cocok dengan CSS transition)
+    let timerId = null;
+    let isRunning = true;
+    let isAnimating = false;
+
+    // Inisialisasi
+    function applyFilter(i){
+      const f = filters[i];
+      img.style.filter = f.value;
+      filterNameEl.textContent = 'Filter: ' + f.name;
+    }
+
+    applyFilter(index);
+
+    // Fungsi untuk melakukan pergantian dengan efek fade
+    function changeTo(newIndex){
+      if(isAnimating) return;
+      isAnimating = true;
+      // fade out
+      img.style.opacity = '0';
+      // setelah fadeMs ganti filter dan fade in
+      const t = setTimeout(() => {
+        index = ((newIndex % filters.length) + filters.length) % filters.length;
+        applyFilter(index);
+        img.style.opacity = '1';
+        // selesai setelah fade kembali
+        setTimeout(() => {
+          isAnimating = false;
+        }, fadeMs + 10);
+      }, fadeMs);
+    }
+
+    // Next / Prev
+    function next(){
+      changeTo(index + 1);
+    }
+
+    function prev(){
+      changeTo(index - 1);
+    }
+
+    // Loop otomatis
+    function startLoop(){
+      if(timerId) clearInterval(timerId);
+      timerId = setInterval(() => {
+        next();
+      }, intervalMs);
+      isRunning = true;
+      playPauseBtn.textContent = 'Pause';
+    }
+
+    function stopLoop(){
+      if(timerId) clearInterval(timerId);
+      timerId = null;
+      isRunning = false;
+      playPauseBtn.textContent = 'Play';
+    }
+
+    // Event listeners
+    playPauseBtn.addEventListener('click', () => {
+      if(isRunning) stopLoop(); else startLoop();
+    });
+
+    nextBtn.addEventListener('click', () => {
+      // jika berjalan, restart interval supaya delay konsisten
+      next();
+      if(isRunning){
+        stopLoop();
+        startLoop();
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      prev();
+      if(isRunning){
+        stopLoop();
+        startLoop();
+      }
+    });
+
+    intervalRange.addEventListener('input', (e) => {
+      intervalMs = parseInt(e.target.value, 10);
+      intervalLabel.textContent = intervalMs + ' ms';
+      // restart loop jika sedang running
+      if(isRunning){
+        stopLoop();
+        startLoop();
+      }
+    });
+
+    // Mulai loop awal
+    startLoop();
+
+    // Optional: hentikan interval saat tab tidak aktif supaya menghemat CPU
+    document.addEventListener('visibilitychange', () => {
+      if(document.hidden){
+        // pause temporer
+        if(isRunning){
+          stopLoop();
+          playPauseBtn.dataset.wasRunning = 'yes';
+        }
+      } else {
+        if(playPauseBtn.dataset.wasRunning === 'yes'){
+          startLoop();
+          delete playPauseBtn.dataset.wasRunning;
+        }
+      }
+    });
+
+    // Dukungan keyboard sederhana: space => play/pause, arrow keys untuk next/prev
+    document.addEventListener('keydown', (e) => {
+      if(e.code === 'Space'){
+        e.preventDefault();
+        playPauseBtn.click();
+      } else if(e.code === 'ArrowRight'){
+        nextBtn.click();
+      } else if(e.code === 'ArrowLeft'){
+        prevBtn.click();
+      }
+    });
+  </script>
+
