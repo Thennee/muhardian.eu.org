@@ -64,6 +64,12 @@
 
         .btn:active { transform: scale(0.98); }
 
+  .button-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 24px;
+    }
+
         /* Scanner Styling */
         #reader {
             width: 100%;
@@ -127,7 +133,7 @@
                 body: JSON.stringify({ data: decodedText, timestamp: new Date() })
             })
             .then(() => {
-                statusDiv.innerText = "✅ Berhasil tersimpan di Sheet!";
+                statusDiv.innerText = "✅ Berhasil tersimpan";
                 statusDiv.style.color = "green";
                 alert("Data berhasil tersimpan!");
             })
@@ -138,5 +144,13 @@
             });
         }
     </script>
+
+ <div class="button-container">
+      <a href="https://muhardian.eu.org/3D.html" class="btn-home">
+        Home
+      </a>
+    </div>
+  </div>
+    
 </body>
 </html>
