@@ -1,40 +1,13 @@
-<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Responsive Center Image</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gambar Berganti Warna - Fade + Kontrol</title>
   <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center; /* center horizontal */
-      align-items: center;     /* center vertical */
-      background-color: #f5f5f5;
+    :root{
+      --bg:#f5f5f5;
+      --btn-bg:#fff;
+      --btn-border:#ddd;
+      --btn-radius:8px;
+      --shadow:0 6px 20px rgba(0,0,0,0.12);
     }
-
-    .image-wrapper {
-      max-width: 90%;
-      max-height: 90vh;
-    }
-
-    .image-wrapper img {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-  </style>
-</head>
-<body>
-
-  <div class="image-wrapper">
-    <img 
-      src="https://yt3.googleusercontent.com/ytc/AIdro_ko_w6nWXVKc9-9a-bnm-3D1xzxrZNwuo_4mRV1OAWTspw=s900-c-k-c0x00ffffff-no-rj" 
-      alt="Responsive Center Image">
-  </div>
-
-</body>
-</html>
