@@ -1,0 +1,269 @@
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gambar Berganti Warna - Fade + Kontrol</title>
+  <style>
+    :root{
+      --bg:#f5f5f5;
+      --btn-bg:#fff;
+      --btn-border:#ddd;
+      --btn-radius:8px;
+      --shadow:0 6px 20px rgba(0,0,0,0.12);
+      --green-home: #2ecc71; /* Warna hijau tema */
+    }
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:18px;
+  background:var(--bg);
+  font-family:system-ui,Segoe UI,Roboto,Arial;
+  padding:24px;
+  box-sizing:border-box;
+}
+
+.image-wrapper{
+  max-width:900px;
+  width:90%;
+  max-height:70vh;
+  display:block;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  background:#000;
+  position:relative; /* Penting untuk posisi tombol melayang */
+}
+
+.image-wrapper img{
+  display:block;
+  width:100%;
+  height:auto;
+  object-fit:cover;
+  transform-origin:center;
+  transition: opacity 600ms ease;
+  opacity:1;
+  filter:none;
+}
+
+/* Tombol Home Melayang */
+.home-overlay-btn {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background-color: var(--green-home);
+  color: white;
+  padding: 10px 24px;
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: bold;
+  font-size: 14px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+  opacity: 0.9;
+  border: 2px solid rgba(255,255,255,0.2);
+}
+
+.home-overlay-btn:hover {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-3px); /* Efek melayang ke atas */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  background-color: #27ae60;
+}
+
+/* Kontrol */
+.controls{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  background:transparent;
+}
+
+.controls button{
+  background:var(--btn-bg);
+  border:1px solid var(--btn-border);
+  padding:8px 12px;
+  border-radius:var(--btn-radius);
+  cursor:pointer;
+  box-shadow:var(--shadow);
+  font-size:14px;
+}
+
+.controls button:active{ transform:translateY(1px); }
+.controls .label{
+  font-size:14px;
+  color:#333;
+  padding:6px 10px;
+  border-radius:8px;
+  background:#fff;
+  border:1px solid var(--btn-border);
+}
+
+.speed{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.meta{
+  font-size:13px;
+  color:#333;
+}
+
+@media (max-width:480px){
+  .controls{ flex-wrap:wrap; justify-content:center; }
+  .controls button{ padding:8px; font-size:13px; }
+}
+  </style>
+</head>
+<body>
+
+  <div class="image-wrapper" aria-live="polite">
+    <a href="https://muhardian.eu.org/3D.html" class="home-overlay-btn">🏠 Home</a>
+    
+    <img
+      id="colorImg"
+      src="https://yt3.googleusercontent.com/ytc/AIdro_ko_w6nWXVKc9-9a-bnm-3D1xzxrZNwuo_4mRV1OAWTspw=s900-c-k-c0x00ffffff-no-rj"
+      alt="Gambar berganti warna"
+    />
+  </div>
+
+  <div class="controls" role="toolbar" aria-label="Kontrol gambar">
+    <button id="prevBtn" title="Sebelumnya">Prev</button>
+    <button id="playPauseBtn" title="Pause / Play">Pause</button>
+    <button id="nextBtn" title="Berikutnya">Next</button>
+
+    <div class="speed" style="margin-left:8px;">
+      <label for="intervalRange" class="label">Interval</label>
+      <input id="intervalRange" type="range" min="500" max="5000" step="100" value="2000" />
+      <span id="intervalLabel" class="label" style="min-width:56px; text-align:center;">2000 ms</span>
+    </div>
+
+    <div id="filterName" class="meta" style="margin-left:8px;">Filter: none</div>
+  </div>
+
+  <script>
+    // Elemen
+    const img = document.getElementById('colorImg');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const intervalRange = document.getElementById('intervalRange');
+    const intervalLabel = document.getElementById('intervalLabel');
+    const filterNameEl = document.getElementById('filterName');
+
+    const filters = [
+      { name: 'none', value: 'none' },
+      { name: 'grayscale', value: 'grayscale(100%)' },
+      { name: 'sepia', value: 'sepia(100%)' },
+      { name: 'hue-60', value: 'hue-rotate(60deg) saturate(1.2)' },
+      { name: 'hue-120', value: 'hue-rotate(120deg) saturate(1.2)' },
+      { name: 'hue-180', value: 'hue-rotate(180deg) saturate(1.2)' },
+      { name: 'invert', value: 'invert(100%)' },
+      { name: 'contrast+', value: 'contrast(140%)' },
+      { name: 'brightness+', value: 'brightness(140%)' },
+      { name: 'vivid', value: 'saturate(200%) hue-rotate(200deg)' }
+    ];
+
+    let index = 0;
+    let intervalMs = parseInt(intervalRange.value, 10) || 2000;
+    const fadeMs = 600; 
+    let timerId = null;
+    let isRunning = true;
+    let isAnimating = false;
+
+    function applyFilter(i){
+      const f = filters[i];
+      img.style.filter = f.value;
+      filterNameEl.textContent = 'Filter: ' + f.name;
+    }
+
+    applyFilter(index);
+
+    function changeTo(newIndex){
+      if(isAnimating) return;
+      isAnimating = true;
+      img.style.opacity = '0';
+      const t = setTimeout(() => {
+        index = ((newIndex % filters.length) + filters.length) % filters.length;
+        applyFilter(index);
+        img.style.opacity = '1';
+        setTimeout(() => {
+          isAnimating = false;
+        }, fadeMs + 10);
+      }, fadeMs);
+    }
+
+    function next(){ changeTo(index + 1); }
+    function prev(){ changeTo(index - 1); }
+
+    function startLoop(){
+      if(timerId) clearInterval(timerId);
+      timerId = setInterval(() => { next(); }, intervalMs);
+      isRunning = true;
+      playPauseBtn.textContent = 'Pause';
+    }
+
+    function stopLoop(){
+      if(timerId) clearInterval(timerId);
+      timerId = null;
+      isRunning = false;
+      playPauseBtn.textContent = 'Play';
+    }
+
+    playPauseBtn.addEventListener('click', () => {
+      if(isRunning) stopLoop(); else startLoop();
+    });
+
+    nextBtn.addEventListener('click', () => {
+      next();
+      if(isRunning){ stopLoop(); startLoop(); }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      prev();
+      if(isRunning){ stopLoop(); startLoop(); }
+    });
+
+    intervalRange.addEventListener('input', (e) => {
+      intervalMs = parseInt(e.target.value, 10);
+      intervalLabel.textContent = intervalMs + ' ms';
+      if(isRunning){ stopLoop(); startLoop(); }
+    });
+
+    startLoop();
+
+    document.addEventListener('visibilitychange', () => {
+      if(document.hidden){
+        if(isRunning){
+          stopLoop();
+          playPauseBtn.dataset.wasRunning = 'yes';
+        }
+      } else {
+        if(playPauseBtn.dataset.wasRunning === 'yes'){
+          startLoop();
+          delete playPauseBtn.dataset.wasRunning;
+        }
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if(e.code === 'Space'){
+        e.preventDefault();
+        playPauseBtn.click();
+      } else if(e.code === 'ArrowRight'){
+        nextBtn.click();
+      } else if(e.code === 'ArrowLeft'){
+        prevBtn.click();
+      }
+    });
+  </script>
+
+</body>
+</html>
