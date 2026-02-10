@@ -282,43 +282,42 @@
     }
 
     // --- FUNGSI BARU: Load Data dari Google Sheet ---
-    function loadContent() {
-        const container = document.getElementById('posts-container');
-        container.innerHTML = '<div class="loader" style="display:block">Sedang memuat berita alam...</div>';
+  // ... (Bagian atas kode tetap sama) ...
 
-        fetch(GOOGLE_SCRIPT_URL)
-        .then(response => response.json())
-        .then(data => {
-            container.innerHTML = ''; // Hapus loader
+function loadContent() {
+    const container = document.getElementById('posts-container');
+    container.innerHTML = '<div class="loader" style="display:block">Memuat konten...</div>';
+
+    fetch(GOOGLE_SCRIPT_URL)
+    .then(response => response.json())
+    .then(data => {
+        container.innerHTML = ''; 
+        data.reverse().forEach(post => {
+            const imageSrc = post.gambar ? post.gambar : 'https://via.placeholder.com/400x200?text=No+Image';
             
-            // Membalik urutan agar berita terbaru muncul paling atas (opsional)
-            data.reverse().forEach(post => {
-                // Gunakan gambar default jika tidak ada gambar
-                const imageSrc = post.gambar ? post.gambar : 'https://source.unsplash.com/random/400x300/?nature';
-                
-                // Template HTML untuk setiap kartu
-                const cardHTML = `
-                    <div class="card">
-                        <img src="${imageSrc}" alt="${post.judul}" loading="lazy">
-                        <div class="card-body">
-                            <span class="card-date"><i class="far fa-calendar-alt"></i> ${post.tanggal}</span>
-                            <h3 class="card-title">${post.judul}</h3>
-                            <p class="card-text">${post.isi}</p>
-                        </div>
+            // LOGIKA: Memotong isi konten hanya menjadi 1 paragraf pendek (sekitar 100 karakter)
+            const ringkasan = post.isi.length > 120 ? post.isi.substring(0, 120) + "..." : post.isi;
+
+            // Mengirim data ke halaman detail menggunakan URLSearchParams
+            const detailUrl = `detail.html?judul=${encodeURIComponent(post.judul)}&tgl=${encodeURIComponent(post.tanggal)}&isi=${encodeURIComponent(post.isi)}&img=${encodeURIComponent(imageSrc)}`;
+
+            const cardHTML = `
+                <div class="card">
+                    <img src="${imageSrc}" alt="${post.judul}">
+                    <div class="card-body">
+                        <span class="card-date"><i class="far fa-calendar-alt"></i> ${post.tanggal}</span>
+                        <h3 class="card-title">${post.judul}</h3>
+                        <p class="card-text">${ringkasan}</p>
+                        <a href="${detailUrl}" style="color: var(--primary); font-weight: 600; text-decoration: none; display: inline-block; margin-top: 10px;">
+                            Baca Selanjutnya <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
-                `;
-                container.innerHTML += cardHTML;
-            });
-            
-            if(data.length === 0) {
-                container.innerHTML = '<p style="text-align:center">Belum ada berita.</p>';
-            }
-        })
-        .catch(error => {
-            console.error('Error loading data:', error);
-            container.innerHTML = '<p style="text-align:center; color:red">Gagal memuat data. Pastikan Script URL benar.</p>';
+                </div>
+            `;
+            container.innerHTML += cardHTML;
         });
-    }
+    });
+}
 
     // --- Fungsi Kirim Data (Simpan) ---
     function submitContent(e) {
