@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Berita - NatureCMS</title>
+    <link rel="icon" type="image/x-icon" href="https://muhardian.eu.org/iconWA.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0f9b0f;
+            --gradient: linear-gradient(135deg, #0f9b0f, #00d2ff);
+        }
+        body { font-family: 'Poppins', sans-serif; background: #f0f9f0; margin: 0; padding: 0; }
+        header { background: var(--gradient); padding: 15px; color: white; display: flex; align-items: center; }
+        .back-btn { color: white; text-decoration: none; font-weight: 600; margin-right: 20px; }
+        .container { max-width: 800px; margin: 30px auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .full-img { width: 100%; border-radius: 15px; margin-bottom: 20px; height: 400px; object-fit: cover; }
+        .meta { color: var(--primary); font-weight: 600; font-size: 0.9rem; }
+        h1 { color: #054705; margin: 10px 0 20px 0; line-height: 1.3; }
+        .content { line-height: 1.8; color: #444; white-space: pre-wrap; }
+        footer { text-align: center; padding: 40px; color: #888; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="back-btn"><i class="fas fa-chevron-left"></i> Kembali</a>
+        <div style="font-weight: 700;">NatureCMS Detail</div>
+    </header>
+
+    <div class="container">
+        <img id="detail-img" src="" alt="" class="full-img">
+        <div class="meta" id="detail-tgl"></div>
+        <h1 id="detail-judul"></h1>
+        <hr border="0" height="1px" style="background:#eee; margin-bottom: 20px;">
+        <div class="content" id="detail-isi"></div>
+    </div>
+
+    <footer>&copy; 2024 NatureCMS - Portal Berita Lingkungan</footer>
+
+    <script>
+        // Mengambil data dari URL
+        const params = new URLSearchParams(window.location.search);
+        
+        document.getElementById('detail-judul').innerText = params.get('judul');
+        document.getElementById('detail-tgl').innerHTML = '<i class="far fa-calendar-alt"></i> ' + params.get('tgl');
+        document.getElementById('detail-isi').innerText = params.get('isi');
+        
+        const imgPath = params.get('img');
+        if(imgPath) {
+            document.getElementById('detail-img').src = imgPath;
+        } else {
+            document.getElementById('detail-img').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
