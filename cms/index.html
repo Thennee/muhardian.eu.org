@@ -254,85 +254,134 @@
         </div>
     </div>
 
-    <script>
-        // --- KONFIGURASI PENTING ---
-        // Ganti URL ini dengan URL Web App dari Google Apps Script Anda nanti
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxX4oFX5-cB4jT8aZM7IVh9gjWGwyIOSlo1E_sZ1hVNYCPbrn2JscT2gp_SGtM4n90O/exec'; 
-        const ADMIN_PASSWORD = 'Denie'; // sederhana 
+<script>
+    // --- KONFIGURASI ---
+    // Pastikan URL ini adalah URL Web App terbaru setelah Deploy Ulang
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4Q5Ca2w8jwyXRnE1lWwMKo7C8q9ILCMNsmvM7rCcmfpnDY0jhCnvsr7Wmj5yLXy4k/exec'; 
+    const ADMIN_PASSWORD = 'denie'; 
 
-        // --- Fungsi UI ---
-        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
-        
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    // --- Saat Halaman Dibuka, Langsung Load Data ---
+    window.addEventListener('DOMContentLoaded', () => {
+        loadContent();
+    });
 
-        function checkLogin() {
-            const pass = document.getElementById('adminPass').value;
-            if(pass === ADMIN_PASSWORD) {
-                closeModal('loginModal');
-                document.getElementById('inputModal').style.display = 'flex';
-                // Set tanggal hari ini otomatis
-                document.getElementById('tanggal').valueAsDate = new Date();
-            } else {
-                alert('Password Salah!');
-            }
+    // --- Fungsi UI ---
+    function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function checkLogin() {
+        const pass = document.getElementById('adminPass').value;
+        if(pass === ADMIN_PASSWORD) {
+            closeModal('loginModal');
+            document.getElementById('inputModal').style.display = 'flex';
+            document.getElementById('tanggal').valueAsDate = new Date();
+        } else {
+            alert('Password Salah!');
         }
+    }
 
-        // --- Fungsi Kirim Data ke Google Sheet ---
-        function submitContent(e) {
-            e.preventDefault();
-            const loader = document.getElementById('loader');
-            loader.style.display = 'block';
+    // --- FUNGSI BARU: Load Data dari Google Sheet ---
+    function loadContent() {
+        const container = document.getElementById('posts-container');
+        container.innerHTML = '<div class="loader" style="display:block">Sedang memuat berita alam...</div>';
 
-            const fileInput = document.getElementById('gambar');
-            const file = fileInput.files[0];
+        fetch(GOOGLE_SCRIPT_URL)
+        .then(response => response.json())
+        .then(data => {
+            container.innerHTML = ''; // Hapus loader
             
-            // Baca file gambar sebagai Base64
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const imgData = e.target.result.split(',')[1]; // Ambil data base64 raw
+            // Membalik urutan agar berita terbaru muncul paling atas (opsional)
+            data.reverse().forEach(post => {
+                // Gunakan gambar default jika tidak ada gambar
+                const imageSrc = post.gambar ? post.gambar : 'https://source.unsplash.com/random/400x300/?nature';
                 
-                const data = {
-                    judul: document.getElementById('judul').value,
-                    tanggal: document.getElementById('tanggal').value,
-                    isi: document.getElementById('isi').value,
-                    imgName: file ? file.name : '',
-                    imgData: file ? imgData : '',
-                    mimeType: file ? file.type : ''
-                };
+                // Template HTML untuk setiap kartu
+                const cardHTML = `
+                    <div class="card">
+                        <img src="${imageSrc}" alt="${post.judul}" loading="lazy">
+                        <div class="card-body">
+                            <span class="card-date"><i class="far fa-calendar-alt"></i> ${post.tanggal}</span>
+                            <h3 class="card-title">${post.judul}</h3>
+                            <p class="card-text">${post.isi}</p>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+            
+            if(data.length === 0) {
+                container.innerHTML = '<p style="text-align:center">Belum ada berita.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading data:', error);
+            container.innerHTML = '<p style="text-align:center; color:red">Gagal memuat data. Pastikan Script URL benar.</p>';
+        });
+    }
 
-                // Kirim dengan fetch (POST)
-                fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(data)
-                })
-                .then(response => response.text())
-                .then(result => {
-                    alert('Sukses! Data tersimpan.');
-                    loader.style.display = 'none';
-                    closeModal('inputModal');
-                    // Idealnya reload halaman atau fetch ulang data
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Gagal menyimpan. Cek console.');
-                    loader.style.display = 'none';
-                });
+    // --- Fungsi Kirim Data (Simpan) ---
+    function submitContent(e) {
+        e.preventDefault();
+        const loader = document.getElementById('loader');
+        const submitBtn = document.querySelector('.submit-btn');
+        
+        loader.style.display = 'block';
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Sedang Mengirim...';
+
+        const fileInput = document.getElementById('gambar');
+        const file = fileInput.files[0];
+        
+        const reader = new FileReader();
+        
+        // Handler saat file selesai dibaca (atau jika tidak ada file)
+        const handlePost = (imgData = '', imgName = '', mimeType = '') => {
+            const data = {
+                judul: document.getElementById('judul').value,
+                tanggal: document.getElementById('tanggal').value,
+                isi: document.getElementById('isi').value,
+                imgName: imgName,
+                imgData: imgData,
+                mimeType: mimeType
             };
 
-            if (file) {
-                reader.readAsDataURL(file);
-            } else {
-                // Handle jika tidak ada gambar (kirim data teks saja)
-                reader.onload({target: {result: ','}}); 
-            }
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(data) // Kirim data sebagai string JSON
+            })
+            .then(response => response.text())
+            .then(result => {
+                alert('Berita berhasil diterbitkan!');
+                closeModal('inputModal');
+                document.getElementById('contentForm').reset();
+                loadContent(); // Refresh tampilan otomatis
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Gagal menyimpan.');
+            })
+            .finally(() => {
+                loader.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Simpan ke Database';
+            });
+        };
+
+        if (file) {
+            reader.onload = function(e) {
+                // Ambil base64 murni (hapus prefix data:image/...)
+                const rawBase64 = e.target.result.split(',')[1];
+                handlePost(rawBase64, file.name, file.type);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            handlePost(); // Kirim tanpa gambar
         }
+    }
+</script>
 
-        // --- Fungsi Load Data (Opsional: Jika script sudah jadi) ---
-        // Anda perlu menambahkan logika GET di Google Apps Script untuk ini
-        window.addEventListener('DOMContentLoaded', () => {
-           // fetch(GOOGLE_SCRIPT_URL).then(...) -> renderPosts
-        });
 
-    </script>
+
+    
 </body>
 </html>
