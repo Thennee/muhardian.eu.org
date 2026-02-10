@@ -3,119 +3,336 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deni Muhardian CMS</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Green Eco CMS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
-        :root { --p: #2d6a4f; --s: #40916c; --bg: #f0f7f4; }
-        body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 15px; }
-        .container { max-width: 600px; margin: auto; }
-        .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .btn { padding: 10px; border-radius: 8px; border: none; cursor: pointer; background: var(--p); color: white; width: 100%; }
-        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .hidden { display: none; }
-        .badge { background: #d8f3dc; color: var(--p); padding: 4px 10px; border-radius: 20px; font-size: 12px; }
-        img { width: 100%; border-radius: 8px; height: 200px; object-fit: cover; }
+        :root {
+            --primary: #0f9b0f;
+            --dark-green: #054705;
+            --light-green: #59c959;
+            --gradient: linear-gradient(135deg, #0f9b0f, #00d2ff);
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body {
+            background: #f0f9f0;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* --- Header & Hero --- */
+        header {
+            background: var(--gradient);
+            padding: 20px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 700; letter-spacing: 1px; }
+        
+        .admin-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid white;
+            padding: 8px 15px;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        
+        .admin-btn:hover { background: white; color: var(--primary); }
+
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(to bottom, #e0f7fa, #f0f9f0);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        /* --- Content Grid --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            opacity: 0; /* Animasi masuk */
+            animation: fadeIn 0.8s forwards;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(15, 155, 15, 0.2);
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-body { padding: 20px; }
+        
+        .card-date {
+            font-size: 0.8rem;
+            color: var(--light-green);
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .card-title { font-size: 1.2rem; margin-bottom: 10px; color: var(--dark-green); }
+        .card-text { font-size: 0.9rem; color: #666; line-height: 1.6; }
+
+        /* --- Admin Modal (Glassmorphism) --- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px; right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .form-group { margin-bottom: 15px; }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            transition: 0.3s;
+            background: rgba(255,255,255,0.8);
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--light-green);
+            box-shadow: 0 0 8px rgba(15, 155, 15, 0.2);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* --- Animations & Responsive --- */
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.8rem; }
+            .posts-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+            color: var(--primary);
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header style="display:flex; justify-content:space-between; align-items:center; color: var(--p)">
-        <h2><i class="fas fa-seedling"></i> EcoCMS</h2>
-        <button onclick="login()" id="loginBtn" style="border:none; background:none; color:var(--p); cursor:pointer;">Admin Login</button>
+    <header>
+        <div class="logo"><i class="fas fa-leaf"></i> NatureCMS</div>
+        <button class="admin-btn" onclick="openLogin()">
+            <i class="fas fa-user-lock"></i> Login Admin
+        </button>
     </header>
 
-    <div id="adminPanel" class="card hidden">
-        <form id="cmsForm">
-            <input type="hidden" id="editId">
-            <input type="text" id="judul" placeholder="Judul" required>
-            <select id="kategori"><option value="Berita">Berita</option><option value="Tips">Tips</option></select>
-            <input type="date" id="tanggal" required>
-            <textarea id="konten" placeholder="Isi konten..."></textarea>
-            <input type="file" id="gambar">
-            <button type="submit" class="btn">Simpan Postingan</button>
-        </form>
+    <div class="hero">
+        <h1>Selamat Datang di Portal Hijau</h1>
+        <p>Berita terkini dengan nuansa alam yang menyegarkan.</p>
     </div>
 
-    <input type="text" id="search" placeholder="Cari judul..." onkeyup="render()">
-    <div id="loader">Memuat data...</div>
-    <div id="feed"></div>
-</div>
+    <div class="container">
+        <div class="posts-grid" id="posts-container">
+            <div class="card">
+                <img src="https://source.unsplash.com/random/400x300/?nature,forest" alt="Nature">
+                <div class="card-body">
+                    <span class="card-date">2023-10-27</span>
+                    <h3 class="card-title">Menjaga Hutan Kita</h3>
+                    <p class="card-text">Ini adalah contoh tampilan artikel. Konten asli akan dimuat dari Google Sheets setelah Anda menghubungkan script.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<script>
-    const API = "https://script.google.com/macros/s/AKfycbxFOXbOnKjFMYH1Iy7ps-bWzgUP8wWOxyPwVuiUI1u1Fk8Q6QteDFPLaIt1ymcsX33U/exec"; // GANTI DENGAN URL GAS KAMU
-    let DB = [], isAdmin = false, pass = "";
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
+            <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">Admin Login</h2>
+            <div class="form-group">
+                <input type="password" id="adminPass" placeholder="Masukkan Password Admin">
+            </div>
+            <button class="submit-btn" onclick="checkLogin()">Masuk</button>
+        </div>
+    </div>
 
-    async function load() {
-        const res = await fetch(API);
-        DB = await res.json();
-        document.getElementById('loader').classList.add('hidden');
-        render();
-    }
+    <div class="modal" id="inputModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('inputModal')">&times;</span>
+            <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">Tambah Konten</h2>
+            <form id="contentForm" onsubmit="submitContent(event)">
+                <div class="form-group">
+                    <input type="text" id="judul" placeholder="Judul Artikel" required>
+                </div>
+                <div class="form-group">
+                    <input type="date" id="tanggal" required>
+                </div>
+                <div class="form-group">
+                    <textarea id="isi" rows="4" placeholder="Isi Konten" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.8rem; color: #666;">Upload Gambar (Max 2MB)</label>
+                    <input type="file" id="gambar" accept="image/*">
+                </div>
+                <button type="submit" class="submit-btn">Simpan ke Database</button>
+                <div class="loader" id="loader"><i class="fas fa-spinner fa-spin"></i> Menyimpan...</div>
+            </form>
+        </div>
+    </div>
 
-    function render() {
-        const query = document.getElementById('search').value.toLowerCase();
-        const feed = document.getElementById('feed');
-        feed.innerHTML = '';
-        DB.filter(i => i.judul.toLowerCase().includes(query)).reverse().forEach(item => {
-            feed.innerHTML += `
-                <div class="card">
-                    ${item.img ? `<img src="${item.img}">` : ''}
-                    <span class="badge">${item.kategori}</span>
-                    <h3>${item.judul}</h3>
-                    <p>${item.konten}</p>
-                    <div class="${isAdmin ? '' : 'hidden'}">
-                        <button onclick="deleteItem('${item.id}', '${item.fileId}')" style="background:red; color:white; border:none; padding:5px; border-radius:4px;">Hapus</button>
-                    </div>
-                </div>`;
+    <script>
+        // --- KONFIGURASI PENTING ---
+        // Ganti URL ini dengan URL Web App dari Google Apps Script Anda nanti
+        const GOOGLE_SCRIPT_URL = 'MASUKKAN_URL_GOOGLE_APPS_SCRIPT_DISINI'; 
+        const ADMIN_PASSWORD = 'admin123'; // Password sederhana (Client side insecure)
+
+        // --- Fungsi UI ---
+        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+        
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function checkLogin() {
+            const pass = document.getElementById('adminPass').value;
+            if(pass === ADMIN_PASSWORD) {
+                closeModal('loginModal');
+                document.getElementById('inputModal').style.display = 'flex';
+                // Set tanggal hari ini otomatis
+                document.getElementById('tanggal').valueAsDate = new Date();
+            } else {
+                alert('Password Salah!');
+            }
+        }
+
+        // --- Fungsi Kirim Data ke Google Sheet ---
+        function submitContent(e) {
+            e.preventDefault();
+            const loader = document.getElementById('loader');
+            loader.style.display = 'block';
+
+            const fileInput = document.getElementById('gambar');
+            const file = fileInput.files[0];
+            
+            // Baca file gambar sebagai Base64
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgData = e.target.result.split(',')[1]; // Ambil data base64 raw
+                
+                const data = {
+                    judul: document.getElementById('judul').value,
+                    tanggal: document.getElementById('tanggal').value,
+                    isi: document.getElementById('isi').value,
+                    imgName: file ? file.name : '',
+                    imgData: file ? imgData : '',
+                    mimeType: file ? file.type : ''
+                };
+
+                // Kirim dengan fetch (POST)
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.text())
+                .then(result => {
+                    alert('Sukses! Data tersimpan.');
+                    loader.style.display = 'none';
+                    closeModal('inputModal');
+                    // Idealnya reload halaman atau fetch ulang data
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Gagal menyimpan. Cek console.');
+                    loader.style.display = 'none';
+                });
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                // Handle jika tidak ada gambar (kirim data teks saja)
+                reader.onload({target: {result: ','}}); 
+            }
+        }
+
+        // --- Fungsi Load Data (Opsional: Jika script sudah jadi) ---
+        // Anda perlu menambahkan logika GET di Google Apps Script untuk ini
+        window.addEventListener('DOMContentLoaded', () => {
+           // fetch(GOOGLE_SCRIPT_URL).then(...) -> renderPosts
         });
-    }
 
-    function login() {
-        pass = prompt("Masukkan Password:");
-        if(pass === "321321") {
-            isAdmin = true;
-            document.getElementById('adminPanel').classList.remove('hidden');
-            render();
-        }
-    }
-
-    document.getElementById('cmsForm').onsubmit = async (e) => {
-        e.preventDefault();
-        const file = document.getElementById('gambar').files[0];
-        let fileData = null;
-        if(file) {
-            const base64 = await toBase64(file);
-            fileData = { data: base64.split(',')[1], mimeType: file.type, name: file.name };
-        }
-
-        const payload = {
-            password: pass,
-            judul: document.getElementById('judul').value,
-            kategori: document.getElementById('kategori').value,
-            tanggal: document.getElementById('tanggal').value,
-            konten: document.getElementById('konten').value,
-            fileData: fileData
-        };
-
-        await fetch(API, { method: 'POST', body: JSON.stringify(payload) });
-        location.reload();
-    };
-
-    const toBase64 = file => new Promise((res, rej) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => res(reader.result);
-    });
-
-    async function deleteItem(id, fileId) {
-        if(confirm('Hapus?')) {
-            await fetch(API, { method: 'POST', body: JSON.stringify({action: 'delete', id, fileId, password: pass}) });
-            location.reload();
-        }
-    }
-
-    load();
-</script>
+    </script>
 </body>
 </html>
