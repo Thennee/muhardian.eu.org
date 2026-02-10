@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root { --p: #1b4332; --s: #2d6a4f; --l: #d8f3dc; --bg: #f8faf9; }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 15px; color: #333; }
+    .container { max-width: 600px; margin: auto; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .search-box { display: flex; gap: 8px; margin-bottom: 20px; }
+    .search-box input, .search-box select { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+    .btn { padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: white; background: var(--s); transition: 0.2s; }
+    .btn:active { transform: scale(0.95); }
+    .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; }
+    .card img { width: 100%; border-radius: 8px; height: 200px; object-fit: cover; margin-bottom: 12px; }
+    .badge { background: var(--l); color: var(--p); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+    form input, form select, form textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+    .hidden { display: none; }
+    .admin-bar { border-top: 1px solid #eee; margin-top: 10px; padding-top: 10px; display: none; }
+    #loader { text-align: center; padding: 20px; color: var(--s); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h2 style="color: var(--p);"><i class="fas fa-leaf"></i> EcoCMS</h2>
+    <button id="loginBtn" class="btn" onclick="handleLogin()">Admin</button>
+  </header>
+
+  <div id="adminPanel" class="card hidden" style="border: 2px solid var(--s)">
+    <h3 id="formTitle">Tambah Baru</h3>
+    <form id="cmsForm">
+      <input type="hidden" id="editId">
+      <input type="hidden" id="editFileId">
+      <input type="text" id="judul" placeholder="Judul Postingan" required>
+      <select id="kategori" required>
+        <option value="">-- Pilih Kategori --</option>
+        <option value="Berita">Berita</option>
+        <option value="Event">Event</option>
+        <option value="Tips">Tips</option>
+      </select>
+      <input type="date" id="tanggal" required>
+      <textarea id="konten" rows="3" placeholder="Tulis sesuatu..." required></textarea>
+      <input type="file" id="gambar" accept="image/*">
+      <button type="submit" class="btn" style="width: 100%">Simpan Data</button>
+      <button type="button" onclick="resetForm()" class="btn" style="width: 100%; margin-top:5px; background: #999">Batal</button>
+    </form>
+  </div>
+
+  <div class="search-box">
+    <input type="text" id="search" placeholder="Cari..." onkeyup="runFilter()">
+    <select id="catFilter" onchange="runFilter()" style="max-width: 120px;">
+      <option value="All">Semua</option>
+      <option value="Berita">Berita</option>
+      <option value="Event">Event</option>
+      <option value="Tips">Tips</option>
+    </select>
+  </div>
+
+  <div id="loader"><i class="fas fa-sync fa-spin"></i> Memuat...</div>
+  <div id="feed"></div>
+</div>
+
+<script>
+  let isAdmin = false;
+  let DB = [];
+
+  function handleLogin() {
+    if(!isAdmin) {
+      let p = prompt("Password:");
+      google.script.run.withSuccessHandler(res => {
+        if(res) {
+          isAdmin = true;
+          document.getElementById('adminPanel').classList.remove('hidden');
+          document.getElementById('loginBtn').innerText = "Logout";
+          render(DB);
+        } else { alert("Salah!"); }
+      }).checkPass(p);
+    } else {
+      isAdmin = false;
+      document.getElementById('adminPanel').classList.add('hidden');
+      document.getElementById('loginBtn').innerText = "Admin";
+      render(DB);
+    }
+  }
+
+  function load() {
+    google.script.run.withSuccessHandler(data => {
+      DB = data.reverse();
+      render(DB);
+    }).getData();
+  }
+
+  function runFilter() {
+    const q = document.getElementById('search').value.toLowerCase();
+    const c = document.getElementById('catFilter').value;
+    const filtered = DB.filter(i => (i.judul.toLowerCase().includes(q)) && (c === 'All' || i.kategori === c));
+    render(filtered);
+  }
+
+  function render(data) {
+    document.getElementById('loader').classList.add('hidden');
+    const feed = document.getElementById('feed');
+    feed.innerHTML = '';
+    data.forEach(item => {
+      feed.innerHTML += `
+        <div class="card">
+          ${item.img ? `<img src="${item.img}">` : ''}
+          <span class="badge">${item.kategori}</span>
+          <h3 style="margin: 8px 0">${item.judul}</h3>
+          <p style="font-size: 14px; color: #555">${item.konten}</p>
+          <div class="admin-bar" style="display: ${isAdmin ? 'block' : 'none'}">
+            <button class="btn" style="background:#f39c12" onclick="editNow('${item.id}','${item.judul}','${item.kategori}','${item.tanggal}','${item.konten.replace(/'/g,"\\'")}','${item.fileId}')">Edit</button>
+            <button class="btn" style="background:#e74c3c" onclick="delNow('${item.id}','${item.fileId}')">Hapus</button>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  document.getElementById('cmsForm').onsubmit = function(e) {
+    e.preventDefault();
+    document.getElementById('loader').classList.remove('hidden');
+    const f = document.getElementById('gambar').files[0];
+    const obj = {
+      id: document.getElementById('editId').value,
+      judul: document.getElementById('judul').value,
+      kategori: document.getElementById('kategori').value,
+      tanggal: document.getElementById('tanggal').value,
+      konten: document.getElementById('konten').value,
+      fileId: document.getElementById('editFileId').value
+    };
+
+    if (f) {
+      const r = new FileReader();
+      r.onload = function(e) {
+        const fileData = { data: e.target.result.split(',')[1], mimeType: f.type, name: f.name };
+        google.script.run.withSuccessHandler(() => { resetForm(); load(); }).saveData(obj, fileData);
+      };
+      r.readAsDataURL(f);
+    } else {
+      google.script.run.withSuccessHandler(() => { resetForm(); load(); }).saveData(obj, null);
+    }
+  };
+
+  function delNow(id, fid) { if(confirm('Hapus?')) google.script.run.withSuccessHandler(load).deleteData(id, fid); }
+
+  function editNow(id, j, k, t, isi, fid) {
+    document.getElementById('editId').value = id;
+    document.getElementById('editFileId').value = fid;
+    document.getElementById('judul').value = j;
+    document.getElementById('kategori').value = k;
+    document.getElementById('tanggal').value = new Date(t).toISOString().split('T')[0];
+    document.getElementById('konten').value = isi;
+    document.getElementById('formTitle').innerText = "Edit Postingan";
+    window.scrollTo(0,0);
+  }
+
+  function resetForm() { document.getElementById('cmsForm').reset(); document.getElementById('editId').value = ''; }
+
+  window.onload = load;
+</script>
+</body>
+</html>
