@@ -292,14 +292,17 @@ function loadContent() {
     .then(response => response.json())
     .then(data => {
         container.innerHTML = ''; 
-        data.reverse().forEach(post => {
+        // Simpan data asli (tanpa reverse) agar index tetap konsisten
+        const originalData = [...data];
+        
+        data.reverse().forEach((post) => {
+            // Cari index asli dari data sebelum di reverse
+            const originalIndex = originalData.indexOf(post);
             const imageSrc = post.gambar ? post.gambar : 'https://via.placeholder.com/400x200?text=No+Image';
-            
-            // LOGIKA: Memotong isi konten hanya menjadi 1 paragraf pendek (sekitar 100 karakter)
             const ringkasan = post.isi.length > 120 ? post.isi.substring(0, 120) + "..." : post.isi;
 
-            // Mengirim data ke halaman detail menggunakan URLSearchParams
-            const detailUrl = `detail.html?judul=${encodeURIComponent(post.judul)}&tgl=${encodeURIComponent(post.tanggal)}&isi=${encodeURIComponent(post.isi)}&img=${encodeURIComponent(imageSrc)}`;
+            // Kirim ID (index asli) ke detail.html
+            const detailUrl = `detail.html?id=${originalIndex}`;
 
             const cardHTML = `
                 <div class="card">
