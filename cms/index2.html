@@ -1,1 +1,323 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muhardian CMS - Rich Editor</title>
+    <link rel="icon" type="image/x-icon" href="https://muhardian.eu.org/iconWA.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #0f9b0f;
+            --dark-green: #054705;
+            --light-green: #59c959;
+            --gradient: linear-gradient(135deg, #0f9b0f, #00d2ff);
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { background: #f0f9f0; color: #333; overflow-x: hidden; }
+
+        header {
+            background: var(--gradient);
+            padding: 20px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 700; letter-spacing: 1px; }
+        .admin-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid white;
+            padding: 8px 15px;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        .admin-btn:hover { background: white; color: var(--primary); }
+
+        .hero { text-align: center; padding: 60px 20px; background: linear-gradient(to bottom, #e0f7fa, #f0f9f0); }
+        .hero h1 {
+            font-size: 2.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .posts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+        .card:hover { transform: translateY(-10px); }
+        .card img { width: 100%; height: 200px; object-fit: cover; }
+        .card-body { padding: 20px; }
+        .card-title { font-size: 1.2rem; margin-bottom: 10px; color: var(--dark-green); }
+
+        /* --- STYLES UNTUK EDITOR --- */
+        .editor-container {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+        }
+        .toolbar {
+            background: #f1f1f1;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .toolbar button, .toolbar select {
+            padding: 5px 10px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        .toolbar button:hover { background: #e0e0e0; }
+        
+        #editor {
+            min-height: 200px;
+            padding: 15px;
+            outline: none;
+            overflow-y: auto;
+            max-height: 300px;
+            text-align: left;
+        }
+
+        /* --- Modal --- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: var(--glass-bg);
+            padding: 25px;
+            border-radius: 20px;
+            width: 95%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; }
+        .form-group { margin-bottom: 15px; }
+        input[type="text"], input[type="date"] {
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px;
+        }
+        .submit-btn {
+            width: 100%; padding: 12px; background: var(--gradient); color: white;
+            border: none; border-radius: 10px; font-weight: 600; cursor: pointer;
+        }
+        .loader { display: none; text-align: center; color: var(--primary); margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo"><i class="fas fa-leaf"></i> Muhardian News</div>
+        <button class="admin-btn" onclick="openLogin()">
+            <i class="fas fa-user-lock"></i> Login Admin
+        </button>
+    </header>
+
+    <div class="hero">
+        <h1>Selamat Datang di Muhardian CMS</h1>
+        <p>Mari kira HIJAUKAN dunia.</p>
+    </div>
+
+    <div class="container">
+        <div class="posts-grid" id="posts-container">
+            </div>
+    </div>
+
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
+            <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">Admin Login</h2>
+            <div class="form-group">
+                <input type="password" id="adminPass" placeholder="Masukkan Password Admin">
+            </div>
+            <button class="submit-btn" onclick="checkLogin()">Masuk</button>
+        </div>
+    </div>
+
+    <div class="modal" id="inputModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('inputModal')">&times;</span>
+            <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">Tambah Konten</h2>
+            <form id="contentForm" onsubmit="submitContent(event)">
+                <div class="form-group">
+                    <input type="text" id="judul" placeholder="Judul Artikel" required>
+                </div>
+                <div class="form-group">
+                    <input type="date" id="tanggal" required>
+                </div>
+                
+                <div class="form-group">
+                    <label style="font-size: 0.9rem; font-weight: 600;">Isi Konten:</label>
+                    <div class="editor-container">
+                        <div class="toolbar">
+                            <button type="button" onclick="formatDoc('bold')" title="Tebal"><i class="fas fa-bold"></i></button>
+                            <button type="button" onclick="formatDoc('italic')" title="Miring"><i class="fas fa-italic"></i></button>
+                            <button type="button" onclick="formatDoc('underline')" title="Garis Bawah"><i class="fas fa-underline"></i></button>
+                            <select onchange="formatDoc('formatBlock', this.value); this.selectedIndex=0;">
+                                <option value="" selected disabled>Ukuran</option>
+                                <option value="h1">Judul Besar</option>
+                                <option value="h3">Judul Kecil</option>
+                                <option value="p">Paragraf</option>
+                            </select>
+                            <button type="button" onclick="formatDoc('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
+                        </div>
+                        <div id="editor" contenteditable="true"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label style="font-size: 0.8rem; color: #666;">Upload Gambar</label>
+                    <input type="file" id="gambar" accept="image/*">
+                </div>
+                <button type="submit" class="submit-btn">Simpan ke Database</button>
+                <div class="loader" id="loader"><i class="fas fa-spinner fa-spin"></i> Menyimpan...</div>
+            </form>
+        </div>
+    </div>
+
+<script>
+    const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE'; 
+    const ADMIN_PASSWORD = 'denie'; 
+
+    window.addEventListener('DOMContentLoaded', loadContent);
+
+    function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function checkLogin() {
+        if(document.getElementById('adminPass').value === ADMIN_PASSWORD) {
+            closeModal('loginModal');
+            document.getElementById('inputModal').style.display = 'flex';
+            document.getElementById('tanggal').valueAsDate = new Date();
+        } else { alert('Password Salah!'); }
+    }
+
+    // FUNGSI RICH TEXT EDITOR
+    function formatDoc(cmd, value = null) {
+        if (value) {
+            document.execCommand(cmd, false, value);
+        } else {
+            document.execCommand(cmd, false, null);
+        }
+    }
+
+    function loadContent() {
+        const container = document.getElementById('posts-container');
+        container.innerHTML = '<p>Memuat konten...</p>';
+
+        fetch(GOOGLE_SCRIPT_URL)
+        .then(res => res.json())
+        .then(data => {
+            container.innerHTML = '';
+            data.reverse().forEach((post) => {
+                const imageSrc = post.gambar || 'https://via.placeholder.com/400x200';
+                // Kita tampilkan teks mentah (strip HTML) untuk ringkasan di halaman depan
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = post.isi;
+                const textOnly = tempDiv.textContent || tempDiv.innerText || "";
+                const ringkasan = textOnly.substring(0, 100) + "...";
+
+                container.innerHTML += `
+                    <div class="card">
+                        <img src="${imageSrc}">
+                        <div class="card-body">
+                            <span style="font-size:0.7rem;">${post.tanggal}</span>
+                            <h3 class="card-title">${post.judul}</h3>
+                            <p class="card-text">${ringkasan}</p>
+                            <button onclick="alert('Buka detail untuk melihat format lengkap')" style="border:none; background:none; color:var(--primary); cursor:pointer; font-weight:600;">Baca Selengkapnya</button>
+                        </div>
+                    </div>`;
+            });
+        });
+    }
+
+    function submitContent(e) {
+        e.preventDefault();
+        const loader = document.getElementById('loader');
+        const submitBtn = document.querySelector('.submit-btn');
+        const editorContent = document.getElementById('editor').innerHTML; // AMBIL HTML DARI EDITOR
+
+        if (editorContent.trim() === "") {
+            alert("Isi konten tidak boleh kosong!");
+            return;
+        }
+
+        loader.style.display = 'block';
+        submitBtn.disabled = true;
+
+        const fileInput = document.getElementById('gambar');
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        const handlePost = (imgData = '', imgName = '', mimeType = '') => {
+            const data = {
+                judul: document.getElementById('judul').value,
+                tanggal: document.getElementById('tanggal').value,
+                isi: editorContent, // DATA HTML TERKIRIM KE GOOGLE SHEETS
+                imgName: imgName,
+                imgData: imgData,
+                mimeType: mimeType
+            };
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            })
+            .then(() => {
+                alert('Berhasil!');
+                closeModal('inputModal');
+                document.getElementById('contentForm').reset();
+                document.getElementById('editor').innerHTML = '';
+                loadContent();
+            })
+            .finally(() => {
+                loader.style.display = 'none';
+                submitBtn.disabled = false;
+            });
+        };
+
+        if (file) {
+            reader.onload = (e) => handlePost(e.target.result.split(',')[1], file.name, file.type);
+            reader.readAsDataURL(file);
+        } else {
+            handlePost();
+        }
+    }
+</script>
+</body>
+</html>
