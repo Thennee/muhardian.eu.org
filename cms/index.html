@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muhardian CMS</title>
+    <title>Muhardian CMS - Rich Editor</title>
     <link rel="icon" type="image/x-icon" href="https://muhardian.eu.org/iconWA.ico">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -20,13 +21,8 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         
-        body {
-            background: #f0f9f0;
-            color: #333;
-            overflow-x: hidden;
-        }
+        body { background: #f0f9f0; color: #333; overflow-x: hidden; }
 
-        /* --- Header & Hero --- */
         header {
             background: var(--gradient);
             padding: 20px;
@@ -41,7 +37,6 @@
         }
 
         .logo { font-size: 1.5rem; font-weight: 700; letter-spacing: 1px; }
-        
         .admin-btn {
             background: rgba(255,255,255,0.2);
             border: 1px solid white;
@@ -52,15 +47,9 @@
             transition: 0.3s;
             backdrop-filter: blur(5px);
         }
-        
         .admin-btn:hover { background: white; color: var(--primary); }
 
-        .hero {
-            text-align: center;
-            padding: 60px 20px;
-            background: linear-gradient(to bottom, #e0f7fa, #f0f9f0);
-        }
-
+        .hero { text-align: center; padding: 60px 20px; background: linear-gradient(to bottom, #e0f7fa, #f0f9f0); }
         .hero h1 {
             font-size: 2.5rem;
             background: var(--gradient);
@@ -69,54 +58,56 @@
             margin-bottom: 10px;
         }
 
-        /* --- Content Grid --- */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .posts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .posts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
 
         .card {
             background: white;
             border-radius: 15px;
             overflow: hidden;
             box-shadow: var(--shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            opacity: 0; /* Animasi masuk */
-            animation: fadeIn 0.8s forwards;
+            transition: transform 0.3s ease;
         }
-
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(15, 155, 15, 0.2);
-        }
-
-        .card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-
+        .card:hover { transform: translateY(-10px); }
+        .card img { width: 100%; height: 200px; object-fit: cover; }
         .card-body { padding: 20px; }
-        
-        .card-date {
+        .card-title { font-size: 1.2rem; margin-bottom: 10px; color: var(--dark-green); }
+
+        /* --- STYLES UNTUK EDITOR --- */
+        .editor-container {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+        }
+        .toolbar {
+            background: #f1f1f1;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .toolbar button, .toolbar select {
+            padding: 5px 10px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 4px;
             font-size: 0.8rem;
-            color: var(--light-green);
-            font-weight: 600;
-            margin-bottom: 5px;
-            display: block;
+        }
+        .toolbar button:hover { background: #e0e0e0; }
+        
+        #editor {
+            min-height: 200px;
+            padding: 15px;
+            outline: none;
+            overflow-y: auto;
+            max-height: 300px;
+            text-align: left;
         }
 
-        .card-title { font-size: 1.2rem; margin-bottom: 10px; color: var(--dark-green); }
-        .card-text { font-size: 0.9rem; color: #666; line-height: 1.6; }
-
-        /* --- Admin Modal (Glassmorphism) --- */
+        /* --- Modal --- */
         .modal {
             display: none;
             position: fixed;
@@ -127,97 +118,45 @@
             align-items: center;
             backdrop-filter: blur(5px);
         }
-
         .modal-content {
             background: var(--glass-bg);
-            padding: 30px;
+            padding: 25px;
             border-radius: 20px;
-            width: 90%;
-            max-width: 500px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            width: 95%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
             position: relative;
         }
-
-        .close-btn {
-            position: absolute;
-            top: 15px; right: 20px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #333;
-        }
-
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; }
         .form-group { margin-bottom: 15px; }
-        
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            outline: none;
-            transition: 0.3s;
-            background: rgba(255,255,255,0.8);
+        input[type="text"], input[type="date"] {
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px;
         }
-
-        input:focus, textarea:focus {
-            border-color: var(--light-green);
-            box-shadow: 0 0 8px rgba(15, 155, 15, 0.2);
-        }
-
         .submit-btn {
-            width: 100%;
-            padding: 12px;
-            background: var(--gradient);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
+            width: 100%; padding: 12px; background: var(--gradient); color: white;
+            border: none; border-radius: 10px; font-weight: 600; cursor: pointer;
         }
-
-        /* --- Animations & Responsive --- */
-        @keyframes fadeIn { to { opacity: 1; } }
-
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 1.8rem; }
-            .posts-grid { grid-template-columns: 1fr; }
-        }
-
-        /* Loader */
-        .loader {
-            display: none;
-            text-align: center;
-            margin-top: 10px;
-            color: var(--primary);
-        }
+        .loader { display: none; text-align: center; color: var(--primary); margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo"><i class="fas fa-leaf"></i> NatureCMS</div>
+        <div class="logo"><i class="fas fa-leaf"></i> Muhardian News</div>
         <button class="admin-btn" onclick="openLogin()">
             <i class="fas fa-user-lock"></i> Login Admin
         </button>
     </header>
 
     <div class="hero">
-        <h1>Selamat Datang di Muhardian CMS</h1>
-        <p>Berita terkini dengan nuansa alam yang menyegarkan.</p>
+        <h1>Selamat Datang di Muhardian News</h1>
+        <p>Mari kira HIJAUKAN dunia.</p>
     </div>
 
     <div class="container">
         <div class="posts-grid" id="posts-container">
-            <div class="card">
-                <img src="https://source.unsplash.com/random/400x300/?nature,forest" alt="Nature">
-                <div class="card-body">
-                    <span class="card-date">2023-10-27</span>
-                    <h3 class="card-title">Menjaga Hutan Kita</h3>
-                    <p class="card-text">Ini adalah contoh tampilan artikel. Konten asli akan dimuat dari Google Sheets setelah Anda menghubungkan script.</p>
-                </div>
             </div>
-        </div>
     </div>
 
     <div class="modal" id="loginModal">
@@ -242,11 +181,28 @@
                 <div class="form-group">
                     <input type="date" id="tanggal" required>
                 </div>
+                
                 <div class="form-group">
-                    <textarea id="isi" rows="4" placeholder="Isi Konten" required></textarea>
+                    <label style="font-size: 0.9rem; font-weight: 600;">Isi Konten:</label>
+                    <div class="editor-container">
+                        <div class="toolbar">
+                            <button type="button" onclick="formatDoc('bold')" title="Tebal"><i class="fas fa-bold"></i></button>
+                            <button type="button" onclick="formatDoc('italic')" title="Miring"><i class="fas fa-italic"></i></button>
+                            <button type="button" onclick="formatDoc('underline')" title="Garis Bawah"><i class="fas fa-underline"></i></button>
+                            <select onchange="formatDoc('formatBlock', this.value); this.selectedIndex=0;">
+                                <option value="" selected disabled>Ukuran</option>
+                                <option value="h1">Judul Besar</option>
+                                <option value="h3">Judul Kecil</option>
+                                <option value="p">Paragraf</option>
+                            </select>
+                            <button type="button" onclick="formatDoc('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
+                        </div>
+                        <div id="editor" contenteditable="true"></div>
+                    </div>
                 </div>
+
                 <div class="form-group">
-                    <label style="font-size: 0.8rem; color: #666;">Upload Gambar (Max 2MB)</label>
+                    <label style="font-size: 0.8rem; color: #666;">Upload Gambar</label>
                     <input type="file" id="gambar" accept="image/*">
                 </div>
                 <button type="submit" class="submit-btn">Simpan ke Database</button>
@@ -256,93 +212,84 @@
     </div>
 
 <script>
-    // --- KONFIGURASI ---
-    // Pastikan URL ini adalah URL Web App terbaru setelah Deploy Ulang
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4Q5Ca2w8jwyXRnE1lWwMKo7C8q9ILCMNsmvM7rCcmfpnDY0jhCnvsr7Wmj5yLXy4k/exec'; 
     const ADMIN_PASSWORD = 'denie'; 
 
-    // --- Saat Halaman Dibuka, Langsung Load Data ---
-    window.addEventListener('DOMContentLoaded', () => {
-        loadContent();
-    });
+    window.addEventListener('DOMContentLoaded', loadContent);
 
-    // --- Fungsi UI ---
     function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
     function checkLogin() {
-        const pass = document.getElementById('adminPass').value;
-        if(pass === ADMIN_PASSWORD) {
+        if(document.getElementById('adminPass').value === ADMIN_PASSWORD) {
             closeModal('loginModal');
             document.getElementById('inputModal').style.display = 'flex';
             document.getElementById('tanggal').valueAsDate = new Date();
+        } else { alert('Password Salah!'); }
+    }
+
+    // FUNGSI RICH TEXT EDITOR
+    function formatDoc(cmd, value = null) {
+        if (value) {
+            document.execCommand(cmd, false, value);
         } else {
-            alert('Password Salah!');
+            document.execCommand(cmd, false, null);
         }
     }
 
-    // --- FUNGSI BARU: Load Data dari Google Sheet ---
-  // ... (Bagian atas kode tetap sama) ...
+    function loadContent() {
+        const container = document.getElementById('posts-container');
+        container.innerHTML = '<p>Memuat konten...</p>';
 
-function loadContent() {
-    const container = document.getElementById('posts-container');
-    container.innerHTML = '<div class="loader" style="display:block">Memuat konten...</div>';
+        fetch(GOOGLE_SCRIPT_URL)
+        .then(res => res.json())
+        .then(data => {
+            container.innerHTML = '';
+            data.reverse().forEach((post) => {
+                const imageSrc = post.gambar || 'https://via.placeholder.com/400x200';
+                // Kita tampilkan teks mentah (strip HTML) untuk ringkasan di halaman depan
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = post.isi;
+                const textOnly = tempDiv.textContent || tempDiv.innerText || "";
+                const ringkasan = textOnly.substring(0, 100) + "...";
 
-    fetch(GOOGLE_SCRIPT_URL)
-    .then(response => response.json())
-    .then(data => {
-        container.innerHTML = ''; 
-        // Simpan data asli (tanpa reverse) agar index tetap konsisten
-        const originalData = [...data];
-        
-        data.reverse().forEach((post) => {
-            // Cari index asli dari data sebelum di reverse
-            const originalIndex = originalData.indexOf(post);
-            const imageSrc = post.gambar ? post.gambar : 'https://via.placeholder.com/400x200?text=No+Image';
-            const ringkasan = post.isi.length > 120 ? post.isi.substring(0, 120) + "..." : post.isi;
-
-            // Kirim ID (index asli) ke detail.html
-            const detailUrl = `detail.html?id=${originalIndex}`;
-
-            const cardHTML = `
-                <div class="card">
-                    <img src="${imageSrc}" alt="${post.judul}">
-                    <div class="card-body">
-                        <span class="card-date"><i class="far fa-calendar-alt"></i> ${post.tanggal}</span>
-                        <h3 class="card-title">${post.judul}</h3>
-                        <p class="card-text">${ringkasan}</p>
-                        <a href="${detailUrl}" style="color: var(--primary); font-weight: 600; text-decoration: none; display: inline-block; margin-top: 10px;">
-                            Baca Selanjutnya <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-            `;
-            container.innerHTML += cardHTML;
+                container.innerHTML += `
+                    <div class="card">
+                        <img src="${imageSrc}">
+                        <div class="card-body">
+                            <span style="font-size:0.7rem;">${post.tanggal}</span>
+                            <h3 class="card-title">${post.judul}</h3>
+                            <p class="card-text">${ringkasan}</p>
+                            <button onclick="alert('Buka detail untuk melihat format lengkap')" style="border:none; background:none; color:var(--primary); cursor:pointer; font-weight:600;">Baca Selengkapnya</button>
+                        </div>
+                    </div>`;
+            });
         });
-    });
-}
+    }
 
-    // --- Fungsi Kirim Data (Simpan) ---
     function submitContent(e) {
         e.preventDefault();
         const loader = document.getElementById('loader');
         const submitBtn = document.querySelector('.submit-btn');
-        
+        const editorContent = document.getElementById('editor').innerHTML; // AMBIL HTML DARI EDITOR
+
+        if (editorContent.trim() === "") {
+            alert("Isi konten tidak boleh kosong!");
+            return;
+        }
+
         loader.style.display = 'block';
         submitBtn.disabled = true;
-        submitBtn.innerText = 'Sedang Mengirim...';
 
         const fileInput = document.getElementById('gambar');
         const file = fileInput.files[0];
-        
         const reader = new FileReader();
-        
-        // Handler saat file selesai dibaca (atau jika tidak ada file)
+
         const handlePost = (imgData = '', imgName = '', mimeType = '') => {
             const data = {
                 judul: document.getElementById('judul').value,
                 tanggal: document.getElementById('tanggal').value,
-                isi: document.getElementById('isi').value,
+                isi: editorContent, // DATA HTML TERKIRIM KE GOOGLE SHEETS
                 imgName: imgName,
                 imgData: imgData,
                 mimeType: mimeType
@@ -350,41 +297,28 @@ function loadContent() {
 
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                body: JSON.stringify(data) // Kirim data sebagai string JSON
+                body: JSON.stringify(data)
             })
-            .then(response => response.text())
-            .then(result => {
-                alert('Berita berhasil diterbitkan!');
+            .then(() => {
+                alert('Berhasil!');
                 closeModal('inputModal');
                 document.getElementById('contentForm').reset();
-                loadContent(); // Refresh tampilan otomatis
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Gagal menyimpan.');
+                document.getElementById('editor').innerHTML = '';
+                loadContent();
             })
             .finally(() => {
                 loader.style.display = 'none';
                 submitBtn.disabled = false;
-                submitBtn.innerText = 'Simpan ke Database';
             });
         };
 
         if (file) {
-            reader.onload = function(e) {
-                // Ambil base64 murni (hapus prefix data:image/...)
-                const rawBase64 = e.target.result.split(',')[1];
-                handlePost(rawBase64, file.name, file.type);
-            };
+            reader.onload = (e) => handlePost(e.target.result.split(',')[1], file.name, file.type);
             reader.readAsDataURL(file);
         } else {
-            handlePost(); // Kirim tanpa gambar
+            handlePost();
         }
     }
 </script>
-
-
-
-    
 </body>
 </html>
