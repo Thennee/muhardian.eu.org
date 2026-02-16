@@ -1,1 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner QR</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { background: #0a192f; color: white; text-align: center; font-family: sans-serif; }
+        #reader { width: 100%; max-width: 500px; margin: auto; border-radius: 20px; overflow: hidden; }
+        .btn-back { margin-top: 20px; padding: 10px 20px; background: #3a7bd5; border: none; color: white; border-radius: 5px; }
+    </style>
+</head>
+<body>
 
+    <h2>Scanner QR Barang</h2>
+    <div id="reader"></div>
+    <button class="btn-back" onclick="window.location.href='index.html'">Kembali</button>
+
+<script>
+    const scriptURL = 'URL_WEB_APP_ANDA_DISINI'; // Harus sama dengan di index.html
+
+    function onScanSuccess(decodedText, decodedResult) {
+        // Hentikan scan agar tidak dobel input
+        html5QrcodeScanner.clear();
+        
+        Swal.fire({ title: 'Data Terdeteksi!', text: 'Hasil: ' + decodedText, icon: 'info', showCancelButton: true, confirmButtonText: 'Kirim ke Sheet' })
+        .then((result) => {
+            if (result.isConfirmed) {
+                // Kirim data scan ke sheet secara otomatis (Default ke BM & Satuan Pcs)
+                const data = {
+                    tanggal: new Date().toISOString().split('T')[0],
+                    namaBarang: "QR Scan Result",
+                    qty: 1,
+                    satuan: "Pcs",
+                    kode: "BM",
+                    scanResult: decodedText
+                };
+
+                fetch(scriptURL, { method: 'POST', body: JSON.stringify(data) })
+                .then(() => {
+                    Swal.fire('Berhasil!', 'Data otomatis terinput', 'success')
+                    .then(() => window.location.href = 'index.html');
+                });
+            } else {
+                location.reload(); // Scan ulang jika batal
+            }
+        });
+    }
+
+    let html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+    html5QrcodeScanner.render(onScanSuccess);
+</script>
+</body>
+</html>
