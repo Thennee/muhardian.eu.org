@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Input Data Barang</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      width: 90%;
+      max-width: 500px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #e0f7fa;
+      text-shadow: 2px 2px 5px #000;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+    }
+
+    input, select {
+      background: rgba(255,255,255,0.9);
+      color: #000;
+    }
+
+    button {
+      background: linear-gradient(90deg, #2196f3, #21cbf3);
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      margin-top: 15px;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    .scan-btn {
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Form Input Barang</h1>
+    <form id="dataForm">
+      <label for="tanggal">Tanggal</label>
+      <input type="date" id="tanggal" name="tanggal" required>
+
+      <label for="namaBarang">Nama Barang</label>
+      <input type="text" id="namaBarang" name="namaBarang" required>
+
+      <label for="qty">Jumlah Qty</label>
+      <input type="number" id="qty" name="qty" required>
+
+      <label for="satuan">Satuan</label>
+      <select id="satuan" name="satuan" required>
+        <option value="Kg">Kg</option>
+        <option value="Liter">Liter</option>
+        <option value="Pcs">Pcs</option>
+        <option value="Box/Peti">Box/Peti</option>
+      </select>
+
+      <button type="submit">Simpan ke Google Sheet</button>
+    </form>
+
+    <button class="scan-btn" onclick="window.location.href='scan.html'">Scan QR Code</button>
+  </div>
+
+  <script>
+    const scriptURL = "PASTE_WEB_APP_URL_HERE"; // URL dari Google Apps Script Web App
+    const form = document.getElementById("dataForm");
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      fetch(scriptURL, { method: "POST", body: new FormData(form)})
+        .then(response => alert("Data berhasil disimpan ke Google Sheet!"))
+        .catch(error => alert("Terjadi kesalahan: " + error.message));
+      form.reset();
+    });
+  </script>
+</body>
+</html>
