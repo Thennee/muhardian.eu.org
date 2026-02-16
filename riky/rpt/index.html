@@ -1,1 +1,132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Dark Blue Frame</title>
+    <style>
+        /* Mengatur dasar halaman */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #020617 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Container Utama */
+        .main-container {
+            width: 100%;
+            max-width: 1000px;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* Logo dengan efek glow */
+        .logo-wrapper {
+            margin-bottom: 30px;
+        }
+
+        .logo-wrapper img {
+            width: 120px;
+            height: auto;
+            filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.6));
+            transition: transform 0.3s ease;
+        }
+
+        .logo-wrapper img:hover {
+            transform: scale(1.1);
+        }
+
+        /* Frame Spreadsheet / Konten */
+        .frame-container {
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 10px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        iframe {
+            width: 100%;
+            height: 600px; /* Standar untuk PC */
+            border: none;
+            border-radius: 12px;
+            background: white;
+        }
+
+        /* Tombol Home yang Eye-Catching */
+        .btn-home {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(45deg, #38bdf8, #2563eb);
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-home:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(56, 189, 248, 0.6);
+            filter: brightness(1.1);
+        }
+
+        /* Animasi */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsif untuk Layar HP */
+        @media (max-width: 768px) {
+            iframe {
+                height: 450px; /* Lebih pendek di HP */
+            }
+            
+            .logo-wrapper img {
+                width: 90px;
+            }
+
+            .btn-home {
+                width: 80%;
+                padding: 12px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="logo-wrapper">
+            <img src="https://muhardian.eu.org/riky/logo.png" alt="Logo">
+        </div>
+
+        <div class="frame-container">
+            <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSLf0pVHDPU73cuFtd6B5fo54PfedGX7qsQQiv1OsT7LCPgQlL2O-pFFaEbjmku6v46ITUjbFs2kmuo/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
+        </div>
+
+        <a href="https://muhardian.eu.org/riky" class="btn-home">Kembali ke Home</a>
+    </div>
+
+</body>
+</html>
