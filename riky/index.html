@@ -3,167 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventaris Tools</title>
+    <title>Inventaris Pro - Muhardian</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
-            --bg-color: #0a192f;
-            --glass-bg: rgba(16, 33, 65, 0.8);
-            --accent-color: #00d2ff;
-            --text-color: #e6f1ff;
+            --primary: #00d2ff;
+            --bg: #0a192f;
+            --card: rgba(16, 33, 65, 0.8);
         }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a192f 0%, #112240 100%);
-            color: var(--text-color);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at center, #112240 0%, var(--bg) 100%);
+            color: #e6f1ff;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px;
         }
-
         .container {
-            width: 90%;
-            max-width: 500px;
-            background: var(--glass-bg);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
+            width: 100%; max-width: 450px; background: var(--card); padding: 30px;
+            border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px); border: 1px solid rgba(0, 210, 255, 0.2);
         }
-
-        .logo {
-            width: 80px;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 0 10px var(--accent-color));
-        }
-
-        h2 { margin-bottom: 20px; color: var(--accent-color); }
-
-        .form-group { text-align: left; margin-bottom: 15px; }
-
-        label { display: block; margin-bottom: 5px; font-size: 0.9em; }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            box-sizing: border-box;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        input:focus { box-shadow: 0 0 10px var(--accent-color); }
-
-        .btn-submit {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            background: linear-gradient(45deg, #00d2ff, #3a7bd5);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
-        }
-
-        .btn-scan {
-            background: transparent;
-            border: 1px solid var(--accent-color);
-            color: var(--accent-color);
-            margin-bottom: 10px;
-        }
-
-        .btn-submit:active { transform: scale(0.98); }
-
-footer b {
-    color: #00d2ff;
-    text-shadow: 0 0 8px rgba(0, 210, 255, 0.5);
-}
-
+        .logo { width: 80px; display: block; margin: 0 auto 20px; filter: drop-shadow(0 0 10px var(--primary)); }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 25px; letter-spacing: 1px; }
         
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 0.9em; color: #8892b0; }
+        input, select {
+            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.05); color: white; box-sizing: border-box; outline: none;
+        }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 210, 255, 0.2); }
+        
+        .btn {
+            width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold;
+            cursor: pointer; transition: 0.3s; margin-top: 10px;
+        }
+        .btn-scan { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-submit { background: linear-gradient(45deg, #00d2ff, #3a7bd5); color: white; box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3); }
+        .btn:active { transform: scale(0.98); }
+
+        footer { margin-top: auto; padding: 20px; font-size: 0.9em; color: rgba(136, 146, 176, 0.7); text-align: center; }
+        footer b { color: var(--primary); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <img src="Logo2.png" alt="Logo" class="logo"> <h2>Input Inventaris</h2>
+    <img src="logo.png" alt="Logo" class="logo">
+    <h2>Input Inventaris</h2>
     
-    <button class="btn-submit btn-scan" onclick="window.location.href='scan.html'">📸 Scan QR Code </button>
+    <button type="button" class="btn btn-scan" onclick="window.location.href='scan.html'">📸 SCAN QR BARANG</button>
 
-    <form id="inventoryForm">
+    <form id="inventoryForm" style="margin-top: 20px;">
+        <div class="form-group">
+            <label>Hasil Scan (Otomatis)</label>
+            <input type="text" id="scanResult" placeholder="Belum ada data scan" style="border: 1px dashed var(--primary); color: var(--primary);" readonly>
+        </div>
         <div class="form-group">
             <label>Tanggal</label>
             <input type="date" id="tanggal" required>
         </div>
         <div class="form-group">
             <label>Nama Barang</label>
-            <input type="text" id="namaBarang" placeholder="Contoh: Kabel LAN" required>
+            <input type="text" id="namaBarang" placeholder="Masukkan nama barang" required>
+        </div>
+        <div class="form-group" style="display: flex; gap: 10px;">
+            <div style="flex: 1;">
+                <label>Qty</label>
+                <input type="number" id="qty" placeholder="0" required>
+            </div>
+            <div style="flex: 1;">
+                <label>Satuan</label>
+                <select id="satuan">
+                    <option value="Pcs">Pcs</option>
+                    <option value="Kg">Kg</option>
+                    <option value="Liter">Liter</option>
+                    <option value="Box/Peti">Box/Peti</option>
+                </select>
+            </div>
         </div>
         <div class="form-group">
-            <label>Jumlah Qty</label>
-            <input type="number" id="qty" placeholder="0" required>
-        </div>
-        <div class="form-group">
-            <label>Satuan</label>
-            <select id="satuan">
-                <option value="Pcs">Pcs</option>
-                <option value="Kg">Kg</option>
-                <option value="Liter">Liter</option>
-                <option value="Box/Peti">Box/Peti</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Kode Transaksi</label>
+            <label>Kode Barang</label>
             <select id="kode">
                 <option value="BM">BM (Barang Masuk)</option>
                 <option value="BK">BK (Barang Keluar)</option>
             </select>
         </div>
-        <button type="submit" class="btn-submit">SIMPAN DATA</button>
+        <button type="submit" class="btn btn-submit">SIMPAN DATA</button>
     </form>
 </div>
 
+<footer>Muhardian @2026</footer>
 
-
-    
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzpBeCLOFLllMKO2RPMhGjjD73VTFcjAEIStmIpJkot_hpwL6viw-EcDnjGSjoCgluOhg/exec'; // Tempel URL Deployment di sini
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzpBeCLOFLllMKO2RPMhGjjD73VTFcjAEIStmIpJkot_hpwL6viw-EcDnjGSjoCgluOhg/exec'; // Ganti dengan URL Google Apps Script Anda
+
+    // Cek jika ada hasil scan dari URL
+    window.onload = () => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('qr')) {
+            document.getElementById('scanResult').value = params.get('qr');
+            Swal.fire({ icon: 'success', title: 'QR Terbaca!', timer: 1500, showConfirmButton: false });
+        }
+        document.getElementById('tanggal').valueAsDate = new Date();
+    };
 
     document.getElementById('inventoryForm').addEventListener('submit', e => {
         e.preventDefault();
+        Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
         const data = {
             tanggal: document.getElementById('tanggal').value,
             namaBarang: document.getElementById('namaBarang').value,
             qty: document.getElementById('qty').value,
             satuan: document.getElementById('satuan').value,
-            kode: document.getElementById('kode').value
+            kode: document.getElementById('kode').value,
+            scanResult: document.getElementById('scanResult').value
         };
 
-        Swal.fire({ title: 'Mengirim...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
         fetch(scriptURL, { method: 'POST', body: JSON.stringify(data) })
-        .then(response => {
-            Swal.fire('Berhasil!', 'Data tersimpan di Google Sheet', 'success');
+        .then(res => {
+            Swal.fire('Berhasil!', 'Data tersimpan dalam satu baris.', 'success');
             document.getElementById('inventoryForm').reset();
+            document.getElementById('scanResult').value = "";
         })
-        .catch(error => Swal.fire('Error!', 'Gagal mengirim data', 'error'));
+        .catch(err => Swal.fire('Error', 'Gagal mengirim data', 'error'));
     });
 </script>
-
-    
-    
 </body>
 </html>
-
-
-
-
