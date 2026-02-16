@@ -1,130 +1,107 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Scan QR</title>
-  <style>
-    body{
-      margin:0;
-      font-family:Inter, Arial, sans-serif;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background: linear-gradient(135deg,#0b3a6f,#123a7a 60%, #071a3a);
-      color:#eaf6ff;
-      padding:18px;
-    }
-    .wrap{
-      width:100%;
-      max-width:520px;
-      background: rgba(255,255,255,0.03);
-      border-radius:14px;
-      padding:14px;
-      text-align:center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-    h2{ margin:6px 0 12px 0; color:#dff6ff; }
-    #reader{ width:100%; }
-    .status{ margin-top:10px; color:#cfeeff; }
-    .btn{
-      margin-top:12px;
-      padding:10px 14px;
-      border-radius:10px;
-      border:none;
-      background: linear-gradient(90deg,#00c6ff,#0072ff);
-      color:#fff;
-      font-weight:600;
-      cursor:pointer;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Scan QR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+body{
+  margin:0;
+  min-height:100vh;
+  background:linear-gradient(135deg,#0d47ff,#00c6ff);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:white;
+  font-family:Segoe UI,Arial;
+}
+
+.box{
+  width:100%;
+  max-width:420px;
+  padding:15px;
+  text-align:center;
+}
+
+#reader{
+  width:100%;
+  border-radius:16px;
+  overflow:hidden;
+}
+
+h2{margin-bottom:12px;}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <h2>Scan QR Code</h2>
-    <div id="reader"></div>
-    <div class="status" id="status">Arahkan kamera ke QR code.</div>
-    <button class="btn" id="cancelBtn">Batal</button>
-  </div>
 
-  <script>
-    // Ganti dengan URL Web App Google Apps Script Anda
-    const WEB_APP_URL = "PASTE_WEB_APP_URL_HERE";
+<div class="box">
+  <h2>Scan QR Code</h2>
+  <div id="reader"></div>
+  <p id="info"></p>
+</div>
 
-    const statusEl = document.getElementById('status');
-    const cancelBtn = document.getElementById('cancelBtn');
+<script>
+const API_URL = "PASTE_URL_WEB_APP_DISINI";
 
-    function sendToSheet(qrText){
-      const fd = new FormData();
-      // Kirim minimal: tanggal, namaBarang kosong, qty 1, satuan Pcs, kode BM default, dan qrCode
-      const now = new Date();
-      const isoDate = now.toISOString().split('T')[0];
+const urlToken = new URLSearchParams(location.search).get("token");
+const sessionToken = sessionStorage.getItem("scan_token");
 
-      fd.append('tanggal', isoDate);
-      fd.append('nama', 'SCAN-'+qrText);
-      fd.append('qty', '1');
-      fd.append('satuan', 'Pcs');
-      fd.append('kode', 'BM');
-      fd.append('kodeqr', qrText);
+if(!urlToken || urlToken !== sessionToken){
+  alert("Akses tidak valid.");
+  location.href="index.html";
+}
 
-      return fetch(WEB_APP_URL, { method: 'POST', body: fd });
+const info = document.getElementById("info");
+
+function onScanSuccess(decodedText) {
+
+  info.textContent = "Mengirim hasil scan...";
+
+  html5QrCode.stop();
+
+  fetch(API_URL,{
+    method:"POST",
+    body: JSON.stringify({
+      type:"scan",
+      hasil_scan: decodedText
+    })
+  })
+  .then(r=>r.json())
+  .then(res=>{
+    if(res.status==="success"){
+      sessionStorage.removeItem("scan_token");
+      location.href="index.html";
+    }else{
+      info.textContent="Gagal menyimpan.";
     }
+  })
+  .catch(()=>{
+    info.textContent="Koneksi gagal.";
+  });
+}
 
-    function onScanSuccess(decodedText, decodedResult){
-      statusEl.innerText = 'QR terbaca: ' + decodedText;
-      // hentikan scanner UI
-      html5QrcodeScanner.clear().then(() => {
-        statusEl.innerText = 'Mengirim data ke server...';
-        sendToSheet(decodedText)
-          .then(r => r.text())
-          .then(txt => {
-            // Redirect kembali ke index.html dengan query param agar field kodeqr terisi
-            window.location.href = 'index.html?qr=' + encodeURIComponent(decodedText);
-          })
-          .catch(err => {
-            console.error(err);
-            alert('Gagal mengirim hasil scan: ' + err.message);
-            // kembali ke index agar user bisa coba lagi
-            window.location.href = 'index.html';
-          });
-      }).catch(err => {
-        console.warn('Gagal clear scanner', err);
-      });
+const html5QrCode = new Html5Qrcode("reader");
+
+Html5Qrcode.getCameras().then(cameras=>{
+  let backCam = cameras[0];
+
+  cameras.forEach(cam=>{
+    if(cam.label.toLowerCase().includes("back")){
+      backCam = cam;
     }
+  });
 
-    function onScanFailure(error){
-      // tidak perlu tampilkan alert, cukup log
-      console.warn('Scan gagal', error);
-    }
+  html5QrCode.start(
+    backCam.id,
+    { fps:10, qrbox:{width:250,height:250} },
+    onScanSuccess
+  );
 
-    // Inisialisasi scanner
-    const html5QrcodeScanner = new Html5Qrcode("reader");
-    const config = { fps: 10, qrbox: { width: 250, height: 250 }, experimentalFeatures: { useBarCodeDetectorIfSupported: true } };
+});
+</script>
 
-    Html5Qrcode.getCameras().then(cameras => {
-      const cameraId = (cameras && cameras.length) ? cameras[0].id : null;
-      html5QrcodeScanner.start(
-        cameraId,
-        config,
-        onScanSuccess,
-        onScanFailure
-      ).catch(err => {
-        console.error('Gagal memulai kamera', err);
-        statusEl.innerText = 'Tidak dapat mengakses kamera. Pastikan izin diberikan.';
-      });
-    }).catch(err => {
-      console.error('Tidak ada kamera', err);
-      statusEl.innerText = 'Perangkat tidak memiliki kamera yang dapat diakses.';
-    });
-
-    cancelBtn.addEventListener('click', () => {
-      html5QrcodeScanner.stop().then(() => {
-        window.location.href = 'index.html';
-      }).catch(()=> window.location.href = 'index.html');
-    });
-  </script>
 </body>
 </html>
