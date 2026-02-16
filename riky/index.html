@@ -1,111 +1,230 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Input Data Barang</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Inventory Input</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+    :root{
+      --bg1:#0f172a;
+      --bg2:#1e3c72;
+      --accent1:#00c6ff;
+      --accent2:#0072ff;
+      --glass: rgba(255,255,255,0.08);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 10% 10%, #123a7a 0%, transparent 20%),
+                  linear-gradient(135deg, var(--bg2), #0b254a 60%);
+      color:#eaf6ff;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
     }
 
-    .container {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-      width: 90%;
-      max-width: 500px;
+    .card{
+      width:100%;
+      max-width:720px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      border-radius:16px;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+      padding:20px;
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.04);
     }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #e0f7fa;
-      text-shadow: 2px 2px 5px #000;
+    .logo {
+      display:flex;
+      justify-content:center;
+      margin-bottom:8px;
     }
 
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
+    .logo img{
+      width:84px;
+      height:84px;
+      object-fit:contain;
+      border-radius:12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      padding:12px;
     }
 
-    input, select, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
+    h1{
+      text-align:center;
+      margin:6px 0 18px 0;
+      font-size:1.4rem;
+      letter-spacing:0.6px;
+      color: #e6f7ff;
+      text-shadow: 0 4px 18px rgba(0,0,0,0.45);
+    }
+
+    form{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+
+    label{
+      display:block;
+      font-size:0.85rem;
+      color:#dff6ff;
+      margin-bottom:6px;
+    }
+
+    .full { grid-column: 1 / -1; }
+
+    input[type="text"], input[type="date"], input[type="number"], select {
+      width:100%;
+      padding:12px;
+      border-radius:10px;
       border: none;
-      border-radius: 8px;
-      font-size: 1em;
+      background: rgba(255,255,255,0.95);
+      color:#042033;
+      font-size:1rem;
+      outline: none;
     }
 
-    input, select {
-      background: rgba(255,255,255,0.9);
-      color: #000;
+    .actions{
+      display:flex;
+      gap:12px;
+      margin-top:12px;
+      align-items:center;
+      justify-content:space-between;
+      grid-column:1 / -1;
     }
 
-    button {
-      background: linear-gradient(90deg, #2196f3, #21cbf3);
-      color: #fff;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-      margin-top: 15px;
+    .btn {
+      flex:1;
+      padding:12px 14px;
+      border-radius:10px;
+      border:none;
+      font-weight:600;
+      cursor:pointer;
+      color:#fff;
+      background: linear-gradient(90deg, var(--accent1), var(--accent2));
+      box-shadow: 0 8px 20px rgba(0,110,255,0.18);
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .btn:hover{ transform: translateY(-3px); box-shadow: 0 14px 30px rgba(0,110,255,0.22); }
+
+    .btn.secondary{
+      background: linear-gradient(90deg, #6b8cff, #3b6bff);
     }
 
-    button:hover {
-      transform: scale(1.05);
+    .note{
+      font-size:0.85rem;
+      color:#cfeeff;
+      text-align:center;
+      margin-top:10px;
     }
 
-    .scan-btn {
-      background: linear-gradient(90deg, #00c6ff, #0072ff);
+    @media (max-width:640px){
+      form{ grid-template-columns: 1fr; }
+      .logo img{ width:72px; height:72px; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Form Input Barang</h1>
-    <form id="dataForm">
-      <label for="tanggal">Tanggal</label>
-      <input type="date" id="tanggal" name="tanggal" required>
+  <div class="card" role="main">
+    <div class="logo">
+      <!-- Ganti src dengan logo Anda -->
+      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><rect rx='20' width='120' height='120' fill='%230072ff'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-size='36' fill='white' font-family='Arial'>LOGO</text></svg>" alt="Logo">
+    </div>
 
-      <label for="namaBarang">Nama Barang</label>
-      <input type="text" id="namaBarang" name="namaBarang" required>
+    <h1>Input Data Barang</h1>
 
-      <label for="qty">Jumlah Qty</label>
-      <input type="number" id="qty" name="qty" required>
+    <form id="mainForm" autocomplete="off">
+      <div class="full">
+        <label for="tanggal">Tanggal</label>
+        <input type="date" id="tanggal" name="tanggal" required>
+      </div>
 
-      <label for="satuan">Satuan</label>
-      <select id="satuan" name="satuan" required>
-        <option value="Kg">Kg</option>
-        <option value="Liter">Liter</option>
-        <option value="Pcs">Pcs</option>
-        <option value="Box/Peti">Box/Peti</option>
-      </select>
+      <div>
+        <label for="nama">Nama Barang</label>
+        <input type="text" id="nama" name="nama" placeholder="Contoh: Beras Premium" required>
+      </div>
 
-      <button type="submit">Simpan ke Google Sheet</button>
+      <div>
+        <label for="kode">Kode Barang</label>
+        <input type="text" id="kode" name="kode" placeholder="BM atau BK" maxlength="3" required>
+      </div>
+
+      <div>
+        <label for="qty">Jumlah Qty</label>
+        <input type="number" id="qty" name="qty" min="0" step="1" required>
+      </div>
+
+      <div>
+        <label for="satuan">Satuan</label>
+        <select id="satuan" name="satuan" required>
+          <option value="Kg">Kg</option>
+          <option value="Liter">Liter</option>
+          <option value="Pcs">Pcs</option>
+          <option value="Box/Peti">Box/Peti</option>
+        </select>
+      </div>
+
+      <div class="full">
+        <label for="kodeqr">Hasil Scan QR (opsional)</label>
+        <input type="text" id="kodeqr" name="kodeqr" placeholder="Jika datang dari scan, field ini akan terisi otomatis">
+      </div>
+
+      <div class="actions full">
+        <button type="submit" class="btn">Simpan ke Google Sheet</button>
+        <button type="button" class="btn secondary" id="scanBtn">Scan QR Code</button>
+      </div>
     </form>
 
-    <button class="scan-btn" onclick="window.location.href='scan.html'">Scan QR Code</button>
+    <div class="note">Data akan tersimpan ke Google Sheet Anda. Pastikan Web App URL sudah diisi di script.</div>
   </div>
 
   <script>
-    const scriptURL = "PASTE_WEB_APP_URL_HERE"; // URL dari Google Apps Script Web App
-    const form = document.getElementById("dataForm");
+    // Ganti dengan URL Web App Google Apps Script Anda
+    const WEB_APP_URL = "PASTE_WEB_APP_URL_HERE";
 
-    form.addEventListener("submit", e => {
+    const form = document.getElementById('mainForm');
+    const scanBtn = document.getElementById('scanBtn');
+
+    // Arahkan ke scan.html saat tombol scan ditekan
+    scanBtn.addEventListener('click', () => {
+      // Buka scan.html di tab yang sama
+      window.location.href = 'scan.html';
+    });
+
+    // Jika index.html dibuka kembali setelah scan, Anda bisa menerima parameter query ?qr=... untuk mengisi field
+    (function prefillFromQuery(){
+      const params = new URLSearchParams(window.location.search);
+      const qr = params.get('qr');
+      if(qr){
+        document.getElementById('kodeqr').value = qr;
+      }
+    })();
+
+    form.addEventListener('submit', function(e){
       e.preventDefault();
-      fetch(scriptURL, { method: "POST", body: new FormData(form)})
-        .then(response => alert("Data berhasil disimpan ke Google Sheet!"))
-        .catch(error => alert("Terjadi kesalahan: " + error.message));
-      form.reset();
+      const fd = new FormData(form);
+
+      // Pastikan format kode BM/BK uppercase
+      const kodeField = fd.get('kode') || '';
+      fd.set('kode', kodeField.toString().trim().toUpperCase());
+
+      fetch(WEB_APP_URL, {
+        method: 'POST',
+        body: fd
+      })
+      .then(resp => resp.text())
+      .then(txt => {
+        alert('Data berhasil dikirim ke Google Sheet.');
+        form.reset();
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Gagal mengirim data: ' + err.message);
+      });
     });
   </script>
 </body>
