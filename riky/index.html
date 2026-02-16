@@ -3,167 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventaris Pro - Muhardian</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>UD. RIO / FIKRI</title>
     <style>
+        /* Variabel Warna & Font */
         :root {
-            --primary: #00d2ff;
-            --bg: #0a192f;
-            --card: rgba(16, 33, 65, 0.8);
-            --text-muted: #8892b0;
+            --bg-dark: #050b18;
+            --bg-card: rgba(22, 30, 45, 0.7);
+            --accent-blue: #00d2ff;
+            --accent-purple: #3a7bd5;
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: radial-gradient(circle at center, #112240 0%, var(--bg) 100%);
-            color: #e6f1ff;
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px;
-        }
-        .container {
-            width: 100%; max-width: 450px; background: var(--card); padding: 30px;
-            border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px); border: 1px solid rgba(0, 210, 255, 0.2);
-        }
-        .logo { width: 80px; display: block; margin: 0 auto 20px; filter: drop-shadow(0 0 10px var(--primary)); }
-        h2 { text-align: center; color: var(--primary); margin-bottom: 25px; letter-spacing: 1px; }
-        
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-size: 0.9em; color: var(--text-muted); }
-        input, select {
-            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(255, 255, 255, 0.05); color: white; box-sizing: border-box; outline: none;
-        }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 210, 255, 0.2); }
-        
-        .btn {
-            width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold;
-            cursor: pointer; transition: 0.3s; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;
-            text-decoration: none; box-sizing: border-box;
-        }
-        .btn-scan { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
-        .btn-submit { background: linear-gradient(45deg, #00d2ff, #3a7bd5); color: white; box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3); }
-        .btn-home { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--text-muted); color: var(--text-muted); margin-top: 15px; }
-        
-        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
-        .btn-home:hover { border-color: var(--primary); color: white; background: rgba(0, 210, 255, 0.1); }
-        .btn:active { transform: scale(0.98); }
 
-        footer { margin-top: auto; padding: 20px; font-size: 0.9em; color: rgba(136, 146, 176, 0.7); text-align: center; }
-        footer b { color: var(--primary); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at top right, #101e3a, #050b18);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header & Logo */
+        header {
+            padding: 20px 5%;
+            display: flex;
+            align-items: center;
+            background: rgba(5, 11, 24, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo-container a {
+            display: inline-block;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .logo-container a:hover {
+            transform: scale(1.1) rotate(-3deg);
+        }
+
+        .logo-container img {
+            height: 50px; /* Sesuaikan ukuran logo.png Anda */
+            width: auto;
+        }
+
+        /* Main Content */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(15px);
+            max-width: 700px;
+            width: 100%;
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            animation: slideUp 1s ease-out;
+        }
+
+        .card h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, var(--accent-blue), #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Content Paragraph & Show More */
+        .content-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-dim);
+            margin-bottom: 15px;
+        }
+
+        #more-text {
+            display: none; /* Sembunyikan artikel full secara default */
+            margin-top: 10px;
+        }
+
+        .read-more-btn {
+            color: var(--accent-blue);
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: underline;
+            transition: color 0.3s;
+        }
+
+        .read-more-btn:hover {
+            color: #fff;
+        }
+
+        /* Action Buttons Area */
+        .button-group {
+            margin-top: 40px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-inventory {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+        }
+
+        .btn-report {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+        }
+
+        .btn-small:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.2);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Footer Samar */
+        footer {
+            text-align: center;
+            padding: 30px;
+            font-size: 11px;
+            color: rgba(148, 163, 184, 0.3); /* Samar-samar */
+            letter-spacing: 1px;
+            transition: color 0.5s;
+        }
+
+        footer:hover {
+            color: var(--accent-blue);
+            text-shadow: 0 0 10px var(--accent-blue);
+        }
+
+        /* Animasi */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Mobile */
+        @media (max-width: 600px) {
+            .card { padding: 25px; }
+            .card h1 { font-size: 1.5rem; }
+            header { justify-content: center; }
+            .logo-container img { height: 40px; }
+            .button-group { justify-content: center; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <img src="logo.png" alt="Logo" class="logo">
-    <h2>Input Inventaris</h2>
-    
-    <button type="button" class="btn btn-scan" onclick="window.location.href='scan.html'">📸 SCAN QR</button>
+    <header>
+        <div class="logo-container">
+            <a href="https://muhardian.eu.org/riky/full-logo.png" target="_blank">
+                <img src="logo.png" alt="Logo">
+            </a>
+        </div>
+    </header>
 
-    <form id="inventoryForm" style="margin-top: 20px;">
-        <div class="form-group">
-            <label>Hasil Scan (Otomatis)</label>
-            <input type="text" id="scanResult" placeholder="Belum ada data scan" style="border: 1px dashed var(--primary); color: var(--primary);" readonly>
-        </div>
-        <div class="form-group">
-            <label>Tanggal</label>
-            <input type="date" id="tanggal" required>
-        </div>
-        <div class="form-group">
-            <label>Nama Barang</label>
-            <input type="text" id="namaBarang" placeholder="Masukkan nama barang" required>
-        </div>
-        <div class="form-group" style="display: flex; gap: 10px;">
-            <div style="flex: 1;">
-                <label>Qty</label>
-                <input type="number" id="qty" placeholder="0" required>
-            </div>
-            <div style="flex: 1;">
-                <label>Satuan</label>
-                <select id="satuan">
-                    <option value="Pcs">Pcs</option>
-                    <option value="Kg">Kg</option>
-                    <option value="Liter">Liter</option>
-                    <option value="Box/Peti">Box/Peti</option>
-                </select>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Kode Barang</label>
-            <select id="kode">
-                <option value="BM">BM (Barang Masuk)</option>
-                <option value="BK">BK (Barang Keluar)</option>
-            </select>
-        </div>
-        
-        <button type="submit" class="btn btn-submit">SIMPAN DATA</button>
-        
-        <a href="https://muhardian.eu.org/riky/" class="btn btn-home">🏠 HOME</a>
-    </form>
-</div>
-
-<footer>By <b>Muhardian</b> @2026</footer>
-
-<script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzpBeCLOFLllMKO2RPMhGjjD73VTFcjAEIStmIpJkot_hpwL6viw-EcDnjGSjoCgluOhg/exec'; 
-
-    window.onload = () => {
-        const params = new URLSearchParams(window.location.search);
-        
-        // Cek jika ada parameter QR
-        if (params.has('qr')) {
-            const qrValue = params.get('qr');
-            document.getElementById('scanResult').value = qrValue;
+    <div class="main-wrapper">
+        <div class="card">
+            <h1>Supllier & Distributor</h1>
             
-            Swal.fire({ 
-                icon: 'success', 
-                title: 'QR Terbaca!', 
-                text: 'Data: ' + qrValue,
-                timer: 1500, 
-                showConfirmButton: false,
-                background: '#112240',
-                color: '#fff'
-            });
+            <div class="content-text">
+                <p id="first-paragraph">
+                    UD. RIO / FIKRI: Dedikasi Menjadi Pilar Utama Suplai Dapur MBG di Bogor
+Berdiri sejak tahun 2008 di Bogor, UD. RIO / FIKRI telah mengukuhkan posisinya sebagai mitra strategis dalam industri penyediaan bahan pangan dan perlengkapan dapur. Mengawali langkah sebagai usaha lokal yang mengedepankan kualitas dan kepercayaan, perusahaan ini telah..
+                </p>
+                
+                <div id="more-text">
+                    <p>
+                        UD. RIO / FIKRI: Dedikasi Menjadi Pilar Utama Suplai Dapur MBG di Bogor
+Berdiri sejak tahun 2008 di Bogor, UD. RIO / FIKRI telah mengukuhkan posisinya sebagai mitra strategis dalam industri penyediaan bahan pangan dan perlengkapan dapur. Mengawali langkah sebagai usaha lokal yang mengedepankan kualitas dan kepercayaan, perusahaan ini telah melewati perjalanan panjang selama lebih dari satu dekade untuk mengasah keahliannya di bidang distribusi. Dengan pengalaman yang matang, UD. RIO / FIKRI bukan sekadar pemasok biasa, melainkan penyambung rantai pasok yang andal bagi berbagai lini usaha kuliner di wilayah Bogor dan sekitarnya.
 
-            // LOGIKA PENTING: Menghapus parameter ?qr=... dari URL tanpa merefresh
-            // Ini membuat jika user menekan F5/Refresh, input akan menjadi kosong kembali.
-            window.history.replaceState({}, document.title, window.location.pathname);
-        } else {
-            // Pastikan kosong jika tidak ada parameter (setelah refresh)
-            document.getElementById('scanResult').value = "";
+Seiring berkembangnya dinamika industri makanan, UD. RIO / FIKRI melakukan spesialisasi strategis dengan memfokuskan diri sebagai supplier utama untuk kebutuhan dapur Makan Bergizi Gratis (MBG). Fokus ini diambil sebagai bentuk komitmen perusahaan dalam mendukung penyediaan asupan makanan yang sehat, higienis, dan bermutu tinggi. Dengan memahami standar ketat yang diperlukan dalam pengolahan menu bergizi, perusahaan memastikan bahwa setiap bahan baku yang didistribusikan telah melalui proses seleksi yang ketat demi menjaga keamanan konsumsi masyarakat.
+
+Sebagai distributor dan supplier yang berpengalaman, UD. RIO / FIKRI menyadari bahwa ketepatan waktu dan kesegaran produk adalah kunci utama dalam operasional dapur. Oleh karena itu, perusahaan menerapkan sistem logistik yang efisien untuk menjamin bahwa seluruh kebutuhan operasional mitra tidak pernah terhambat. Kelengkapan komoditas yang ditawarkan, mulai dari bahan pokok hingga bumbu dapur khusus, menjadikan UD. RIO / FIKRI sebagai solusi satu pintu (one-stop solution) yang memudahkan para pengelola dapur dalam mengatur stok harian mereka.
+
+Keunggulan UD. RIO / FIKRI juga terletak pada pendekatan personalnya terhadap setiap pelanggan. Sebagai bisnis yang tumbuh dari akar lokal Bogor, mereka memiliki pemahaman mendalam mengenai preferensi pasar dan ketersediaan sumber daya di daerah tersebut. Hubungan yang harmonis dengan produsen lokal dan jaringan distribusi yang luas memungkinkan perusahaan untuk menawarkan harga yang kompetitif tanpa harus mengorbankan kualitas produk, sebuah keseimbangan yang sangat dibutuhkan dalam manajemen anggaran dapur berskala besar.
+
+Memasuki masa depan, UD. RIO / FIKRI terus berinovasi untuk meningkatkan standar layanan dan profesionalisme dalam industri supplier. Dengan rekam jejak yang solid sejak 2008, perusahaan ini optimis dapat terus berkontribusi nyata dalam menyukseskan program-program pemenuhan gizi masyarakat melalui suplai bahan pangan yang konsisten. Kepercayaan pelanggan adalah aset terbesar bagi UD. RIO / FIKRI untuk tetap berdiri tegak sebagai pemimpin pasar di bidang distribusi kebutuhan dapur MBG.
+
+                        
+                    </p>
+                </div>
+                
+                <span class="read-more-btn" id="toggle-btn" onclick="showMore()">Baca Selengkapnya...</span>
+            </div>
+
+            <div class="button-group">
+                <a href="https://muhardian.eu.org/riky/inv" class="btn-small btn-inventory">
+                    📦 Input Inventori
+                </a>
+                <a href="https://muhardian.eu.org/riky/rpt/" class="btn-small btn-report">
+                    ⚠️ Report
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        By Muhardian @2026
+    </footer>
+
+    <script>
+        function showMore() {
+            var moreText = document.getElementById("more-text");
+            var btnText = document.getElementById("toggle-btn");
+
+            if (moreText.style.display === "block") {
+                moreText.style.display = "none";
+                btnText.innerHTML = "Baca Selengkapnya...";
+            } else {
+                moreText.style.display = "block";
+                btnText.innerHTML = "Tampilkan Sedikit";
+            }
         }
-        
-        document.getElementById('tanggal').valueAsDate = new Date();
-    };
+    </script>
 
-    document.getElementById('inventoryForm').addEventListener('submit', e => {
-        e.preventDefault();
-        Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-        const data = {
-            tanggal: document.getElementById('tanggal').value,
-            namaBarang: document.getElementById('namaBarang').value,
-            qty: document.getElementById('qty').value,
-            satuan: document.getElementById('satuan').value,
-            kode: document.getElementById('kode').value,
-            scanResult: document.getElementById('scanResult').value
-        };
-
-        fetch(scriptURL, { method: 'POST', body: JSON.stringify(data) })
-        .then(res => {
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: 'Data telah disimpan .',
-                background: '#112240',
-                color: '#fff'
-            });
-            document.getElementById('inventoryForm').reset();
-            document.getElementById('scanResult').value = "";
-            document.getElementById('tanggal').valueAsDate = new Date();
-        })
-        .catch(err => Swal.fire('Error', 'Gagal mengirim data', 'error'));
-    });
-</script>
 </body>
 </html>
-
