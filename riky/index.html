@@ -3,225 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Inventaris</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Scan QR Code</title>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
-        :root {
-            --primary-blue: #00c6ff;
-            --secondary-blue: #0072ff;
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-        }
-
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background: #000;
             color: white;
-            min-height: 100vh;
+            font-family: sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            height: 100vh;
             margin: 0;
-            padding: 20px;
         }
-
-        .container {
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 30px;
+        #reader {
             width: 100%;
             max-width: 500px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        /* Logo Placeholder */
-        .logo-circle {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue));
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            font-weight: bold;
-            box-shadow: 0 0 20px var(--secondary-blue);
-            border: 3px solid white;
-        }
-
-        h2 { margin: 0; text-shadow: 0 0 10px rgba(0,198,255,0.5); }
-
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-size: 0.9em; color: #ddd; }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            box-sizing: border-box;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
             border-radius: 10px;
-            color: white;
-            font-family: inherit;
-            outline: none;
-            transition: 0.3s;
+            overflow: hidden;
         }
-
-        input:focus, select:focus {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 10px rgba(0, 198, 255, 0.3);
-        }
-
-        /* Agar opsi select terlihat jelas di mobile */
-        option { background: #302b63; color: white; }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 1em;
-        }
-
-        .btn-submit {
-            background: linear-gradient(90deg, var(--secondary-blue), var(--primary-blue));
-            color: white;
-            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4);
-        }
-
-        .btn-scan {
-            background: rgba(255, 255, 255, 0.1);
+        h3 { margin-bottom: 20px; text-align: center; color: #00c6ff; }
+        .status { margin-top: 20px; font-size: 0.9em; color: #aaa; }
+        .btn-back {
+            margin-top: 30px;
+            padding: 10px 20px;
+            background: transparent;
             border: 1px solid white;
             color: white;
-        }
-
-        button:hover { transform: translateY(-2px); }
-        button:active { transform: translateY(0); }
-
-        .loader {
-            display: none;
-            text-align: center;
-            margin-top: 10px;
-            font-size: 0.9em;
-            color: var(--primary-blue);
+            border-radius: 20px;
+            cursor: pointer;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <div class="logo-circle">LOG</div>
-        <h2>Input Data Barang</h2>
-    </div>
+    <h3>Arahkan Kamera ke QR Code</h3>
+    <div id="reader"></div>
+    <div id="status" class="status">Menunggu scan...</div>
+    <a href="index.html" class="btn-back">Kembali</a>
 
-    <form id="inventoryForm">
-        <div class="form-group">
-            <label>Tanggal</label>
-            <input type="date" id="tanggal" name="tanggal" required>
-        </div>
+    <script>
+        // --- KONFIGURASI ---
+        const SCRIPT_URL = 'https://script.google.com/macros/library/d/10VJ71GjhC2ouclwYYjfSIwJU7ghiAinvn98Xzu_ITMRAzZe8Q-v6gLdH/2'; // PASTE LINK YANG SAMA DI SINI
+        // -------------------
 
-        <div class="form-group">
-            <label>Nama Barang</label>
-            <input type="text" id="nama_barang" name="nama_barang" placeholder="Contoh: Beras Premium" required>
-        </div>
+        let isProcessing = false;
 
-        <div class="form-group">
-            <label>Jumlah (Qty)</label>
-            <input type="number" id="qty" name="qty" placeholder="0" required>
-        </div>
+        function onScanSuccess(decodedText, decodedResult) {
+            if (isProcessing) return; // Mencegah scan ganda cepat
+            isProcessing = true;
+            
+            document.getElementById('status').innerText = "QR Terbaca! Mengirim data...";
+            document.getElementById('status').style.color = "#00c6ff";
 
-        <div class="form-group">
-            <label>Satuan</label>
-            <select id="satuan" name="satuan" required>
-                <option value="Kg">Kg</option>
-                <option value="Liter">Liter</option>
-                <option value="Pcs">Pcs</option>
-                <option value="Box/Peti">Box / Peti</option>
-            </select>
-        </div>
+            // Siapkan data untuk dikirim
+            let data = {
+                qr_data: decodedText,
+                tanggal: new Date().toISOString().split('T')[0], // Tanggal hari ini
+                sumber: 'Scan QR',
+                // Field lain dikosongkan karena ini quick scan
+                nama_barang: '-',
+                qty: 1,
+                satuan: 'Pcs',
+                kode_barang: 'BM' // Default BM, bisa diubah sesuai logika bisnis
+            };
 
-        <div class="form-group">
-            <label>Kode Barang (Transaksi)</label>
-            <select id="kode_barang" name="kode_barang" required>
-                <option value="BM">BM (Barang Masuk)</option>
-                <option value="BK">BK (Barang Keluar)</option>
-            </select>
-        </div>
+            // Kirim ke Google Sheet
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(response => {
+                alert('Scan Berhasil! Data: ' + decodedText);
+                // Redirect otomatis ke index.html
+                window.location.replace("index.html");
+            })
+            .catch(error => {
+                alert('Gagal mengirim data scan.');
+                isProcessing = false;
+                document.getElementById('status').innerText = "Gagal. Coba lagi.";
+            });
+        }
 
-        <div class="loader" id="loader">Sedang mengirim data...</div>
+        function onScanFailure(error) {
+            // handle scan failure, usually better to ignore and keep scanning.
+            // console.warn(`Code scan error = ${error}`);
+        }
 
-        <div class="btn-group">
-            <button type="button" class="btn-scan" onclick="window.location.href='scan.html'">
-                📷 Scan QR
-            </button>
-            <button type="submit" class="btn-submit">Simpan Data</button>
-        </div>
-    </form>
-</div>
-
-<script>
-    // --- KONFIGURASI ---
-    const SCRIPT_URL = 'https://script.google.com/macros/library/d/10VJ71GjhC2ouclwYYjfSIwJU7ghiAinvn98Xzu_ITMRAzZe8Q-v6gLdH/2'; // PASTE LINK DEPLOYMENT ANDA DI SINI
-    // -------------------
-
-    // Set tanggal hari ini otomatis
-    document.getElementById('tanggal').valueAsDate = new Date();
-
-    const form = document.getElementById('inventoryForm');
-    const loader = document.getElementById('loader');
-
-    form.addEventListener('submit', e => {
-        e.preventDefault();
-        loader.style.display = 'block';
-
-        // Ambil data form
-        let data = {
-            tanggal: form.tanggal.value,
-            nama_barang: form.nama_barang.value,
-            qty: form.qty.value,
-            satuan: form.satuan.value,
-            kode_barang: form.kode_barang.value,
-            sumber: 'Manual'
-        };
-
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(response => {
-            loader.style.display = 'none';
-            alert('Data Berhasil Disimpan!');
-            form.reset();
-            document.getElementById('tanggal').valueAsDate = new Date();
-        })
-        .catch(error => {
-            loader.style.display = 'none';
-            alert('Error! Cek koneksi internet.');
-            console.error('Error!', error.message);
-        });
-    });
-</script>
-
+        let html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader",
+            { fps: 10, qrbox: {width: 250, height: 250} },
+            /* verbose= */ false);
+        
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    </script>
 </body>
 </html>
