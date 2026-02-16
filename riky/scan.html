@@ -1,80 +1,130 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scan QR Code</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Scan QR</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      flex-direction: column;
+    body{
+      margin:0;
+      font-family:Inter, Arial, sans-serif;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: linear-gradient(135deg,#0b3a6f,#123a7a 60%, #071a3a);
+      color:#eaf6ff;
+      padding:18px;
     }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #e0f7fa;
-      text-shadow: 2px 2px 5px #000;
+    .wrap{
+      width:100%;
+      max-width:520px;
+      background: rgba(255,255,255,0.03);
+      border-radius:14px;
+      padding:14px;
+      text-align:center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
-
-    #reader {
-      width: 90%;
-      max-width: 400px;
-      margin: auto;
-    }
-
-    .loading {
-      margin-top: 15px;
-      font-size: 1.1em;
-      color: #ffeb3b;
+    h2{ margin:6px 0 12px 0; color:#dff6ff; }
+    #reader{ width:100%; }
+    .status{ margin-top:10px; color:#cfeeff; }
+    .btn{
+      margin-top:12px;
+      padding:10px 14px;
+      border-radius:10px;
+      border:none;
+      background: linear-gradient(90deg,#00c6ff,#0072ff);
+      color:#fff;
+      font-weight:600;
+      cursor:pointer;
     }
   </style>
-  <!-- Library html5-qrcode -->
+
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
-  <h1>Scan QR Code</h1>
-  <div id="reader"></div>
-  <div class="loading" id="status">Arahkan kamera ke QR Code...</div>
+  <div class="wrap">
+    <h2>Scan QR Code</h2>
+    <div id="reader"></div>
+    <div class="status" id="status">Arahkan kamera ke QR code.</div>
+    <button class="btn" id="cancelBtn">Batal</button>
+  </div>
 
   <script>
-    const scriptURL = "PASTE_WEB_APP_URL_HERE"; // URL Google Apps Script Web App
+    // Ganti dengan URL Web App Google Apps Script Anda
+    const WEB_APP_URL = "PASTE_WEB_APP_URL_HERE";
 
-    function onScanSuccess(decodedText, decodedResult) {
-      document.getElementById("status").innerText = "QR berhasil: " + decodedText;
+    const statusEl = document.getElementById('status');
+    const cancelBtn = document.getElementById('cancelBtn');
 
-      // Kirim hasil scan ke Google Sheets
-      const formData = new FormData();
-      formData.append("qrCode", decodedText);
+    function sendToSheet(qrText){
+      const fd = new FormData();
+      // Kirim minimal: tanggal, namaBarang kosong, qty 1, satuan Pcs, kode BM default, dan qrCode
+      const now = new Date();
+      const isoDate = now.toISOString().split('T')[0];
 
-      fetch(scriptURL, { method: "POST", body: formData })
-        .then(response => {
-          alert("Data QR berhasil disimpan!");
-          window.location.href = "index.html"; // redirect ke index.html
-        })
-        .catch(error => {
-          alert("Terjadi kesalahan: " + error.message);
-        });
+      fd.append('tanggal', isoDate);
+      fd.append('nama', 'SCAN-'+qrText);
+      fd.append('qty', '1');
+      fd.append('satuan', 'Pcs');
+      fd.append('kode', 'BM');
+      fd.append('kodeqr', qrText);
+
+      return fetch(WEB_APP_URL, { method: 'POST', body: fd });
     }
 
-    function onScanFailure(error) {
-      // Tidak perlu alert, cukup log
-      console.warn(`Scan gagal: ${error}`);
+    function onScanSuccess(decodedText, decodedResult){
+      statusEl.innerText = 'QR terbaca: ' + decodedText;
+      // hentikan scanner UI
+      html5QrcodeScanner.clear().then(() => {
+        statusEl.innerText = 'Mengirim data ke server...';
+        sendToSheet(decodedText)
+          .then(r => r.text())
+          .then(txt => {
+            // Redirect kembali ke index.html dengan query param agar field kodeqr terisi
+            window.location.href = 'index.html?qr=' + encodeURIComponent(decodedText);
+          })
+          .catch(err => {
+            console.error(err);
+            alert('Gagal mengirim hasil scan: ' + err.message);
+            // kembali ke index agar user bisa coba lagi
+            window.location.href = 'index.html';
+          });
+      }).catch(err => {
+        console.warn('Gagal clear scanner', err);
+      });
+    }
+
+    function onScanFailure(error){
+      // tidak perlu tampilkan alert, cukup log
+      console.warn('Scan gagal', error);
     }
 
     // Inisialisasi scanner
-    let html5QrcodeScanner = new Html5QrcodeScanner(
-      "reader", 
-      { fps: 10, qrbox: 250 }
-    );
-    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    const html5QrcodeScanner = new Html5Qrcode("reader");
+    const config = { fps: 10, qrbox: { width: 250, height: 250 }, experimentalFeatures: { useBarCodeDetectorIfSupported: true } };
+
+    Html5Qrcode.getCameras().then(cameras => {
+      const cameraId = (cameras && cameras.length) ? cameras[0].id : null;
+      html5QrcodeScanner.start(
+        cameraId,
+        config,
+        onScanSuccess,
+        onScanFailure
+      ).catch(err => {
+        console.error('Gagal memulai kamera', err);
+        statusEl.innerText = 'Tidak dapat mengakses kamera. Pastikan izin diberikan.';
+      });
+    }).catch(err => {
+      console.error('Tidak ada kamera', err);
+      statusEl.innerText = 'Perangkat tidak memiliki kamera yang dapat diakses.';
+    });
+
+    cancelBtn.addEventListener('click', () => {
+      html5QrcodeScanner.stop().then(() => {
+        window.location.href = 'index.html';
+      }).catch(()=> window.location.href = 'index.html');
+    });
   </script>
 </body>
 </html>
