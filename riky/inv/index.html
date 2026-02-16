@@ -45,8 +45,7 @@
         
         .btn:hover { opacity: 0.9; transform: translateY(-2px); }
         .btn-home:hover { border-color: var(--primary); color: white; background: rgba(0, 210, 255, 0.1); }
-        .btn:active { transform: scale(0.98); }
-
+        
         footer { margin-top: auto; padding: 20px; font-size: 0.9em; color: rgba(136, 146, 176, 0.7); text-align: center; }
         footer b { color: var(--primary); }
     </style>
@@ -61,20 +60,23 @@
 
     <form id="inventoryForm" style="margin-top: 20px;">
         <div class="form-group">
-            <label>Hasil Scan (Otomatis)</label>
+            <label>Hasil Scan QR </label>
             <input type="text" id="scanResult" placeholder="Belum ada data scan" style="border: 1px dashed var(--primary); color: var(--primary);" readonly>
         </div>
+        
         <div class="form-group">
             <label>Tanggal</label>
             <input type="date" id="tanggal" required>
         </div>
+
         <div class="form-group">
             <label>Nama Barang</label>
             <input type="text" id="namaBarang" placeholder="Masukkan nama barang" required>
         </div>
+
         <div class="form-group" style="display: flex; gap: 10px;">
             <div style="flex: 1;">
-                <label>Qty</label>
+                <label>Jumlah (Qty)</label>
                 <input type="number" id="qty" placeholder="0" required>
             </div>
             <div style="flex: 1;">
@@ -87,16 +89,16 @@
                 </select>
             </div>
         </div>
+
         <div class="form-group">
-            <label>Kode Barang</label>
+            <label>Status Transaksi</label>
             <select id="kode">
-                <option value="BM">BM (Barang Masuk)</option>
-                <option value="BK">BK (Barang Keluar)</option>
+                <option value="BM">BM (Masuk ke Kolom F)</option>
+                <option value="BK">BK (Keluar ke Kolom G)</option>
             </select>
         </div>
         
         <button type="submit" class="btn btn-submit">SIMPAN DATA</button>
-        
         <a href="https://muhardian.eu.org/riky/" class="btn btn-home">🏠 HOME</a>
     </form>
 </div>
@@ -108,36 +110,19 @@
 
     window.onload = () => {
         const params = new URLSearchParams(window.location.search);
-        
-        // Cek jika ada parameter QR
         if (params.has('qr')) {
-            const qrValue = params.get('qr');
-            document.getElementById('scanResult').value = qrValue;
-            
-            Swal.fire({ 
-                icon: 'success', 
-                title: 'QR Terbaca!', 
-                text: 'Data: ' + qrValue,
-                timer: 1500, 
-                showConfirmButton: false,
-                background: '#112240',
-                color: '#fff'
-            });
-
-            // LOGIKA PENTING: Menghapus parameter ?qr=... dari URL tanpa merefresh
-            // Ini membuat jika user menekan F5/Refresh, input akan menjadi kosong kembali.
+            document.getElementById('scanResult').value = params.get('qr');
+            // Menghapus query string di URL agar saat refresh input menjadi kosong
             window.history.replaceState({}, document.title, window.location.pathname);
         } else {
-            // Pastikan kosong jika tidak ada parameter (setelah refresh)
             document.getElementById('scanResult').value = "";
         }
-        
         document.getElementById('tanggal').valueAsDate = new Date();
     };
 
     document.getElementById('inventoryForm').addEventListener('submit', e => {
         e.preventDefault();
-        Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ title: 'Mengirim...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         const data = {
             tanggal: document.getElementById('tanggal').value,
@@ -150,18 +135,12 @@
 
         fetch(scriptURL, { method: 'POST', body: JSON.stringify(data) })
         .then(res => {
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: 'Data telah disimpan .',
-                background: '#112240',
-                color: '#fff'
-            });
+            Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Data tersimpan di kolom yang tepat.', background: '#112240', color: '#fff' });
             document.getElementById('inventoryForm').reset();
             document.getElementById('scanResult').value = "";
             document.getElementById('tanggal').valueAsDate = new Date();
         })
-        .catch(err => Swal.fire('Error', 'Gagal mengirim data', 'error'));
+        .catch(err => Swal.fire('Error', 'Gagal koneksi database', 'error'));
     });
 </script>
 </body>
