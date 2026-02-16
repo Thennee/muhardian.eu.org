@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scan QR Code</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #e0f7fa;
+      text-shadow: 2px 2px 5px #000;
+    }
+
+    #reader {
+      width: 90%;
+      max-width: 400px;
+      margin: auto;
+    }
+
+    .loading {
+      margin-top: 15px;
+      font-size: 1.1em;
+      color: #ffeb3b;
+    }
+  </style>
+  <!-- Library html5-qrcode -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+<body>
+  <h1>Scan QR Code</h1>
+  <div id="reader"></div>
+  <div class="loading" id="status">Arahkan kamera ke QR Code...</div>
+
+  <script>
+    const scriptURL = "PASTE_WEB_APP_URL_HERE"; // URL Google Apps Script Web App
+
+    function onScanSuccess(decodedText, decodedResult) {
+      document.getElementById("status").innerText = "QR berhasil: " + decodedText;
+
+      // Kirim hasil scan ke Google Sheets
+      const formData = new FormData();
+      formData.append("qrCode", decodedText);
+
+      fetch(scriptURL, { method: "POST", body: formData })
+        .then(response => {
+          alert("Data QR berhasil disimpan!");
+          window.location.href = "index.html"; // redirect ke index.html
+        })
+        .catch(error => {
+          alert("Terjadi kesalahan: " + error.message);
+        });
+    }
+
+    function onScanFailure(error) {
+      // Tidak perlu alert, cukup log
+      console.warn(`Scan gagal: ${error}`);
+    }
+
+    // Inisialisasi scanner
+    let html5QrcodeScanner = new Html5QrcodeScanner(
+      "reader", 
+      { fps: 10, qrbox: 250 }
+    );
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+  </script>
+</body>
+</html>
