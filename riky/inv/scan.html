@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner - Muhardian</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        body { background: #0a192f; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        #reader { width: 100%; max-width: 400px; border: 2px solid #00d2ff; border-radius: 15px; overflow: hidden; }
+        .btn-back { margin-top: 20px; padding: 12px 25px; background: rgba(255,255,255,0.1); border: 1px solid #00d2ff; color: #00d2ff; border-radius: 30px; cursor: pointer; text-decoration: none; }
+        footer { margin-top: 30px; color: rgba(255,255,255,0.4); font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+    <h2 style="color:#00d2ff">Scan QR Code</h2>
+    <div id="reader"></div>
+    <a href="index.html" class="btn-back">Batal & Kembali</a>
+
+    <footer>Muhardian @2026</footer>
+
+    <script>
+        function onScanSuccess(decodedText) {
+            html5QrcodeScanner.clear();
+            // Kirim hasil scan lewat URL parameter kembali ke index.html
+            window.location.href = "index.html?qr=" + encodeURIComponent(decodedText);
+        }
+
+        let html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
+            fps: 15, 
+            qrbox: 250,
+            rememberLastUsedCamera: true,
+            aspectRatio: 1.0
+        });
+        html5QrcodeScanner.render(onScanSuccess);
+    </script>
+</body>
+</html>
