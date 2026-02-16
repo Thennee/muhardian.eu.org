@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UD. RIO / FIKRI</title>
+    <title>Muhardian 2026</title>
     <style>
-        /* Variabel Warna & Font */
         :root {
             --bg-dark: #050b18;
-            --bg-card: rgba(22, 30, 45, 0.7);
+            --bg-card: rgba(22, 30, 45, 0.8);
             --accent-blue: #00d2ff;
-            --accent-purple: #3a7bd5;
             --text-main: #e2e8f0;
             --text-dim: #94a3b8;
             --glass-border: rgba(255, 255, 255, 0.1);
@@ -20,7 +18,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', Roboto, sans-serif;
         }
 
         body {
@@ -29,15 +27,12 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
         }
 
         /* Header & Logo */
         header {
-            padding: 20px 5%;
-            display: flex;
-            align-items: center;
-            background: rgba(5, 11, 24, 0.8);
+            padding: 15px 5%;
+            background: rgba(5, 11, 24, 0.9);
             backdrop-filter: blur(10px);
             position: sticky;
             top: 0;
@@ -45,21 +40,16 @@
             border-bottom: 1px solid var(--glass-border);
         }
 
-        .logo-container a {
-            display: inline-block;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .logo-container a:hover {
-            transform: scale(1.1) rotate(-3deg);
-        }
-
         .logo-container img {
-            height: 50px; /* Sesuaikan ukuran logo.png Anda */
-            width: auto;
+            height: 45px;
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
         }
 
-        /* Main Content */
+        .logo-container a:hover img {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        /* Container Card */
         .main-wrapper {
             flex: 1;
             display: flex;
@@ -70,114 +60,98 @@
 
         .card {
             background: var(--bg-card);
-            backdrop-filter: blur(15px);
-            max-width: 700px;
+            backdrop-filter: blur(20px);
+            max-width: 750px;
             width: 100%;
             padding: 40px;
-            border-radius: 24px;
+            border-radius: 20px;
             border: 1px solid var(--glass-border);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            animation: slideUp 1s ease-out;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            animation: fadeIn 0.8s ease-out;
         }
 
-        .card h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-            background: linear-gradient(to right, var(--accent-blue), #ffffff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* Content Paragraph & Show More */
-        .content-text {
-            font-size: 1.1rem;
+        /* Konten & Alinea */
+        .content-text p {
+            text-indent: 40px; /* Membuat Alinea */
+            margin-bottom: 2em; /* Jarak 2 baris antar paragraf */
             line-height: 1.8;
             color: var(--text-dim);
-            margin-bottom: 15px;
         }
 
+        /* More Text Rata Kanan Kiri */
         #more-text {
-            display: none; /* Sembunyikan artikel full secara default */
-            margin-top: 10px;
+            display: none;
+            text-align: justify; /* Rata Kanan Kiri */
+            hyphens: auto;
         }
 
         .read-more-btn {
             color: var(--accent-blue);
             cursor: pointer;
-            font-weight: 600;
-            text-decoration: underline;
-            transition: color 0.3s;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            transition: 0.3s;
         }
 
         .read-more-btn:hover {
-            color: #fff;
+            text-shadow: 0 0 10px var(--accent-blue);
         }
 
-        /* Action Buttons Area */
+        /* Buttons */
         .button-group {
-            margin-top: 40px;
             display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
+            gap: 12px;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 25px;
         }
 
         .btn-small {
-            padding: 8px 18px;
+            padding: 10px 20px;
             border-radius: 8px;
             font-size: 13px;
             text-decoration: none;
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .btn-inventory {
-            background: rgba(59, 130, 246, 0.15);
-            color: var(--accent-blue);
-        }
-
-        .btn-report {
-            background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
-        }
+        .btn-inventory { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
+        .btn-report { background: rgba(239, 68, 68, 0.2); color: #f87171; }
 
         .btn-small:hover {
-            transform: translateY(-3px);
-            filter: brightness(1.2);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transform: translateY(-2px);
+            filter: brightness(1.3);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         /* Footer Samar */
         footer {
             text-align: center;
-            padding: 30px;
-            font-size: 11px;
-            color: rgba(148, 163, 184, 0.3); /* Samar-samar */
-            letter-spacing: 1px;
-            transition: color 0.5s;
+            padding: 20px;
+            font-size: 10px;
+            color: rgba(148, 163, 184, 0.2);
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         footer:hover {
             color: var(--accent-blue);
-            text-shadow: 0 0 10px var(--accent-blue);
+            text-shadow: 0 0 8px var(--accent-blue);
+            transition: 0.5s;
         }
 
-        /* Animasi */
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         /* Responsive Mobile */
         @media (max-width: 600px) {
             .card { padding: 25px; }
-            .card h1 { font-size: 1.5rem; }
-            header { justify-content: center; }
-            .logo-container img { height: 40px; }
-            .button-group { justify-content: center; }
+            .content-text p { text-indent: 25px; margin-bottom: 1.5em; }
+            header { text-align: left; }
         }
     </style>
 </head>
@@ -193,27 +167,28 @@
 
     <div class="main-wrapper">
         <div class="card">
-            <h1>Supllier & Distributor</h1>
+            <h2 style="margin-bottom: 25px; color: #fff;">Supllier & Distributor</h2>
             
             <div class="content-text">
-                <p id="first-paragraph">
-                    UD. RIO / FIKRI: Dedikasi Menjadi Pilar Utama Suplai Dapur MBG di Bogor
-Berdiri sejak tahun 2008 di Bogor, UD. RIO / FIKRI telah mengukuhkan posisinya sebagai mitra strategis dalam industri penyediaan bahan pangan dan perlengkapan dapur. Mengawali langkah sebagai usaha lokal yang mengedepankan kualitas dan kepercayaan, perusahaan ini telah..
+                <p>
+                    Integrasi teknologi kecerdasan buatan masa kini memberikan kemudahan luar biasa dalam pengolahan data dan efisiensi kerja. Dengan sistem berbasis AI, pengguna dapat melakukan analisis mendalam hanya dalam hitungan detik, memungkinkan pengambilan keputusan yang lebih cepat dan akurat di berbagai sektor industri maupun kebutuhan personal yang mendesak.
                 </p>
                 
                 <div id="more-text">
                     <p>
                         UD. RIO / FIKRI: Dedikasi Menjadi Pilar Utama Suplai Dapur MBG di Bogor
 Berdiri sejak tahun 2008 di Bogor, UD. RIO / FIKRI telah mengukuhkan posisinya sebagai mitra strategis dalam industri penyediaan bahan pangan dan perlengkapan dapur. Mengawali langkah sebagai usaha lokal yang mengedepankan kualitas dan kepercayaan, perusahaan ini telah melewati perjalanan panjang selama lebih dari satu dekade untuk mengasah keahliannya di bidang distribusi. Dengan pengalaman yang matang, UD. RIO / FIKRI bukan sekadar pemasok biasa, melainkan penyambung rantai pasok yang andal bagi berbagai lini usaha kuliner di wilayah Bogor dan sekitarnya.
-<br>
+                    
+                    </p>
+                    <p>
+<br><br>
 Seiring berkembangnya dinamika industri makanan, UD. RIO / FIKRI melakukan spesialisasi strategis dengan memfokuskan diri sebagai supplier utama untuk kebutuhan dapur Makan Bergizi Gratis (MBG). Fokus ini diambil sebagai bentuk komitmen perusahaan dalam mendukung penyediaan asupan makanan yang sehat, higienis, dan bermutu tinggi. Dengan memahami standar ketat yang diperlukan dalam pengolahan menu bergizi, perusahaan memastikan bahwa setiap bahan baku yang didistribusikan telah melalui proses seleksi yang ketat demi menjaga keamanan konsumsi masyarakat.
-<br>
+<br><br>
 Sebagai distributor dan supplier yang berpengalaman, UD. RIO / FIKRI menyadari bahwa ketepatan waktu dan kesegaran produk adalah kunci utama dalam operasional dapur. Oleh karena itu, perusahaan menerapkan sistem logistik yang efisien untuk menjamin bahwa seluruh kebutuhan operasional mitra tidak pernah terhambat. Kelengkapan komoditas yang ditawarkan, mulai dari bahan pokok hingga bumbu dapur khusus, menjadikan UD. RIO / FIKRI sebagai solusi satu pintu (one-stop solution) yang memudahkan para pengelola dapur dalam mengatur stok harian mereka.
-<br>
+<br><br>
 Keunggulan UD. RIO / FIKRI juga terletak pada pendekatan personalnya terhadap setiap pelanggan. Sebagai bisnis yang tumbuh dari akar lokal Bogor, mereka memiliki pemahaman mendalam mengenai preferensi pasar dan ketersediaan sumber daya di daerah tersebut. Hubungan yang harmonis dengan produsen lokal dan jaringan distribusi yang luas memungkinkan perusahaan untuk menawarkan harga yang kompetitif tanpa harus mengorbankan kualitas produk, sebuah keseimbangan yang sangat dibutuhkan dalam manajemen anggaran dapur berskala besar.
-<br>
+<br><br>
 Memasuki masa depan, UD. RIO / FIKRI terus berinovasi untuk meningkatkan standar layanan dan profesionalisme dalam industri supplier. Dengan rekam jejak yang solid sejak 2008, perusahaan ini optimis dapat terus berkontribusi nyata dalam menyukseskan program-program pemenuhan gizi masyarakat melalui suplai bahan pangan yang konsisten. Kepercayaan pelanggan adalah aset terbesar bagi UD. RIO / FIKRI untuk tetap berdiri tegak sebagai pemimpin pasar di bidang distribusi kebutuhan dapur MBG.
-<br>
                         
                     </p>
                 </div>
@@ -222,12 +197,8 @@ Memasuki masa depan, UD. RIO / FIKRI terus berinovasi untuk meningkatkan standar
             </div>
 
             <div class="button-group">
-                <a href="https://muhardian.eu.org/riky/inv" class="btn-small btn-inventory">
-                    📦 Input Inventori
-                </a>
-                <a href="https://muhardian.eu.org/riky/rpt/" class="btn-small btn-report">
-                    ⚠️ Report
-                </a>
+                <a href="https://muhardian.eu.org/riky/inv" class="btn-small btn-inventory">📦 Input </a>
+                <a href="https://muhardian.eu.org/riky/rpt/" class="btn-small btn-report">⚠️ Report</a>
             </div>
         </div>
     </div>
@@ -246,11 +217,10 @@ Memasuki masa depan, UD. RIO / FIKRI terus berinovasi untuk meningkatkan standar
                 btnText.innerHTML = "Baca Selengkapnya...";
             } else {
                 moreText.style.display = "block";
-                btnText.innerHTML = "Tampilkan Sedikit";
+                btnText.innerHTML = "Tampilkan Lebih Sedikit";
             }
         }
     </script>
 
 </body>
 </html>
-
