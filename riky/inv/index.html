@@ -93,8 +93,8 @@
         <div class="form-group">
             <label>Status Transaksi</label>
             <select id="kode">
-                <option value="BM">BM (Masuk ke Kolom F)</option>
-                <option value="BK">BK (Keluar ke Kolom G)</option>
+                <option value="BM">BM (Barang Masuk)</option>
+                <option value="BK">BK (Barang Keluar)</option>
             </select>
         </div>
         
@@ -135,7 +135,7 @@
 
         fetch(scriptURL, { method: 'POST', body: JSON.stringify(data) })
         .then(res => {
-            Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Data tersimpan di kolom yang tepat.', background: '#112240', color: '#fff' });
+            Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Data tersimpan .', background: '#112240', color: '#fff' });
             document.getElementById('inventoryForm').reset();
             document.getElementById('scanResult').value = "";
             document.getElementById('tanggal').valueAsDate = new Date();
@@ -145,3 +145,4 @@
 </script>
 </body>
 </html>
+
