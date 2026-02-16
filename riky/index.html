@@ -1,233 +1,224 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Inventory Input</title>
-  <style>
-    :root{
-      --bg1:#0f172a;
-      --bg2:#1e3c72;
-      --accent1:#00c6ff;
-      --accent2:#0072ff;
-      --glass: rgba(255,255,255,0.08);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Inter, system-ui, Arial, sans-serif;
-      background: radial-gradient(1200px 600px at 10% 10%, #123a7a 0%, transparent 20%),
-                  linear-gradient(135deg, var(--bg2), #0b254a 60%);
-      color:#eaf6ff;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-    }
+<meta charset="UTF-8">
+<title>Input Barang</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    .card{
-      width:100%;
-      max-width:720px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-      border-radius:16px;
-      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
-      padding:20px;
-      backdrop-filter: blur(6px);
-      border: 1px solid rgba(255,255,255,0.04);
-    }
+<style>
+:root{
+  --blue1:#0d47ff;
+  --blue2:#00c6ff;
+}
 
-    .logo {
-      display:flex;
-      justify-content:center;
-      margin-bottom:8px;
-    }
+*{box-sizing:border-box;font-family:Segoe UI,Arial;}
 
-    .logo img{
-      width:84px;
-      height:84px;
-      object-fit:contain;
-      border-radius:12px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
-      background: linear-gradient(135deg, var(--accent1), var(--accent2));
-      padding:12px;
-    }
+body{
+  margin:0;
+  min-height:100vh;
+  background:linear-gradient(135deg,var(--blue1),var(--blue2));
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
 
-    h1{
-      text-align:center;
-      margin:6px 0 18px 0;
-      font-size:1.4rem;
-      letter-spacing:0.6px;
-      color: #e6f7ff;
-      text-shadow: 0 4px 18px rgba(0,0,0,0.45);
-    }
+.card{
+  width:100%;
+  max-width:420px;
+  background:rgba(255,255,255,.15);
+  backdrop-filter: blur(10px);
+  border-radius:18px;
+  padding:20px 18px 24px;
+  box-shadow:0 15px 35px rgba(0,0,0,.25);
+  color:#fff;
+  animation:fadeIn .6s ease;
+}
 
-    form{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-    }
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(15px);}
+  to{opacity:1;transform:translateY(0);}
+}
 
-    label{
-      display:block;
-      font-size:0.85rem;
-      color:#dff6ff;
-      margin-bottom:6px;
-    }
+.logo{
+  text-align:center;
+  margin-bottom:10px;
+}
 
-    .full { grid-column: 1 / -1; }
+.logo img{
+  height:70px;
+  object-fit:contain;
+}
 
-    input[type="text"], input[type="date"], input[type="number"], select {
-      width:100%;
-      padding:12px;
-      border-radius:10px;
-      border: none;
-      background: rgba(255,255,255,0.95);
-      color:#042033;
-      font-size:1rem;
-      outline: none;
-    }
+h2{
+  text-align:center;
+  margin:10px 0 18px;
+}
 
-    .actions{
-      display:flex;
-      gap:12px;
-      margin-top:12px;
-      align-items:center;
-      justify-content:space-between;
-      grid-column:1 / -1;
-    }
+.form-group{
+  margin-bottom:12px;
+}
 
-    .btn {
-      flex:1;
-      padding:12px 14px;
-      border-radius:10px;
-      border:none;
-      font-weight:600;
-      cursor:pointer;
-      color:#fff;
-      background: linear-gradient(90deg, var(--accent1), var(--accent2));
-      box-shadow: 0 8px 20px rgba(0,110,255,0.18);
-      transition: transform .12s ease, box-shadow .12s ease;
-    }
-    .btn:hover{ transform: translateY(-3px); box-shadow: 0 14px 30px rgba(0,110,255,0.22); }
+label{
+  font-size:13px;
+  opacity:.9;
+}
 
-    .btn.secondary{
-      background: linear-gradient(90deg, #6b8cff, #3b6bff);
-    }
+input,select{
+  width:100%;
+  padding:10px 12px;
+  border-radius:10px;
+  border:none;
+  outline:none;
+  margin-top:4px;
+  font-size:14px;
+}
 
-    .note{
-      font-size:0.85rem;
-      color:#cfeeff;
-      text-align:center;
-      margin-top:10px;
-    }
+input,select{
+  background:#fff;
+}
 
-    @media (max-width:640px){
-      form{ grid-template-columns: 1fr; }
-      .logo img{ width:72px; height:72px; }
-    }
-  </style>
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:15px;
+}
+
+button{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  font-weight:600;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.btn-submit{
+  background:linear-gradient(135deg,#00e5ff,#2979ff);
+  color:#003;
+}
+
+.btn-scan{
+  background:linear-gradient(135deg,#00ff9c,#00c853);
+  color:#003;
+}
+
+button:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.05);
+}
+
+.status{
+  margin-top:10px;
+  font-size:13px;
+  text-align:center;
+}
+</style>
 </head>
 <body>
-  <div class="card" role="main">
-    <div class="logo">
-      <!-- Ganti src dengan logo Anda -->
-      <img src="https://muhardian.eu.org/riky/Logo.png" alt="Logo">
-    </div>
 
-    <h1>Input Data Barang</h1>
+<div class="card">
 
-    <form id="mainForm" autocomplete="off">
-      <div class="full">
-        <label for="tanggal">Tanggal</label>
-        <input type="date" id="tanggal" name="tanggal" required>
-      </div>
-
-      <div>
-        <label for="nama">Nama Barang</label>
-        <input type="text" id="nama" name="nama" placeholder="Contoh: Beras Premium" required>
-      </div>
-
-      <div>
-        <label for="kode">Kode Barang</label>
-        <input type="text" id="kode" name="kode" placeholder="BM atau BK" maxlength="3" required>
-      </div>
-
-      <div>
-        <label for="qty">Jumlah Qty</label>
-        <input type="number" id="qty" name="qty" min="0" step="1" required>
-      </div>
-
-      <div>
-        <label for="satuan">Satuan</label>
-        <select id="satuan" name="satuan" required>
-          <option value="Kg">Kg</option>
-          <option value="Liter">Liter</option>
-          <option value="Pcs">Pcs</option>
-          <option value="Box/Peti">Box/Peti</option>
-        </select>
-      </div>
-
-      <div class="full">
-        <label for="kodeqr">Hasil Scan QR (opsional)</label>
-        <input type="text" id="kodeqr" name="kodeqr" placeholder="Jika datang dari scan, field ini akan terisi otomatis">
-      </div>
-
-      <div class="actions full">
-        <button type="submit" class="btn">Simpan ke Google Sheet</button>
-        <button type="button" class="btn secondary" id="scanBtn">Scan QR Code</button>
-      </div>
-    </form>
-
-    <div class="note">Data akan tersimpan ke Google Sheet Anda. Pastikan Web App URL sudah diisi di script.</div>
+  <div class="logo">
+    <!-- Ganti dengan logo Anda -->
+    <img src="https://muhardian.eu.org/riky/Logo2.png" alt="Logo">
   </div>
 
-  <script>
-    // Ganti dengan URL Web App Google Apps Script Anda
-    const WEB_APP_URL = "PASTE_WEB_APP_URL_HERE";
+  <h2>Input Barang</h2>
 
-    const form = document.getElementById('mainForm');
-    const scanBtn = document.getElementById('scanBtn');
+  <form id="formBarang">
 
-    // Arahkan ke scan.html saat tombol scan ditekan
-    scanBtn.addEventListener('click', () => {
-      // Buka scan.html di tab yang sama
-      window.location.href = 'scan.html';
+    <div class="form-group">
+      <label>Tanggal</label>
+      <input type="date" name="tanggal" required>
+    </div>
+
+    <div class="form-group">
+      <label>Nama Barang</label>
+      <input type="text" name="nama_barang" required>
+    </div>
+
+    <div class="form-group">
+      <label>Jumlah / Qty</label>
+      <input type="number" name="qty" required>
+    </div>
+
+    <div class="form-group">
+      <label>Satuan</label>
+      <select name="satuan" required>
+        <option value="">Pilih</option>
+        <option>Kg</option>
+        <option>Liter</option>
+        <option>Pcs</option>
+        <option>Box/Peti</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Kode Barang</label>
+      <select name="kode" required>
+        <option value="">Pilih</option>
+        <option value="BM">BM - Barang Masuk</option>
+        <option value="BK">BK - Barang Keluar</option>
+      </select>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn-submit">Simpan</button>
+      <button type="button" class="btn-scan" id="btnScan">Scan QR</button>
+    </div>
+
+  </form>
+
+  <div class="status" id="status"></div>
+
+</div>
+
+<script>
+/* GANTI DENGAN URL WEB APP ANDA */
+const API_URL = "PASTE_URL_WEB_APP_DISINI";
+
+document.getElementById("btnScan").addEventListener("click",()=>{
+  const token = Date.now().toString();
+  sessionStorage.setItem("scan_token", token);
+  location.href = "scan.html?token="+token;
+});
+
+document.getElementById("formBarang").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const status = document.getElementById("status");
+  status.textContent = "Mengirim data...";
+
+  const formData = new FormData(e.target);
+
+  const payload = {
+    type:"form",
+    tanggal: formData.get("tanggal"),
+    nama_barang: formData.get("nama_barang"),
+    qty: formData.get("qty"),
+    satuan: formData.get("satuan"),
+    kode: formData.get("kode")
+  };
+
+  try{
+    const res = await fetch(API_URL,{
+      method:"POST",
+      body: JSON.stringify(payload)
     });
 
-    // Jika index.html dibuka kembali setelah scan, Anda bisa menerima parameter query ?qr=... untuk mengisi field
-    (function prefillFromQuery(){
-      const params = new URLSearchParams(window.location.search);
-      const qr = params.get('qr');
-      if(qr){
-        document.getElementById('kodeqr').value = qr;
-      }
-    })();
+    const r = await res.json();
+    if(r.status === "success"){
+      status.textContent = "Data berhasil disimpan.";
+      e.target.reset();
+    }else{
+      status.textContent = "Gagal menyimpan.";
+    }
 
-    form.addEventListener('submit', function(e){
-      e.preventDefault();
-      const fd = new FormData(form);
+  }catch(err){
+    status.textContent = "Koneksi gagal.";
+  }
+});
+</script>
 
-      // Pastikan format kode BM/BK uppercase
-      const kodeField = fd.get('kode') || '';
-      fd.set('kode', kodeField.toString().trim().toUpperCase());
-
-      fetch(WEB_APP_URL, {
-        method: 'POST',
-        body: fd
-      })
-      .then(resp => resp.text())
-      .then(txt => {
-        alert('Data berhasil dikirim ke Google Sheet.');
-        form.reset();
-      })
-      .catch(err => {
-        console.error(err);
-        alert('Gagal mengirim data: ' + err.message);
-      });
-    });
-  </script>
 </body>
 </html>
-
-
