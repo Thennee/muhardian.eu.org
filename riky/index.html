@@ -1,225 +1,227 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Input Barang</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Inventaris</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #00c6ff;
+            --secondary-blue: #0072ff;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
 
-<style>
-:root{
-  --blue1:#0d47ff;
-  --blue2:#00c6ff;
-}
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
 
-*{box-sizing:border-box;font-family:Segoe UI,Arial;}
+        .container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
 
-body{
-  margin:0;
-  min-height:100vh;
-  background:linear-gradient(135deg,var(--blue1),var(--blue2));
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
 
-.card{
-  width:100%;
-  max-width:420px;
-  background:rgba(255,255,255,.15);
-  backdrop-filter: blur(10px);
-  border-radius:18px;
-  padding:20px 18px 24px;
-  box-shadow:0 15px 35px rgba(0,0,0,.25);
-  color:#fff;
-  animation:fadeIn .6s ease;
-}
+        /* Logo Placeholder */
+        .logo-circle {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            font-weight: bold;
+            box-shadow: 0 0 20px var(--secondary-blue);
+            border: 3px solid white;
+        }
 
-@keyframes fadeIn{
-  from{opacity:0;transform:translateY(15px);}
-  to{opacity:1;transform:translateY(0);}
-}
+        h2 { margin: 0; text-shadow: 0 0 10px rgba(0,198,255,0.5); }
 
-.logo{
-  text-align:center;
-  margin-bottom:10px;
-}
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 0.9em; color: #ddd; }
 
-.logo img{
-  height:70px;
-  object-fit:contain;
-}
+        input, select {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: white;
+            font-family: inherit;
+            outline: none;
+            transition: 0.3s;
+        }
 
-h2{
-  text-align:center;
-  margin:10px 0 18px;
-}
+        input:focus, select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 10px rgba(0, 198, 255, 0.3);
+        }
 
-.form-group{
-  margin-bottom:12px;
-}
+        /* Agar opsi select terlihat jelas di mobile */
+        option { background: #302b63; color: white; }
 
-label{
-  font-size:13px;
-  opacity:.9;
-}
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
 
-input,select{
-  width:100%;
-  padding:10px 12px;
-  border-radius:10px;
-  border:none;
-  outline:none;
-  margin-top:4px;
-  font-size:14px;
-}
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1em;
+        }
 
-input,select{
-  background:#fff;
-}
+        .btn-submit {
+            background: linear-gradient(90deg, var(--secondary-blue), var(--primary-blue));
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4);
+        }
 
-.actions{
-  display:flex;
-  gap:10px;
-  margin-top:15px;
-}
+        .btn-scan {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid white;
+            color: white;
+        }
 
-button{
-  flex:1;
-  padding:12px;
-  border:none;
-  border-radius:12px;
-  font-weight:600;
-  cursor:pointer;
-  transition:.3s;
-}
+        button:hover { transform: translateY(-2px); }
+        button:active { transform: translateY(0); }
 
-.btn-submit{
-  background:linear-gradient(135deg,#00e5ff,#2979ff);
-  color:#003;
-}
-
-.btn-scan{
-  background:linear-gradient(135deg,#00ff9c,#00c853);
-  color:#003;
-}
-
-button:hover{
-  transform:translateY(-2px);
-  filter:brightness(1.05);
-}
-
-.status{
-  margin-top:10px;
-  font-size:13px;
-  text-align:center;
-}
-</style>
+        .loader {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: var(--primary-blue);
+        }
+    </style>
 </head>
 <body>
 
-<div class="card">
-
-  <div class="logo">
-    <!-- Ganti dengan logo Anda -->
-    <img src="https://muhardian.eu.org/riky/Logo2.png" alt="Logo">
-  </div>
-
-  <h2>Input Barang</h2>
-
-  <form id="formBarang">
-
-    <div class="form-group">
-      <label>Tanggal</label>
-      <input type="date" name="tanggal" required>
+<div class="container">
+    <div class="header">
+        <div class="logo-circle">LOG</div>
+        <h2>Input Data Barang</h2>
     </div>
 
-    <div class="form-group">
-      <label>Nama Barang</label>
-      <input type="text" name="nama_barang" required>
-    </div>
+    <form id="inventoryForm">
+        <div class="form-group">
+            <label>Tanggal</label>
+            <input type="date" id="tanggal" name="tanggal" required>
+        </div>
 
-    <div class="form-group">
-      <label>Jumlah / Qty</label>
-      <input type="number" name="qty" required>
-    </div>
+        <div class="form-group">
+            <label>Nama Barang</label>
+            <input type="text" id="nama_barang" name="nama_barang" placeholder="Contoh: Beras Premium" required>
+        </div>
 
-    <div class="form-group">
-      <label>Satuan</label>
-      <select name="satuan" required>
-        <option value="">Pilih</option>
-        <option>Kg</option>
-        <option>Liter</option>
-        <option>Pcs</option>
-        <option>Box/Peti</option>
-      </select>
-    </div>
+        <div class="form-group">
+            <label>Jumlah (Qty)</label>
+            <input type="number" id="qty" name="qty" placeholder="0" required>
+        </div>
 
-    <div class="form-group">
-      <label>Kode Barang</label>
-      <select name="kode" required>
-        <option value="">Pilih</option>
-        <option value="BM">BM - Barang Masuk</option>
-        <option value="BK">BK - Barang Keluar</option>
-      </select>
-    </div>
+        <div class="form-group">
+            <label>Satuan</label>
+            <select id="satuan" name="satuan" required>
+                <option value="Kg">Kg</option>
+                <option value="Liter">Liter</option>
+                <option value="Pcs">Pcs</option>
+                <option value="Box/Peti">Box / Peti</option>
+            </select>
+        </div>
 
-    <div class="actions">
-      <button type="submit" class="btn-submit">Simpan</button>
-      <button type="button" class="btn-scan" id="btnScan">Scan QR</button>
-    </div>
+        <div class="form-group">
+            <label>Kode Barang (Transaksi)</label>
+            <select id="kode_barang" name="kode_barang" required>
+                <option value="BM">BM (Barang Masuk)</option>
+                <option value="BK">BK (Barang Keluar)</option>
+            </select>
+        </div>
 
-  </form>
+        <div class="loader" id="loader">Sedang mengirim data...</div>
 
-  <div class="status" id="status"></div>
-
+        <div class="btn-group">
+            <button type="button" class="btn-scan" onclick="window.location.href='scan.html'">
+                📷 Scan QR
+            </button>
+            <button type="submit" class="btn-submit">Simpan Data</button>
+        </div>
+    </form>
 </div>
 
 <script>
-/* GANTI DENGAN URL WEB APP ANDA */
-const API_URL = "https://script.google.com/macros/s/AKfycbwnJkkiDOXcIqKuTsD4GLWBZV2uMjQpxAe_vJrkzTtCkumc7I93rgf7nVqK1RGoz-9c/exec";
+    // --- KONFIGURASI ---
+    const SCRIPT_URL = 'https://script.google.com/macros/library/d/10VJ71GjhC2ouclwYYjfSIwJU7ghiAinvn98Xzu_ITMRAzZe8Q-v6gLdH/2'; // PASTE LINK DEPLOYMENT ANDA DI SINI
+    // -------------------
 
-document.getElementById("btnScan").addEventListener("click",()=>{
-  const token = Date.now().toString();
-  sessionStorage.setItem("scan_token", token);
-  location.href = "scan.html?token="+token;
-});
+    // Set tanggal hari ini otomatis
+    document.getElementById('tanggal').valueAsDate = new Date();
 
-document.getElementById("formBarang").addEventListener("submit", async (e)=>{
-  e.preventDefault();
-  const status = document.getElementById("status");
-  status.textContent = "Mengirim data...";
+    const form = document.getElementById('inventoryForm');
+    const loader = document.getElementById('loader');
 
-  const formData = new FormData(e.target);
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        loader.style.display = 'block';
 
-  const payload = {
-    type:"form",
-    tanggal: formData.get("tanggal"),
-    nama_barang: formData.get("nama_barang"),
-    qty: formData.get("qty"),
-    satuan: formData.get("satuan"),
-    kode: formData.get("kode")
-  };
+        // Ambil data form
+        let data = {
+            tanggal: form.tanggal.value,
+            nama_barang: form.nama_barang.value,
+            qty: form.qty.value,
+            satuan: form.satuan.value,
+            kode_barang: form.kode_barang.value,
+            sumber: 'Manual'
+        };
 
-  try{
-    const res = await fetch(API_URL,{
-      method:"POST",
-      body: JSON.stringify(payload)
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(response => {
+            loader.style.display = 'none';
+            alert('Data Berhasil Disimpan!');
+            form.reset();
+            document.getElementById('tanggal').valueAsDate = new Date();
+        })
+        .catch(error => {
+            loader.style.display = 'none';
+            alert('Error! Cek koneksi internet.');
+            console.error('Error!', error.message);
+        });
     });
-
-    const r = await res.json();
-    if(r.status === "success"){
-      status.textContent = "Data berhasil disimpan.";
-      e.target.reset();
-    }else{
-      status.textContent = "Gagal menyimpan.";
-    }
-
-  }catch(err){
-    status.textContent = "Koneksi gagal.";
-  }
-});
 </script>
 
 </body>
 </html>
-
