@@ -5,112 +5,125 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Responsive Dark Blue Frame</title>
     <style>
-        /* Mengatur dasar halaman */
+        /* Dasar Halaman */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #020617 100%);
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between; /* Menjaga footer tetap di bawah */
             padding: 20px;
             color: white;
             overflow-x: hidden;
         }
 
-        /* Container Utama */
         .main-container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 1100px;
             text-align: center;
-            animation: fadeIn 1s ease-in-out;
+            animation: fadeIn 0.8s ease-out;
+            flex-grow: 1; /* Memberikan ruang agar footer terdorong ke bawah */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
-        /* Logo dengan efek glow */
+        /* Logo Glow Effect */
         .logo-wrapper {
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .logo-wrapper img {
-            width: 120px;
+            width: 110px;
             height: auto;
-            filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.6));
+            filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.5));
             transition: transform 0.3s ease;
         }
 
-        .logo-wrapper img:hover {
-            transform: scale(1.1);
-        }
-
-        /* Frame Spreadsheet / Konten */
+        /* Frame Container Glassmorphism */
         .frame-container {
-            position: relative;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 10px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            margin-bottom: 30px;
-            overflow: hidden;
+            border-radius: 15px;
+            padding: 8px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            margin-bottom: 25px;
         }
 
         iframe {
             width: 100%;
-            height: 600px; /* Standar untuk PC */
+            height: 550px;
             border: none;
-            border-radius: 12px;
-            background: white;
+            border-radius: 10px;
+            background: #ffffff;
         }
 
-        /* Tombol Home yang Eye-Catching */
-        .btn-home {
-            display: inline-block;
-            padding: 15px 40px;
-            background: linear-gradient(45deg, #38bdf8, #2563eb);
+        /* Grouping Tombol */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            padding: 14px 30px;
             color: white;
             text-decoration: none;
-            font-weight: bold;
-            border-radius: 50px;
+            font-weight: 600;
+            border-radius: 12px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 160px;
         }
 
-        .btn-home:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(56, 189, 248, 0.6);
-            filter: brightness(1.1);
+        .btn-home {
+            background: linear-gradient(45deg, #1e40af, #3b82f6);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-input {
+            background: linear-gradient(45deg, #0f766e, #14b8a6);
+            box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(56, 189, 248, 0.5);
+            filter: brightness(1.2);
+        }
+
+        /* Footer Samar */
+        footer {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3); /* Transparan/samar */
+            letter-spacing: 1px;
+            padding-bottom: 10px;
         }
 
         /* Animasi */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Responsif untuk Layar HP */
+        /* Responsif HP */
         @media (max-width: 768px) {
-            iframe {
-                height: 450px; /* Lebih pendek di HP */
-            }
-            
-            .logo-wrapper img {
-                width: 90px;
-            }
-
-            .btn-home {
-                width: 80%;
-                padding: 12px 20px;
-            }
+            iframe { height: 450px; }
+            .button-group { flex-direction: column; align-items: center; }
+            .btn { width: 90%; }
         }
     </style>
 </head>
@@ -125,8 +138,37 @@
             <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSLf0pVHDPU73cuFtd6B5fo54PfedGX7qsQQiv1OsT7LCPgQlL2O-pFFaEbjmku6v46ITUjbFs2kmuo/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
         </div>
 
-        <a href="https://muhardian.eu.org/riky" class="btn-home">Kembali ke Home</a>
+        <div class="button-group">
+            <a href="https://muhardian.eu.org/riky" class="btn btn-home">Home</a>
+            <a href="https://muhardian.eu.org/riky/inv" class="btn btn-input">Input Me</a>
+        </div>
     </div>
+
+    <footer>
+        By Muhardian @2026
+    </footer>
+
+    <script>
+        // Fungsi membersihkan cache & memaksa data terbaru
+        window.onload = function() {
+            // Bersihkan cookies
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i];
+                const eqPos = cookie.indexOf("=");
+                const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+            }
+
+            // Tambahkan timestamp pada URL Iframe untuk mencegah cache
+            const iframe = document.getElementById('sheetFrame');
+            const currentSrc = iframe.src;
+            const newSrc = currentSrc.includes('?') ? 
+                           currentSrc + '&nocache=' + new Date().getTime() : 
+                           currentSrc + '?nocache=' + new Date().getTime();
+            iframe.src = newSrc;
+        };
+    </script>
 
 </body>
 </html>
