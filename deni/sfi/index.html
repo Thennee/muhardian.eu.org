@@ -3,125 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Year of the Horse - Interactive Experience</title>
+    <title>Year of the Horse - Gallery Experience</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
     <style>
         :root {
-            --bg-color: #fce4ec; /* Warna pink lembut sesuai gambar */
+            --bg-color: #fce4ec; 
+            --accent-color: #d32f2f;
         }
 
         body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
             background-color: var(--bg-color);
             overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Arial', sans-serif;
         }
 
-        /* Container Utama */
-        .container {
+        .main-container {
             position: relative;
+            width: 90vw;
+            max-width: 800px;
             text-align: center;
-            cursor: pointer;
-            perspective: 1000px;
         }
 
-        /* Styling Gambar */
-        .image-wrapper {
-            width: 80vw;
-            max-width: 800px;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        /* Styling Gambar Utama */
+        #mainImageCard {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            border-radius: 15px;
+            background: white;
+            padding: 10px;
+        }
+
+        #mainImageCard img {
+            width: 100%;
+            display: block;
+            border-radius: 10px;
+        }
+
+        /* Styling Slider (Tersembunyi di awal) */
+        #sliderContainer {
+            display: none;
+            position: relative;
+            width: 100%;
             border-radius: 15px;
             overflow: hidden;
-            background: #fff;
-            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            background: #000;
         }
 
-        .image-wrapper img {
+        .slide {
+            display: none;
+            width: 100%;
+            animation: fadeEffect 1s;
+        }
+
+        .slide img {
             width: 100%;
             height: auto;
-            display: block;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease;
+            vertical-align: middle;
         }
 
-        /* Efek Hover di PC */
-        .image-wrapper:hover {
-            transform: scale(1.02) rotateY(5deg);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        @keyframes fadeEffect {
+            from { opacity: 0.4; transform: scale(1.1); }
+            to { opacity: 1; transform: scale(1); }
         }
 
-        /* Class untuk trigger animasi klik via JS */
-        .clicked-effect {
-            animation: heartBeat 0.8s;
-        }
-
-        /* Overlay Text (Opsional) */
-        .hint {
+        /* Navigasi Slider */
+        .prev, .next {
+            cursor: pointer;
             position: absolute;
-            bottom: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #d32f2f;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 16px;
+            color: white;
             font-weight: bold;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            font-size: 0.8rem;
+            font-size: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 0 3px 3px 0;
+            user-select: none;
+            transition: 0.3s;
         }
+
+        .next { right: 0; border-radius: 3px 0 0 3px; }
+        .prev:hover, .next:hover { background: var(--accent-color); }
+
+        .hint-text {
+            margin-top: 20px;
+            color: var(--accent-color);
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="container animate__animated animate__zoomInDown">
-        <div class="image-wrapper" id="imgBox">
-            <img src="sf-china.jpg" id="mainImage" alt="Year of the Horse">
+    <div class="main-container">
+        
+        <div id="mainImageCard" class="animate__animated animate__zoomIn">
+            <img src="sf-china.jpg" alt="Main Image">
+            <div class="hint-text">Click Me</div>
         </div>
-        <div class="hint">Click me</div>
+
+        <div id="sliderContainer" class="animate__animated">
+            <div class="slide">
+                <img src="1.jpg" alt="Foto 1">
+            </div>
+            <div class="slide">
+                <img src="2.jpg" alt="Foto 2">
+            </div>
+            <div class="slide">
+                <img src="3.jpg" alt="Foto 3">
+            </div>
+            <div class="slide">
+                <img src="4.jpg" alt="Foto 4">
+            </div>
+
+            <a class="prev" onclick="changeSlide(-1)">&#10094;</a>
+            <a class="next" onclick="changeSlide(1)">&#10095;</a>
+        </div>
+
     </div>
 
     <script>
-        const imgBox = document.getElementById('imgBox');
-        const mainImage = document.getElementById('mainImage');
-        
-        // Ganti URL ini dengan gambar kedua Anda
-        const secondaryImage = "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80";
-        const primaryImage = "sf-china.jpg";
+        const mainCard = document.getElementById('mainImageCard');
+        const sliderContainer = document.getElementById('sliderContainer');
+        let slideIndex = 1;
 
-        let isChanged = false;
-
-        imgBox.addEventListener('click', function() {
-            // Tambahkan animasi getar saat diklik
-            imgBox.classList.add('clicked-effect');
-            
-            // Efek Transisi Gambar
-            mainImage.style.opacity = '0';
-            mainImage.style.transform = 'scale(0.9)';
+        // Fungsi ketika gambar utama diklik
+        mainCard.addEventListener('click', function() {
+            // Animasi keluar untuk gambar utama
+            mainCard.classList.remove('animate__zoomIn');
+            mainCard.classList.add('animate__zoomOut');
 
             setTimeout(() => {
-                if (!isChanged) {
-                    mainImage.src = secondaryImage;
-                    isChanged = true;
-                } else {
-                    mainImage.src = primaryImage;
-                    isChanged = false;
-                }
-                
-                mainImage.style.opacity = '1';
-                mainImage.style.transform = 'scale(1)';
-            }, 300);
-
-            // Hapus class animasi agar bisa diulang
-            setTimeout(() => {
-                imgBox.classList.remove('clicked-effect');
-            }, 800);
+                mainCard.style.display = 'none';
+                sliderContainer.style.display = 'block';
+                sliderContainer.classList.add('animate__backInUp');
+                showSlides(slideIndex);
+            }, 600);
         });
+
+        // Logika Slider
+        function changeSlide(n) {
+            showSlides(slideIndex += n);
+        }
+
+        function showSlides(n) {
+            let slides = document.getElementsByClassName("slide");
+            if (n > slides.length) {slideIndex = 1}
+            if (n < 1) {slideIndex = slides.length}
+            
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
+            slides[slideIndex-1].style.display = "block";
+        }
     </script>
 </body>
 </html>
