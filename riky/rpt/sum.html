@@ -1,1 +1,160 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Dark Blue Frame</title>
+    <style>
+        /* Dasar Halaman */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
 
+        body {
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 1100px;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        /* Logo Glow Effect */
+        .logo-wrapper {
+            margin-bottom: 25px;
+        }
+
+        .logo-wrapper img {
+            width: 110px;
+            height: auto;
+            filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.5));
+            transition: transform 0.3s ease;
+        }
+
+        /* Frame Container Glassmorphism */
+        .frame-container {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 8px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            margin-bottom: 25px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 10px;
+            background: #ffffff;
+        }
+
+        /* Grouping Tombol */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 30px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 12px;
+            text-transform: uppercase;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 160px;
+        }
+
+        .btn-home {
+            background: linear-gradient(45deg, #1e40af, #3b82f6);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-input {
+            background: linear-gradient(45deg, #0f766e, #14b8a6);
+            box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(56, 189, 248, 0.5);
+            filter: brightness(1.2);
+        }
+
+        /* Animasi */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsif HP */
+        @media (max-width: 768px) {
+            iframe { height: 450px; }
+            .button-group { flex-direction: column; align-items: center; }
+            .btn { width: 90%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="logo-wrapper">
+            <img src="logo.png" alt="Logo">
+        </div>
+
+        <div class="frame-container">
+            <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSLf0pVHDPU73cuFtd6B5fo54PfedGX7qsQQiv1OsT7LCPgQlL2O-pFFaEbjmku6v46ITUjbFs2kmuo/pubhtml?gid=1426365321&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
+        </div>
+
+        <div class="button-group">
+            <a href="https://muhardian.eu.org/riky" class="btn btn-home">Home</a>
+            <a href="https://muhardian.eu.org/riky/inv" class="btn btn-input">Input Me</a>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi untuk membersihkan cache iframe & cookies saat refresh
+        window.onload = function() {
+            // 1. Menghapus Cookies
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i];
+                const eqPos = cookie.indexOf("=");
+                const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+            }
+
+            // 2. Memaksa Iframe memuat data terbaru dengan menambahkan parameter unik (Timestamp)
+            const iframe = document.getElementById('sheetFrame');
+            const currentSrc = iframe.src;
+            // Menambahkan parameter ?t=[waktu] agar browser menganggap ini link baru (anti-cache)
+            const newSrc = currentSrc.includes('?') ? 
+                           currentSrc + '&t=' + new Date().getTime() : 
+                           currentSrc + '?t=' + new Date().getTime();
+            iframe.src = newSrc;
+
+            console.log("Cookies cleared and Iframe refreshed with latest data.");
+        };
+    </script>
+
+</body>
+</html>
