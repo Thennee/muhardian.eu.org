@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Year of the Horse - Interactive Experience</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <style>
+        :root {
+            --bg-color: #fce4ec; /* Warna pink lembut sesuai gambar */
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-color);
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Container Utama */
+        .container {
+            position: relative;
+            text-align: center;
+            cursor: pointer;
+            perspective: 1000px;
+        }
+
+        /* Styling Gambar */
+        .image-wrapper {
+            width: 80vw;
+            max-width: 800px;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            background: #fff;
+            position: relative;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease;
+        }
+
+        /* Efek Hover di PC */
+        .image-wrapper:hover {
+            transform: scale(1.02) rotateY(5deg);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+
+        /* Class untuk trigger animasi klik via JS */
+        .clicked-effect {
+            animation: heartBeat 0.8s;
+        }
+
+        /* Overlay Text (Opsional) */
+        .hint {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #d32f2f;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container animate__animated animate__zoomInDown">
+        <div class="image-wrapper" id="imgBox">
+            <img src="sf-china.jpg" id="mainImage" alt="Year of the Horse">
+        </div>
+        <div class="hint">Click me</div>
+    </div>
+
+    <script>
+        const imgBox = document.getElementById('imgBox');
+        const mainImage = document.getElementById('mainImage');
+        
+        // Ganti URL ini dengan gambar kedua Anda
+        const secondaryImage = "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80";
+        const primaryImage = "sf-china.jpg";
+
+        let isChanged = false;
+
+        imgBox.addEventListener('click', function() {
+            // Tambahkan animasi getar saat diklik
+            imgBox.classList.add('clicked-effect');
+            
+            // Efek Transisi Gambar
+            mainImage.style.opacity = '0';
+            mainImage.style.transform = 'scale(0.9)';
+
+            setTimeout(() => {
+                if (!isChanged) {
+                    mainImage.src = secondaryImage;
+                    isChanged = true;
+                } else {
+                    mainImage.src = primaryImage;
+                    isChanged = false;
+                }
+                
+                mainImage.style.opacity = '1';
+                mainImage.style.transform = 'scale(1)';
+            }, 300);
+
+            // Hapus class animasi agar bisa diulang
+            setTimeout(() => {
+                imgBox.classList.remove('clicked-effect');
+            }, 800);
+        });
+    </script>
+</body>
+</html>
