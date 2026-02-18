@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Sholat & Kalender Islam 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #1b4332;
+            --light-green: #2d6a4f;
+            --accent-gold: #d4af37;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            background: linear-gradient(135deg, #081c15, #1b4332, #2d6a4f);
+            background-attachment: fixed;
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        h1 { color: var(--accent-gold); font-size: 1.8rem; margin-bottom: 5px; }
+
+        /* Grid Layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover { transform: translateY(-5px); }
+
+        /* Prayer Times List */
+        .sholat-list { list-style: none; margin-top: 15px; }
+        .sholat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        .sholat-item.active {
+            background: var(--accent-gold);
+            color: var(--primary-green);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            h1 { font-size: 1.4rem; }
+        }
+
+        .loading { text-align: center; color: var(--accent-gold); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1 id="nama-kota">Memuat Lokasi...</h1>
+        <p id="tanggal-masehi"></p>
+        <p id="tanggal-hijriah" style="color: var(--accent-gold); font-weight: bold;"></p>
+    </header>
+
+    <div class="main-grid">
+        <div class="card">
+            <h3>🌙 Jadwal Sholat Hari Ini</h3>
+            <div id="sholat-container">
+                <p class="loading">Mengambil data...</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📅 Info Kalender 2026</h3>
+            <p id="info-puasa" style="margin-top: 15px; line-height: 1.6;"></p>
+            <div style="margin-top: 15px; font-size: 0.9rem; opacity: 0.8;">
+                *Data otomatis sinkron dengan API MyQuran (Kemenag/MUI)
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ID Kota Jakarta = 1301. Bisa diganti sesuai API MyQuran
+    const cityId = "1301"; 
+    const date = new Date();
+    const y = date.getFullYear();
+    const m = date.getMonth() + 1;
+    const d = date.getDate();
+
+    async function getJadwal() {
+        try {
+            const response = await fetch(`https://api.myquran.com/v2/sholat/jadwal/${cityId}/${y}/${m}/${d}`);
+            const data = await response.json();
+            const jadwal = data.data.jadwal;
+
+            document.getElementById('nama-kota').innerText = "DKI Jakarta & Sekitarnya";
+            document.getElementById('tanggal-masehi').innerText = jadwal.tanggal;
+            
+            // Render Jadwal
+            const list = `
+                <ul class="sholat-list">
+                    <li class="sholat-item"><span>Imsak (Puasa)</span> <b>${jadwal.imsak}</b></li>
+                    <li class="sholat-item"><span>Subuh</span> <b>${jadwal.subuh}</b></li>
+                    <li class="sholat-item"><span>Dzuhur</span> <b>${jadwal.dzuhur}</b></li>
+                    <li class="sholat-item"><span>Ashar</span> <b>${jadwal.ashar}</b></li>
+                    <li class="sholat-item active"><span>Maghrib (Buka)</span> <b>${jadwal.maghrib}</b></li>
+                    <li class="sholat-item"><span>Isya</span> <b>${jadwal.isya}</b></li>
+                </ul>
+            `;
+            document.getElementById('sholat-container').innerHTML = list;
+
+            // Info Puasa 2026 (1 Ramadhan 1447H jatuh pada ~19 Feb 2026)
+            const infoPuasa = `
+                <b>Status:</b> Sedang berada di bulan Februari 2026.<br>
+                <b>Ramadhan 1447H:</b> Berdasarkan kalender, 1 Ramadhan 2026 diperkirakan jatuh pada 19 Februari 2026.<br><br>
+                <i>Gunakan waktu Imsak dan Maghrib di samping sebagai acuan puasa hari ini.</i>
+            `;
+            document.getElementById('info-puasa').innerHTML = infoPuasa;
+
+        } catch (error) {
+            document.getElementById('sholat-container').innerHTML = "Gagal memuat data.";
+        }
+    }
+
+    // Mengambil data Hijriah (Simulasi sederhana karena API MyQuran sudah menyertakan info tanggal)
+    getJadwal();
+</script>
+
+</body>
+</html>
