@@ -12,15 +12,10 @@
             --light-green: #2d6a4f;
             --accent-gold: #d4af37;
             --glass: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
         body {
             background: linear-gradient(135deg, var(--primary-green), var(--mid-green), var(--light-green));
@@ -32,14 +27,8 @@
             padding: 20px;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            flex: 1; /* Membuat container mengambil sisa ruang agar footer tetap di bawah */
-            width: 100%;
-        }
+        .container { max-width: 900px; margin: 0 auto; flex: 1; width: 100%; }
 
-        /* Header Section */
         header {
             text-align: center;
             margin-bottom: 30px;
@@ -51,21 +40,8 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
         }
 
-        h1 {
-            color: var(--accent-gold);
-            font-size: 1.8rem;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
+        h1 { color: var(--accent-gold); font-size: 1.8rem; margin-bottom: 8px; }
 
-        #tanggal-hijriah {
-            font-weight: 600;
-            color: #a7c957;
-            font-size: 1.1rem;
-        }
-
-        /* Responsive Grid */
         .main-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -79,128 +55,118 @@
             border-radius: 25px;
             border: 1px solid var(--glass-border);
             box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .card:hover {
-            transform: translateY(-8px);
-            border-color: var(--accent-gold);
-        }
-
-        h3 {
-            margin-bottom: 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 10px;
-        }
-
-        /* Sholat List Items */
-        .sholat-list {
-            list-style: none;
-        }
+        h3 { margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; color: var(--accent-gold); }
 
         .sholat-item {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 14px 18px;
+            padding: 12px 18px;
             margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.07);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
-            font-size: 1rem;
-            transition: background 0.3s ease;
-        }
-
-        .sholat-item:hover {
-            background: rgba(255, 255, 255, 0.12);
-        }
-
-        .sholat-item b {
-            color: var(--accent-gold);
-            font-size: 1.1rem;
         }
 
         .sholat-item.highlight {
-            background: linear-gradient(90deg, var(--accent-gold), #f4d35e);
+            background: var(--accent-gold);
             color: var(--primary-green);
+            font-weight: bold;
         }
 
-        .sholat-item.highlight b {
-            color: var(--primary-green);
-        }
-
-        /* Footer Style */
         footer {
             text-align: center;
             margin-top: 40px;
             padding: 15px;
-            opacity: 0.4; /* Efek Samar */
-            transition: opacity 0.4s ease;
+            opacity: 0.4;
+            transition: 0.3s;
         }
 
-        footer:hover {
-            opacity: 1; /* Menjadi Jelas Saat Hover */
-        }
+        footer:hover { opacity: 1; }
 
         footer a {
             color: var(--accent-gold);
             text-decoration: none;
             font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            letter-spacing: 0.5px;
         }
 
-        footer a:hover {
-            text-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
-            letter-spacing: 1.5px;
-        }
-
-        /* Utility */
-        .loading {
-            text-align: center;
-            color: var(--accent-gold);
-            padding: 20px;
-        }
-
-        @media (max-width: 600px) {
-            body { padding: 15px; }
-            h1 { font-size: 1.4rem; }
-            .card { padding: 20px; }
-        }
+        .loading-text { text-align: center; font-style: italic; color: var(--accent-gold); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1 id="nama-kota">Mencari Lokasi...</h1>
-        <p id="tanggal-masehi">Memuat...</p>
-        <p id="tanggal-hijriah"></p>
+        <h1 id="nama-kota">Mendeteksi Lokasi...</h1>
+        <p id="tanggal-masehi">Memuat tanggal...</p>
+        <p id="tanggal-hijriah" style="color: #a7c957; font-weight: 600; margin-top: 5px;"></p>
     </header>
 
     <div class="main-grid">
         <div class="card">
             <h3>🌙 Jadwal Sholat</h3>
             <div id="sholat-container">
-                <p class="loading">Mengambil data dari server...</p>
+                <p class="loading-text">Menghubungkan ke server...</p>
             </div>
         </div>
 
         <div class="card">
-            <h3>📅 Kalender & Puasa 2026</h3>
-            <div id="info-kalender" style="line-height: 1.8;">
-                <p>Memproses info kalender...</p>
-            </div>
-            <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 15px; font-size: 0.85rem;">
-                <p>💡 <b>Catatan:</b> Data ini sinkron secara otomatis dengan jadwal resmi Kemenag RI/MUI melalui API MyQuran.</p>
+            <h3>📅 Info Puasa 2026</h3>
+            <div id="info-kalender">
+                <p>Sedang menghitung kalender...</p>
             </div>
         </div>
     </div>
 </div>
 
 <footer>
-    <p
+    <p><a href="https://muhardian.eu.org/deni" target="_blank">Muhardian @2026</a></p>
+</footer>
+
+<script>
+    async function initApp() {
+        try {
+            // 1. Dapatkan lokasi berdasarkan IP (Agar otomatis Bojong Gede/Bogor/Jakarta)
+            const geoRes = await fetch('https://ipapi.co/json/');
+            const geoData = await geoRes.json();
+            const city = geoData.city || "Jakarta";
+            const country = geoData.country_name || "Indonesia";
+            
+            document.getElementById('nama-kota').innerText = city + ", " + country;
+
+            // 2. Dapatkan Jadwal Sholat dari Aladhan API (Reliable HTTPS)
+            const now = new Date();
+            const timestamp = Math.floor(now.getTime() / 1000);
+            
+            const prayerRes = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=${country}&method=11`);
+            const prayerData = await prayerRes.json();
+            
+            if (prayerData.code === 200) {
+                const timings = prayerData.data.timings;
+                const dateInfo = prayerData.data.date;
+
+                // Tampilkan Tanggal
+                document.getElementById('tanggal-masehi').innerText = dateInfo.readable;
+                document.getElementById('tanggal-hijriah').innerText = `${dateInfo.hijri.day} ${dateInfo.hijri.month.en} ${dateInfo.hijri.year} H`;
+
+                // Tampilkan Jadwal
+                const listHtml = `
+                    <div class="sholat-item"><span>Imsak (Mulai Puasa)</span> <b>${timings.Imsak}</b></div>
+                    <div class="sholat-item"><span>Subuh</span> <b>${timings.Fajr}</b></div>
+                    <div class="sholat-item"><span>Dzuhur</span> <b>${timings.Dhuhr}</b></div>
+                    <div class="sholat-item"><span>Ashar</span> <b>${timings.Asr}</b></div>
+                    <div class="sholat-item highlight"><span>Maghrib (Buka)</span> <b>${timings.Maghrib}</b></div>
+                    <div class="sholat-item"><span>Isya</span> <b>${timings.Isha}</b></div>
+                `;
+                document.getElementById('sholat-container').innerHTML = listHtml;
+
+                // Update Info Puasa
+                // Ramadhan 1447H diperkirakan mulai 19 Feb 2026
+                const infoHtml = `
+                    <p style="margin-bottom:10px">✨ <b>Ramadhan 2026:</b> 1 Ramadhan 1447H diperkirakan jatuh pada <b>19 Februari 2026</b>.</p>
+                    <p>🌙 <b>Hari Ini:</b> Anda berada di bulan ${dateInfo.hijri.month.en}.</p>
+                    <p style="margin-top:10px; font-size: 0.85rem; opacity: 0.8"><i>*Gunakan jadwal Maghrib sebagai waktu berbuka puasa.</i></p>
+                `;
+                document.getElementById('info-kalender').innerHTML = infoHtml;
+            }
+        } catch (error) {
