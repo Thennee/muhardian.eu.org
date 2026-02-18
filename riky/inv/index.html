@@ -3,51 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventaris Pro - Muhardian</title>
+    <title>Muhardian @2026</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root {
-            --primary: #00d2ff;
-            --bg: #0a192f;
-            --card: rgba(16, 33, 65, 0.8);
-            --text-muted: #8892b0;
-        }
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: radial-gradient(circle at center, #112240 0%, var(--bg) 100%);
-            color: #e6f1ff;
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px;
-        }
-        .container {
-            width: 100%; max-width: 450px; background: var(--card); padding: 30px;
-            border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px); border: 1px solid rgba(0, 210, 255, 0.2);
-        }
+        :root { --primary: #00d2ff; --bg: #0a192f; --card: rgba(16, 33, 65, 0.8); }
+        body { font-family: 'Segoe UI', sans-serif; background: radial-gradient(circle at center, #112240 0%, var(--bg) 100%); color: #e6f1ff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .container { width: 100%; max-width: 450px; background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); backdrop-filter: blur(10px); border: 1px solid rgba(0, 210, 255, 0.2); }
         .logo { width: 80px; display: block; margin: 0 auto 20px; filter: drop-shadow(0 0 10px var(--primary)); }
-        h2 { text-align: center; color: var(--primary); margin-bottom: 25px; letter-spacing: 1px; }
-        
+        h2 { text-align: center; color: var(--primary); margin-bottom: 25px; }
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-size: 0.9em; color: var(--text-muted); }
-        input, select {
-            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(255, 255, 255, 0.05); color: white; box-sizing: border-box; outline: none;
-        }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 210, 255, 0.2); }
-        
-        .btn {
-            width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold;
-            cursor: pointer; transition: 0.3s; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;
-            text-decoration: none; box-sizing: border-box;
-        }
+        label { display: block; margin-bottom: 5px; font-size: 0.9em; color: #8892b0; }
+        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255, 255, 255, 0.05); color: white; box-sizing: border-box; outline: none; }
+        input:focus { border-color: var(--primary); }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; text-decoration: none; display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
         .btn-scan { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
-        .btn-submit { background: linear-gradient(45deg, #00d2ff, #3a7bd5); color: white; box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3); }
-        .btn-home { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--text-muted); color: var(--text-muted); margin-top: 15px; }
-        
-        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
-        .btn-home:hover { border-color: var(--primary); color: white; background: rgba(0, 210, 255, 0.1); }
-        
+        .btn-submit { background: linear-gradient(45deg, #00d2ff, #3a7bd5); color: white; }
+        .btn-home { background: rgba(255, 255, 255, 0.05); color: #8892b0; font-size: 0.8em; margin-top: 15px; }
         footer { margin-top: auto; padding: 20px; font-size: 0.9em; color: rgba(136, 146, 176, 0.7); text-align: center; }
-        footer b { color: var(--primary); }
     </style>
 </head>
 <body>
@@ -56,29 +28,18 @@
     <img src="logo.png" alt="Logo" class="logo">
     <h2>Input Inventaris</h2>
     
-    <button type="button" class="btn btn-scan" onclick="window.location.href='scan.html'">📸 SCAN QR</button>
+    <button type="button" class="btn btn-scan" onclick="window.location.href='scan.html'">📸 SCAN QR </button>
 
     <form id="inventoryForm" style="margin-top: 20px;">
         <div class="form-group">
-            <label>Hasil Scan QR </label>
-            <input type="text" id="scanResult" placeholder="Belum ada data scan" style="border: 1px dashed var(--primary); color: var(--primary);" readonly>
+            <label>Hasil Scan QR</label>
+            <input type="text" id="scanResult" placeholder="Scan barcode barang..." style="border: 1px dashed var(--primary); color: var(--primary);" readonly required>
         </div>
         
         <div class="form-group">
             <label>Tanggal</label>
             <input type="date" id="tanggal" required>
         </div>
-
-        
-
-
-
-
-
-
-
-
-
 
         <div class="form-group" style="display: flex; gap: 10px;">
             <div style="flex: 1;">
@@ -97,10 +58,10 @@
         </div>
 
         <div class="form-group">
-            <label>Status Transaksi</label>
+            <label>Tipe Transaksi</label>
             <select id="kode">
-                <option value="BM">BM (Barang Masuk)</option>
-                <option value="BK">BK (Barang Keluar)</option>
+                <option value="BM">Barang Masuk (BM)</option>
+                <option value="BK">Barang Keluar (BK)</option>
             </select>
         </div>
         
@@ -112,27 +73,23 @@
 <footer>By <b>Muhardian</b> @2026</footer>
 
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzWv0SAOG99JKTuGGSbBh01jtAFzNwNQSVSydqTT4f1rCvFNZSL7LZ4h4xl4LXdGq-mBg/exec'; 
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzP6n5RzQM3TiHk2e9aIg2EwiDPyLn-79aXH2B89UNeGIRhtZK7mVVgc77atdNM2HD9ug/exec'; 
 
     window.onload = () => {
         const params = new URLSearchParams(window.location.search);
         if (params.has('qr')) {
             document.getElementById('scanResult').value = params.get('qr');
-            // Menghapus query string di URL agar saat refresh input menjadi kosong
             window.history.replaceState({}, document.title, window.location.pathname);
-        } else {
-            document.getElementById('scanResult').value = "";
         }
         document.getElementById('tanggal').valueAsDate = new Date();
     };
 
     document.getElementById('inventoryForm').addEventListener('submit', e => {
         e.preventDefault();
-        Swal.fire({ title: 'Mengirim...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         const data = {
             tanggal: document.getElementById('tanggal').value,
-            namaBarang: document.getElementById('namaBarang').value,
             qty: document.getElementById('qty').value,
             satuan: document.getElementById('satuan').value,
             kode: document.getElementById('kode').value,
@@ -141,16 +98,13 @@
 
         fetch(scriptURL, { method: 'POST', body: JSON.stringify(data) })
         .then(res => {
-            Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Data tersimpan .', background: '#112240', color: '#fff' });
+            Swal.fire({ icon: 'success', title: 'Berhasil!', background: '#112240', color: '#fff' });
             document.getElementById('inventoryForm').reset();
             document.getElementById('scanResult').value = "";
             document.getElementById('tanggal').valueAsDate = new Date();
         })
-        .catch(err => Swal.fire('Error', 'Gagal koneksi database', 'error'));
+        .catch(err => Swal.fire('Error', 'Gagal kirim data', 'error'));
     });
 </script>
 </body>
 </html>
-
-
-
