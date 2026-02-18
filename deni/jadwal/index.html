@@ -3,170 +3,284 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadwal Sholat & Puasa 2026 | Muhardian</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Jadwal Islami Modern 2026</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-green: #081c15;
-            --mid-green: #1b4332;
-            --light-green: #2d6a4f;
-            --accent-gold: #d4af37;
+            --primary-green: #00b894;
+            --dark-green: #006266;
+            --light-green: #55efc4;
             --glass: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-color: #ffffff;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
 
         body {
-            background: linear-gradient(135deg, var(--primary-green), var(--mid-green), var(--light-green));
+            background: linear-gradient(135deg, #004d40 0%, #00241b 100%);
             background-attachment: fixed;
-            color: #ffffff;
+            color: var(--text-color);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            align-items: center;
             padding: 20px;
         }
 
-        .container { max-width: 900px; margin: 0 auto; flex: 1; width: 100%; }
-
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 30px 20px;
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            border-radius: 25px;
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        .container {
+            width: 100%;
+            max-width: 900px;
         }
 
-        h1 { color: var(--accent-gold); font-size: 1.8rem; margin-bottom: 8px; }
+        /* Header & Jam */
+        .header-card {
+            background: linear-gradient(45deg, var(--dark-green), var(--primary-green));
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
 
-        .main-grid {
+        #clock {
+            font-size: 3.5rem;
+            font-weight: 800;
+            text-shadow: 0 0 20px rgba(255,255,255,0.4);
+            margin: 10px 0;
+        }
+
+        .date-info {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Grid Layout */
+        .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 50px;
         }
 
         .card {
             background: var(--glass);
-            backdrop-filter: blur(20px);
-            padding: 25px;
-            border-radius: 25px;
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s ease;
         }
 
-        h3 { margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; color: var(--accent-gold); }
+        .card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
 
-        .sholat-item {
+        h3 {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid var(--light-green);
+            padding-bottom: 10px;
+        }
+
+        /* Jadwal Sholat List */
+        .prayer-list {
+            list-style: none;
+        }
+
+        .prayer-item {
             display: flex;
             justify-content: space-between;
-            padding: 12px 18px;
-            margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            font-weight: 500;
         }
 
-        .sholat-item.highlight {
-            background: var(--accent-gold);
-            color: var(--primary-green);
+        .prayer-item.active {
+            background: var(--light-green);
+            color: var(--dark-green);
+            box-shadow: 0 0 15px var(--light-green);
+        }
+
+        /* Fasting & Calendar */
+        .info-box {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 10px;
+        }
+
+        .highlight {
+            color: var(--light-green);
             font-weight: bold;
         }
 
+        /* Footer */
         footer {
+            margin-top: auto;
+            padding: 20px;
             text-align: center;
-            margin-top: 40px;
-            padding: 15px;
-            opacity: 0.4;
+        }
+
+        .footer-link {
+            color: rgba(255,255,255,0.3);
+            text-decoration: none;
+            font-size: 0.8rem;
             transition: 0.3s;
         }
 
-        footer:hover { opacity: 1; }
-
-        footer a {
-            color: var(--accent-gold);
-            text-decoration: none;
-            font-size: 0.9rem;
+        .footer-link:hover {
+            color: var(--light-green);
+            text-shadow: 0 0 10px var(--light-green);
         }
 
-        .loading-text { text-align: center; font-style: italic; color: var(--accent-gold); }
+        /* Mobile Responsive */
+        @media (max-width: 600px) {
+            #clock { font-size: 2.5rem; }
+            .header-card { padding: 20px; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1 id="nama-kota">Mendeteksi Lokasi...</h1>
-        <p id="tanggal-masehi">Memuat tanggal...</p>
-        <p id="tanggal-hijriah" style="color: #a7c957; font-weight: 600; margin-top: 5px;"></p>
-    </header>
-
-    <div class="main-grid">
-        <div class="card">
-            <h3>🌙 Jadwal Sholat</h3>
-            <div id="sholat-container">
-                <p class="loading-text">Menghubungkan ke server...</p>
-            </div>
+    <div class="container">
+        <div class="header-card">
+            <div id="clock">00:00:00</div>
+            <div class="date-info" id="full-date">Memuat kalender...</div>
+            <div class="date-info" id="hijri-date" style="color: var(--light-green); font-weight: bold; margin-top: 5px;"></div>
         </div>
 
-        <div class="card">
-            <h3>📅 Info Puasa 2026</h3>
-            <div id="info-kalender">
-                <p>Sedang menghitung kalender...</p>
+        <div class="grid-container">
+            <div class="card">
+                <h3><i class="fas fa-mosque"></i> Jadwal Sholat</h3>
+                <div id="location-name" style="font-size: 0.8rem; margin-bottom: 10px; opacity: 0.7;">Lokasi: Jakarta & Sekitarnya</div>
+                <ul class="prayer-list" id="prayer-times">
+                    <li class="prayer-item"><span>Imsak</span> <span id="imsak">-</span></li>
+                    <li class="prayer-item"><span>Subuh</span> <span id="subuh">-</span></li>
+                    <li class="prayer-item"><span>Dzuhur</span> <span id="dzuhur">-</span></li>
+                    <li class="prayer-item"><span>Ashar</span> <span id="ashar">-</span></li>
+                    <li class="prayer-item"><span>Maghrib</span> <span id="maghrib">-</span></li>
+                    <li class="prayer-item"><span>Isya</span> <span id="isya">-</span></li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-calendar-alt"></i> Info Puasa & Kalender</h3>
+                <div class="info-box">
+                    <p>Status Puasa Hari Ini:</p>
+                    <p id="fasting-status" class="highlight">Mengecek jadwal puasa...</p>
+                </div>
+                <div class="info-box">
+                    <p><i class="fas fa-info-circle"></i> Agenda Islam 2026:</p>
+                    <ul style="list-style: none; font-size: 0.9rem; margin-top: 10px;">
+                        <li>🌙 Awal Ramadhan: <span class="highlight">~18 Feb 2026</span></li>
+                        <li>🎊 Idul Fitri: <span class="highlight">~20 Maret 2026</span></li>
+                        <li>🕋 Idul Adha: <span class="highlight">~27 Mei 2026</span></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<footer>
-    <p><a href="https://muhardian.eu.org/deni" target="_blank">Muhardian @2026</a></p>
-</footer>
+    <footer>
+        <a href="https://muhardian.eu.org/deni" class="footer-link">Muhardian @2026</a>
+    </footer>
 
-<script>
-    async function initApp() {
-        try {
-            // 1. Dapatkan lokasi berdasarkan IP (Agar otomatis Bojong Gede/Bogor/Jakarta)
-            const geoRes = await fetch('https://ipapi.co/json/');
-            const geoData = await geoRes.json();
-            const city = geoData.city || "Jakarta";
-            const country = geoData.country_name || "Indonesia";
-            
-            document.getElementById('nama-kota').innerText = city + ", " + country;
-
-            // 2. Dapatkan Jadwal Sholat dari Aladhan API (Reliable HTTPS)
+    <script>
+        // 1. Fungsi Jam Digital
+        function updateClock() {
             const now = new Date();
-            const timestamp = Math.floor(now.getTime() / 1000);
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('clock').innerText = `${h}:${m}:${s}`;
             
-            const prayerRes = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=${country}&method=11`);
-            const prayerData = await prayerRes.json();
+            // Format Tanggal Masehi
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('full-date').innerText = now.toLocaleDateString('id-ID', options);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // 2. Ambil Data Jadwal Sholat Otomatis (API MyQuran)
+        async function fetchPrayerTimes() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
             
-            if (prayerData.code === 200) {
-                const timings = prayerData.data.timings;
-                const dateInfo = prayerData.data.date;
+            try {
+                // ID 1301 adalah Jakarta. Anda bisa menggantinya dengan ID kota lain
+                const response = await fetch(`https://api.myquran.com/v2/sholat/jadwal/1301/${year}/${month}/${day}`);
+                const data = await response.json();
+                const jadwal = data.data.jadwal;
 
-                // Tampilkan Tanggal
-                document.getElementById('tanggal-masehi').innerText = dateInfo.readable;
-                document.getElementById('tanggal-hijriah').innerText = `${dateInfo.hijri.day} ${dateInfo.hijri.month.en} ${dateInfo.hijri.year} H`;
+                document.getElementById('imsak').innerText = jadwal.imsak;
+                document.getElementById('subuh').innerText = jadwal.subuh;
+                document.getElementById('dzuhur').innerText = jadwal.dzuhur;
+                document.getElementById('ashar').innerText = jadwal.ashar;
+                document.getElementById('maghrib').innerText = jadwal.maghrib;
+                document.getElementById('isya').innerText = jadwal.isya;
+                document.getElementById('hijri-date').innerText = jadwal.tanggal;
 
-                // Tampilkan Jadwal
-                const listHtml = `
-                    <div class="sholat-item"><span>Imsak (Mulai Puasa)</span> <b>${timings.Imsak}</b></div>
-                    <div class="sholat-item"><span>Subuh</span> <b>${timings.Fajr}</b></div>
-                    <div class="sholat-item"><span>Dzuhur</span> <b>${timings.Dhuhr}</b></div>
-                    <div class="sholat-item"><span>Ashar</span> <b>${timings.Asr}</b></div>
-                    <div class="sholat-item highlight"><span>Maghrib (Buka)</span> <b>${timings.Maghrib}</b></div>
-                    <div class="sholat-item"><span>Isya</span> <b>${timings.Isha}</b></div>
-                `;
-                document.getElementById('sholat-container').innerHTML = listHtml;
+                checkFasting(jadwal.maghrib);
+                highlightNextPrayer(jadwal);
 
-                // Update Info Puasa
-                // Ramadhan 1447H diperkirakan mulai 19 Feb 2026
-                const infoHtml = `
-                    <p style="margin-bottom:10px">✨ <b>Ramadhan 2026:</b> 1 Ramadhan 1447H diperkirakan jatuh pada <b>19 Februari 2026</b>.</p>
-                    <p>🌙 <b>Hari Ini:</b> Anda berada di bulan ${dateInfo.hijri.month.en}.</p>
-                    <p style="margin-top:10px; font-size: 0.85rem; opacity: 0.8"><i>*Gunakan jadwal Maghrib sebagai waktu berbuka puasa.</i></p>
-                `;
-                document.getElementById('info-kalender').innerHTML = infoHtml;
+            } catch (error) {
+                console.error("Gagal mengambil data:", error);
+                document.getElementById('location-name').innerText = "Gagal memuat data API.";
             }
-        } catch (error) {
+        }
+
+        // 3. Logika Sederhana Status Puasa
+        function checkFasting(maghribTime) {
+            const now = new Date();
+            const currentTime = now.getHours() + ":" + now.getMinutes();
+            
+            // Contoh logika sederhana: Jika hari Senin/Kamis atau bulan Ramadhan
+            const dayName = now.toLocaleDateString('id-ID', { weekday: 'long' });
+            if (dayName === "Senin" || dayName === "Kamis") {
+                document.getElementById('fasting-status').innerText = "Sunnah Senin/Kamis - Berbuka jam " + maghribTime;
+            } else {
+                document.getElementById('fasting-status').innerText = "Tidak ada jadwal puasa wajib hari ini.";
+            }
+        }
+
+        // 4. Highlight Jadwal Sholat Terdekat
+        function highlightNextPrayer(jadwal) {
+            const now = new Date();
+            const currentTotalMin = (now.getHours() * 60) + now.getMinutes();
+            
+            const times = [
+                { id: 'subuh', time: jadwal.subuh },
+                { id: 'dzuhur', time: jadwal.dzuhur },
+                { id: 'ashar', time: jadwal.ashar },
+                { id: 'maghrib', time: jadwal.maghrib },
+                { id: 'isya', time: jadwal.isya }
+            ];
+
+            for (let item of times) {
+                const [h, m] = item.time.split(':');
+                const prayerTotalMin = (parseInt(h) * 60) + parseInt(m);
+                
+                if (prayerTotalMin > currentTotalMin) {
+                    document.getElementById(item.id).parentElement.classList.add('active');
+                    break;
+                }
+            }
+        }
+
+        fetchPrayerTimes();
+    </script>
+</body>
+</html>
