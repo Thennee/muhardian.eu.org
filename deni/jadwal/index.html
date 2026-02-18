@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadwal Islami & Kalender Hijriah 2026 - Muhardian Files</title>
+    <title>Jadwal Islami 2026 - Muhardian Files</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -23,7 +23,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, #004d40 0%, #00241b 100%);
+            background: linear-gradient(135deg, #003d33 0%, #001a14 100%);
             background-attachment: fixed;
             color: var(--text-color);
             min-height: 100vh;
@@ -35,78 +35,58 @@
 
         .container {
             width: 100%;
-            max-width: 900px;
+            max-width: 1000px;
         }
 
-        /* Header & Jam */
+        /* Header & Jam Digital */
         .header-card {
             background: linear-gradient(45deg, var(--dark-green), var(--primary-green));
             padding: 40px 20px;
-            border-radius: 25px;
+            border-radius: 30px;
             text-align: center;
             box-shadow: 0 15px 35px rgba(0,0,0,0.4);
             margin-bottom: 25px;
             border: 1px solid rgba(255,255,255,0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Animasi kilau pada header */
-        .header-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            transform: rotate(30deg);
         }
 
         #clock {
-            font-size: 4rem;
+            font-size: 4rem; /* Ukuran Jam Utama */
             font-weight: 900;
-            text-shadow: 0 0 25px rgba(255,255,255,0.5);
+            text-shadow: 0 0 20px rgba(255,255,255,0.4);
             margin-bottom: 10px;
-            letter-spacing: 2px;
+            letter-spacing: -2px;
         }
 
         .hijri-main {
             font-size: 1.8rem;
             font-weight: 700;
             color: var(--accent-yellow);
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
             margin-bottom: 5px;
         }
 
         .masehi-sub {
-            font-size: 1.1rem;
-            opacity: 0.85;
-            font-weight: 400;
+            font-size: 1rem;
+            opacity: 0.8;
             letter-spacing: 1px;
         }
 
-        /* Grid Layout */
+        /* Layout Grid */
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-            margin-bottom: 50px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 60px;
         }
 
         .card {
             background: var(--glass);
             backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 25px;
+            border-radius: 25px;
+            padding: 30px;
             border: 1px solid rgba(255,255,255,0.1);
             transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-8px);
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
         }
 
         h3 {
@@ -116,73 +96,95 @@
             gap: 12px;
             border-bottom: 2px solid var(--light-green);
             padding-bottom: 12px;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        /* Jadwal Sholat List */
-        .prayer-list {
-            list-style: none;
-        }
-
+        /* Jadwal Sholat */
         .prayer-item {
             display: flex;
             justify-content: space-between;
-            padding: 15px;
-            margin: 10px 0;
-            background: rgba(0,0,0,0.25);
-            border-radius: 12px;
+            padding: 14px 20px;
+            margin: 8px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
             font-weight: 600;
             font-size: 1.1rem;
-            transition: 0.3s;
         }
 
         .prayer-item.active {
-            background: var(--accent-yellow);
-            color: #000;
-            box-shadow: 0 0 20px var(--accent-yellow);
-            transform: scale(1.02);
+            background: var(--light-green);
+            color: var(--dark-green);
+            box-shadow: 0 0 15px var(--light-green);
         }
 
-        /* Fasting & Calendar */
-        .info-box {
-            background: rgba(255,255,255,0.08);
-            padding: 18px;
-            border-radius: 15px;
-            margin-top: 15px;
+        /* Countdown Area */
+        .countdown-container {
+            text-align: center;
+            padding: 20px 0;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
-        .highlight {
+        #eid-number {
+            font-size: 4rem; /* Ukuran SAMA dengan Jam Digital */
+            font-weight: 900;
+            color: var(--accent-yellow);
+            text-shadow: 0 0 30px rgba(255, 230, 0, 0.3);
+            line-height: 1;
+        }
+
+        .eid-label {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            font-weight: 500;
+            letter-spacing: 1px;
             color: var(--light-green);
-            font-weight: bold;
+        }
+
+        /* Agenda Kecil */
+        .agenda-list {
+            list-style: none;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .agenda-list li {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
         }
 
         /* Footer */
         footer {
             margin-top: auto;
-            padding: 30px;
+            padding: 20px;
+            width: 100%;
             text-align: center;
         }
 
         .footer-link {
-            color: rgba(255,255,255,0.3);
+            color: rgba(255,255,255,0.2);
             text-decoration: none;
-            font-size: 0.85rem;
-            transition: 0.4s;
-            letter-spacing: 1px;
+            font-size: 0.8rem;
+            transition: 0.3s;
         }
 
         .footer-link:hover {
             color: var(--light-green);
-            text-shadow: 0 0 10px var(--light-green);
-            opacity: 1;
         }
 
-        /* Mobile Responsive */
+        /* Mobile Adjustments */
         @media (max-width: 600px) {
-            #clock { font-size: 3rem; }
-            .hijri-main { font-size: 1.4rem; }
-            .header-card { padding: 30px 15px; }
+            #clock, #eid-number { font-size: 3rem; }
             .grid-container { grid-template-columns: 1fr; }
+            .card { padding: 20px; }
         }
     </style>
 </head>
@@ -197,34 +199,32 @@
 
         <div class="grid-container">
             <div class="card">
-                <h3><i class="fas fa-mosque"></i> Jadwal Sholat Hari Ini</h3>
-                <div id="location-info" style="font-size: 0.85rem; margin-bottom: 12px; opacity: 0.7; font-style: italic;">
-                    <i class="fas fa-location-dot"></i> Sumber: Kemenag RI (Wilayah Jakarta)
+                <h3><i class="fas fa-clock"></i> Jadwal Sholat</h3>
+                <div id="prayer-times">
+                    <div class="prayer-item"><span>Imsak</span> <span id="imsak">--:--</span></div>
+                    <div class="prayer-item"><span>Subuh</span> <span id="subuh">--:--</span></div>
+                    <div class="prayer-item"><span>Dzuhur</span> <span id="dzuhur">--:--</span></div>
+                    <div class="prayer-item"><span>Ashar</span> <span id="ashar">--:--</span></div>
+                    <div class="prayer-item"><span>Maghrib</span> <span id="maghrib">--:--</span></div>
+                    <div class="prayer-item"><span>Isya</span> <span id="isya">--:--</span></div>
                 </div>
-                <ul class="prayer-list" id="prayer-times">
-                    <li class="prayer-item"><span>Imsak</span> <span id="imsak">--:--</span></li>
-                    <li class="prayer-item"><span>Subuh</span> <span id="subuh">--:--</span></li>
-                    <li class="prayer-item"><span>Dzuhur</span> <span id="dzuhur">--:--</span></li>
-                    <li class="prayer-item"><span>Ashar</span> <span id="ashar">--:--</span></li>
-                    <li class="prayer-item"><span>Maghrib</span> <span id="maghrib">--:--</span></li>
-                    <li class="prayer-item"><span>Isya</span> <span id="isya">--:--</span></li>
-                </ul>
+                <div style="font-size: 0.75rem; opacity: 0.5; margin-top: 15px; text-align: center;">
+                    Sumber Data: Kemenag RI 
+                </div>
             </div>
 
             <div class="card">
-                <h3><i class="fas fa-moon"></i> Info Puasa & Kalender</h3>
-                <div class="info-box">
-                    <p style="margin-bottom: 5px;">Rekomendasi Puasa:</p>
-                    <p id="fasting-info" class="highlight">Mengecek jadwal sunnah...</p>
+                <h3><i class="fas fa-heart"></i> Menuju Kemenangan</h3>
+                <div class="countdown-container">
+                    <div id="eid-number">--</div>
+                    <div class="eid-label">Lebaran tinggal <span id="days-text">...</span> hari lagi</div>
                 </div>
-                <div class="info-box">
-                    <p><i class="fas fa-star-and-crescent"></i> Hari Besar 2026:</p>
-                    <ul style="list-style: none; font-size: 0.95rem; margin-top: 10px; line-height: 1.6;">
-                        <li>🌙 1 Ramadhan: <span class="highlight">~18 Feb 2026</span></li>
-                        <li>🎊 Idul Fitri: <span class="highlight">~20 Mar 2026</span></li>
-                        <li>🕋 Idul Adha: <span class="highlight">~27 Mei 2026</span></li>
-                        <li>🚩 Tahun Baru Islam: <span class="highlight">~16 Juli 2026</span></li>
-                    </ul>
+
+                <div class="agenda-list">
+                    <p style="font-weight: bold; color: var(--accent-yellow); margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">Penting di 2026:</p>
+                    <li><span>1 Ramadhan 1447 H</span> <span>18 Feb 2026</span></li>
+                    <li><span>Idul Fitri 1447 H</span> <span>20 Mar 2026</span></li>
+                    <li><span>Idul Adha 1447 H</span> <span>27 Mei 2026</span></li>
                 </div>
             </div>
         </div>
@@ -235,105 +235,100 @@
     </footer>
 
     <script>
-        // 1. Fungsi Jam Digital & Kalender Ganda
-        function updateDateTime() {
+        // 1. Sinkronisasi Jam & Kalender
+        function updateAll() {
             const now = new Date();
             
-            // Jam
+            // Jam Digital
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
             const s = String(now.getSeconds()).padStart(2, '0');
             document.getElementById('clock').innerText = `${h}:${m}:${s}`;
             
-            // Tanggal Masehi
-            const masehiOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('masehi-display').innerText = now.toLocaleDateString('id-ID', masehiOptions);
+            // Kalender Masehi
+            const masehiOpt = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('masehi-display').innerText = now.toLocaleDateString('id-ID', masehiOpt);
 
-            // Tanggal Hijriah (Menggunakan Intl.DateTimeFormat)
-            const hijriOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+            // Kalender Hijriah
             try {
-                let hijriDate = new Intl.DateTimeFormat('id-ID-u-ca-islamic-uma-nu-latn', hijriOptions).format(now);
+                const hijriOpt = { day: 'numeric', month: 'long', year: 'numeric' };
+                let hijriDate = new Intl.DateTimeFormat('id-ID-u-ca-islamic-uma-nu-latn', hijriOpt).format(now);
                 document.getElementById('hijri-display').innerText = hijriDate + " H";
             } catch (e) {
-                document.getElementById('hijri-display').innerText = "Gagal memuat Hijriah";
+                document.getElementById('hijri-display').innerText = "1 Ramadhan 1447 H";
             }
         }
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
+        setInterval(updateAll, 1000);
+        updateAll();
 
-        // 2. Ambil Data Jadwal Sholat Otomatis
-        async function fetchJadwal() {
+        // 2. Hitung Mundur Lebaran (Estimasi 20 Maret 2026)
+        function calculateEidCountdown() {
+            const today = new Date();
+            const eidDate = new Date("March 20, 2026 00:00:00");
+            
+            const diffTime = eidDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            const displayBox = document.getElementById('eid-number');
+            const labelText = document.getElementById('days-text');
+
+            if (diffDays > 0) {
+                displayBox.innerText = diffDays;
+                labelText.innerText = diffDays;
+            } else if (diffDays === 0) {
+                displayBox.style.fontSize = "2.5rem";
+                displayBox.innerText = "IDUL FITRI";
+                labelText.innerText = "Hari ini";
+            } else {
+                displayBox.innerText = "0";
+                labelText.innerText = "0";
+            }
+        }
+        calculateEidCountdown();
+
+        // 3. Ambil Jadwal Sholat dari API (Jakarta sebagai Default)
+        async function getPrayers() {
             const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth() + 1;
-            const day = now.getDate();
+            const y = now.getFullYear();
+            const m = now.getMonth() + 1;
+            const d = now.getDate();
             
             try {
-                // ID 1301 adalah Jakarta. Ganti ID jika ingin kota lain.
-                const response = await fetch(`https://api.myquran.com/v2/sholat/jadwal/1301/${year}/${month}/${day}`);
-                const result = await response.json();
-                const jadwal = result.data.jadwal;
+                const res = await fetch(`https://api.myquran.com/v2/sholat/jadwal/1301/${y}/${m}/${d}`);
+                const json = await res.json();
+                const j = json.data.jadwal;
 
-                document.getElementById('imsak').innerText = jadwal.imsak;
-                document.getElementById('subuh').innerText = jadwal.subuh;
-                document.getElementById('dzuhur').innerText = jadwal.dzuhur;
-                document.getElementById('ashar').innerText = jadwal.ashar;
-                document.getElementById('maghrib').innerText = jadwal.maghrib;
-                document.getElementById('isya').innerText = jadwal.isya;
+                document.getElementById('imsak').innerText = j.imsak;
+                document.getElementById('subuh').innerText = j.subuh;
+                document.getElementById('dzuhur').innerText = j.dzuhur;
+                document.getElementById('ashar').innerText = j.ashar;
+                document.getElementById('maghrib').innerText = j.maghrib;
+                document.getElementById('isya').innerText = j.isya;
 
-                checkFastingStatus(jadwal.maghrib);
-                highlightCurrentPrayer(jadwal);
-            } catch (error) {
-                console.error("Error fetching data:", error);
+                highlightNext(j);
+            } catch (err) {
+                console.log("API Error, using fallback");
             }
         }
 
-        // 3. Logika Puasa Sederhana
-        function checkFastingStatus(maghribTime) {
+        function highlightNext(j) {
             const now = new Date();
-            const day = now.getDay(); // 1=Senin, 4=Kamis
-            let status = "Tidak ada jadwal puasa sunnah hari ini.";
-            
-            if (day === 1) status = "Puasa Sunnah Senin - Berbuka jam " + maghribTime;
-            if (day === 4) status = "Puasa Sunnah Kamis - Berbuka jam " + maghribTime;
-            
-            // Deteksi bulan Ramadhan 2026 (Sekitar Feb-Mar)
-            const month = now.getMonth();
-            if (month === 1 || month === 2) { // Februari atau Maret
-                status = "Bulan Ramadhan/Syawal - Siapkan diri untuk ibadah!";
-            }
-
-            document.getElementById('fasting-info').innerText = status;
-        }
-
-        // 4. Highlight Jadwal Sholat Berikutnya
-        function highlightCurrentPrayer(jadwal) {
-            const now = new Date();
-            const currentMin = (now.getHours() * 60) + now.getMinutes();
-            
-            const list = [
-                { id: 'subuh', time: jadwal.subuh },
-                { id: 'dzuhur', time: jadwal.dzuhur },
-                { id: 'ashar', time: jadwal.ashar },
-                { id: 'maghrib', time: jadwal.maghrib },
-                { id: 'isya', time: jadwal.isya }
+            const curMin = (now.getHours() * 60) + now.getMinutes();
+            const times = [
+                {id: 'subuh', t: j.subuh}, {id: 'dzuhur', t: j.dzuhur},
+                {id: 'ashar', t: j.ashar}, {id: 'maghrib', t: j.maghrib},
+                {id: 'isya', t: j.isya}
             ];
 
-            // Hapus semua aktif sebelumnya
-            document.querySelectorAll('.prayer-item').forEach(el => el.classList.remove('active'));
-
-            for (let item of list) {
-                const [h, m] = item.time.split(':');
-                const pMin = (parseInt(h) * 60) + parseInt(m);
-                
-                if (pMin > currentMin) {
+            for (let item of times) {
+                const [h, m] = item.t.split(':');
+                if ((parseInt(h) * 60 + parseInt(m)) > curMin) {
                     document.getElementById(item.id).parentElement.classList.add('active');
                     break;
                 }
             }
         }
-
-        fetchJadwal();
+        getPrayers();
     </script>
 </body>
 </html>
