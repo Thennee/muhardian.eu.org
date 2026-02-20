@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Deni</title>
+    <style>
+        :root {
+            --bg-color: #0d0000;
+            --primary-red: #ff0000;
+            --dark-red: #660000;
+            --glass-bg: rgba(40, 0, 0, 0.6);
+            --glow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #3d0000 0%, #0d0000 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 20px;
+        }
+
+        /* Container Kalkulator */
+        .calculator-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 30px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5), var(--glow);
+            width: 100%;
+            max-width: 380px;
+            transition: transform 0.3s ease;
+        }
+
+        .calculator-card:hover {
+            transform: scale(1.02);
+            border-color: var(--primary-red);
+        }
+
+        /* Layar Display */
+        #display {
+            width: 100%;
+            height: 70px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: right;
+            padding: 15px;
+            font-size: 2rem;
+            color: #ff4d4d;
+            text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
+            outline: none;
+        }
+
+        /* Grid Tombol */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            padding: 20px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            background: rgba(100, 0, 0, 0.3);
+            color: white;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: var(--primary-red);
+            box-shadow: 0 0 15px var(--primary-red);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .operator {
+            background: linear-gradient(145deg, #990000, #4d0000);
+            color: #ffcccc;
+        }
+
+        .equal {
+            grid-column: span 2;
+            background: linear-gradient(90deg, #ff0000, #800000);
+        }
+
+        .clear {
+            grid-column: span 2;
+            background: #330000;
+        }
+
+        /* Tombol Home di luar kotak */
+        .home-btn {
+            margin-top: 30px;
+            padding: 12px 30px;
+            background: transparent;
+            border: 2px solid var(--primary-red);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            box-shadow: var(--glow);
+        }
+
+        .home-btn:hover {
+            background: var(--primary-red);
+            color: black;
+            box-shadow: 0 0 30px var(--primary-red);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: auto;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            letter-spacing: 2px;
+        }
+
+        /* Responsivitas untuk HP Kecil */
+        @media (max-width: 400px) {
+            .calculator-card {
+                padding: 15px;
+            }
+            button {
+                padding: 15px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator-card">
+        <input type="text" id="display" disabled>
+        <div class="buttons">
+            <button class="clear" onclick="clearDisplay()">C</button>
+            <button class="operator" onclick="deleteLast()">DEL</button>
+            <button class="operator" onclick="appendToDisplay('/')">/</button>
+            
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button class="operator" onclick="appendToDisplay('*')">×</button>
+            
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button class="operator" onclick="appendToDisplay('-')">-</button>
+            
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button class="operator" onclick="appendToDisplay('+')">+</button>
+            
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button class="equal" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <a href="https://muhardian.eu.org/" class="home-btn">Home</a>
+
+    <footer>
+        Muhardian @2026
+    </footer>
+
+    <script>
+        const display = document.getElementById('display');
+
+        function appendToDisplay(input) {
+            display.value += input;
+        }
+
+        function clearDisplay() {
+            display.value = "";
+        }
+
+        function deleteLast() {
+            display.value = display.value.slice(0, -1);
+        }
+
+        function calculate() {
+            try {
+                // Menggunakan eval dengan hati-hati untuk demo ini
+                display.value = eval(display.value);
+            } catch (error) {
+                display.value = "Error";
+                setTimeout(clearDisplay, 1500);
+            }
+        }
+    </script>
+</body>
+</html>
