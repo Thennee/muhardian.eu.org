@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Super Mario Ultra - Responsive</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #5c94fc; font-family: 'Arial', sans-serif; }
+        canvas { display: block; touch-action: none; }
+        #ui {
+            position: absolute; top: 20px; left: 20px;
+            color: #fff; font-size: 28px; font-weight: bold;
+            text-shadow: 3px 3px #000; pointer-events: none; z-index: 10;
+        }
+        #instructions {
+            position: absolute; bottom: 10px; width: 100%;
+            text-align: center; color: white; font-size: 14px;
+            text-shadow: 1px 1px #000; opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui">COINS: <span id="score">0</span></div>
+    <div id="instructions">Spasi / Klik / Tap untuk Melompat</div>
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+
+        // --- SOUNDS ---
+        // Menggunakan library suara publik
+        const sndJump = new Audio('https://www.soundjay.com/buttons/sounds/button-10.mp3');
+        const sndCoin = new Audio('https://www.soundjay.com/buttons/sounds/button-3.mp3');
+        const sndDie  = new Audio('https://www.soundjay.com/buttons/sounds/button-11.mp3');
+
+        // --- SPRITES ---
+        const imgMario = new Image();
+        imgMario.src = 'https://muhardian.eu.org/deni/mario/Smario-removebg-preview.png'; 
+
+        const imgGoomba = new Image();
+        imgGoomba.src = 'https://muhardian.eu.org/deni/mario/musuh.png'; 
+
+        const imgCoin = new Image();
+        imgCoin.src = 'https://muhardian.eu.org/deni/mario/koin-removebg-preview.png'; 
+
+        // --- GAME VARIABLES ---
+        let score = 0;
+        let gameActive = true;
+        let gameSpeed = 6;
+        let spawnTimer = 0;
+        let groundHeight = 60;
+
+        const player = {
+            x: 60, y: 0, width: 46, height: 60,
+            dy: 0, jumpForce: 17, gravity: 0.85, grounded: false
+        };
+
+        const obstacles = [];
+        const coins = [];
+
+        // --- CORE FUNCTIONS ---
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Menjaga mario tetap di atas tanah saat resize
+            if (player.grounded) player.y = canvas.height - groundHeight - player.height;
+        }
+
+        function handleInput(e) {
+            if (e) e.preventDefault();
+            
+            if (gameActive) {
+                if (player.grounded) {
+                    player.dy = -player.jumpForce;
+                    player.grounded = false;
+                    sndJump.currentTime = 0;
+                    sndJump.play().catch(() => {}); // Play jump sound
+                }
+            } else {
+                resetGame();
+            }
+        }
+
+        function resetGame() {
+            score = 0;
+            gameSpeed = 6;
+            obstacles.length = 0;
+            coins.length = 0;
+            gameActive = true;
+            scoreElement.innerText = score;
+        }
+
+        function update() {
+            if (!gameActive) return;
+
+            // Gravitasi & Posisi
+            player.dy += player.gravity;
+            player.y += player.dy;
+
+            const floor = canvas.height - groundHeight;
+            if (player.y + player.height > floor) {
+                player.y = floor - player.height;
+                player.dy = 0;
+                player.grounded = true;
+            }
+
+            // Spawning (Musuh atau Koin)
+            spawnTimer++;
+            if (spawnTimer > Math.max(40, 90 - (score / 2))) { 
+                if (Math.random() > 0.35) {
+                    obstacles.push({ x: canvas.width, y: floor - 45, w: 45, h: 45 });
+                } else {
+                    coins.push({ x: canvas.width, y: floor - 130, w: 35, h: 35 });
+                }
+                spawnTimer = 0;
+            }
+
+            // Update Rintangan (Goomba)
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].x -= gameSpeed;
+                
+                // Cek Tabrakan
+                if (player.x < obstacles[i].x + obstacles[i].w &&
+                    player.x + player.width > obstacles[i].x &&
+                    player.y < obstacles[i].y + obstacles[i].h &&
+                    player.y + player.height > obstacles[i].y) {
+                    gameActive = false;
+                    sndDie.play().catch(() => {});
+                }
+
+                if (obstacles[i].x + obstacles[i].w < 0) obstacles.splice(i, 1);
+            }
+
+            // Update Koin
+            for (let i = coins.length - 1; i >= 0; i--) {
+                coins[i].x -= gameSpeed;
+                
+                // Cek Ambil Koin
+                if (player.x < coins[i].x + coins[i].w &&
+                    player.x + player.width > coins[i].x &&
+                    player.y < coins[i].y + coins[i].h &&
+                    player.y + player.height > coins[i].y) {
+                    coins.splice(i, 1);
+                    score += 1;
+                    scoreElement.innerText = score;
+                    gameSpeed += 0.15; // Game makin cepat
+                    sndCoin.currentTime = 0;
+                    sndCoin.play().catch(() => {});
+                }
+
+                if (coins[i].x + coins[i].w < 0) coins.splice(i, 1);
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Langit (Background)
+            ctx.fillStyle = "#5c94fc";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 2. Tanah & Rumput
+            ctx.fillStyle = "#885418"; // Tanah cokelat
+            ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
+            ctx.fillStyle = "#2ecc71"; // Rumput hijau
+            ctx.fillRect(0, canvas.height - groundHeight - 5, canvas.width, 5);
+
+            // 3. Mario
+            ctx.drawImage(imgMario, player.x, player.y, player.width, player.height);
+
+            // 4. Musuh (Goomba)
+            obstacles.forEach(obs => {
+                ctx.drawImage(imgGoomba, obs.x, obs.y, obs.w, obs.h);
+            });
+
+            // 5. Koin
+            coins.forEach(c => {
+                ctx.drawImage(imgCoin, c.x, c.y, c.w, c.h);
+            });
+
+            // 6. Overlay Game Over
+            if (!gameActive) {
+                ctx.fillStyle = "rgba(0,0,0,0.7)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "white";
+                ctx.textAlign = "center";
+                ctx.font = "bold 40px Arial";
+                ctx.fillText("GAME OVER", canvas.width/2, canvas.height/2 - 20);
+                ctx.font = "20px Arial";
+                ctx.fillText("SKOR AKHIR: " + score, canvas.width/2, canvas.height/2 + 20);
+                ctx.fillText("TAP UNTUK RESTART", canvas.width/2, canvas.height/2 + 60);
+            }
+
+            update();
+            requestAnimationFrame(draw);
+        }
+
+        // --- EVENT LISTENERS ---
+        window.addEventListener('resize', resize);
+        window.addEventListener('keydown', (e) => { if(e.code === 'Space' || e.code === 'ArrowUp') handleInput(e); });
+        window.addEventListener('touchstart', handleInput, {passive: false});
+        window.addEventListener('mousedown', handleInput);
+
+        // --- START ---
+        resize();
+        draw();
+    </script>
+</body>
+</html>
