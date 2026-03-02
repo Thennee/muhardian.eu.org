@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exotic Glowing Red | Muhardian Edition</title>
+    <title>Muhardian Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -114,59 +114,6 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .slideshow-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            border-radius: 1rem;
-        }
-        .slide {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-            background-size: cover;
-            background-position: center;
-        }
-        .slide.active {
-            opacity: 1;
-        }
-
-        .hadits-container {
-            position: relative;
-            min-height: 180px;
-            overflow: hidden;
-        }
-
-        .hadits-item {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 1s ease, transform 1s ease;
-            position: absolute;
-            width: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-        }
-
-        .hadits-item.active {
-            opacity: 1;
-            transform: translateY(0);
-            position: relative;
-            pointer-events: auto;
-        }
-
-        .hadits-item.exit {
-            opacity: 0;
-            transform: translateY(-30px);
-        }
-
-        .arabic {
-            font-family: 'Amiri', serif;
-            direction: rtl;
-        }
-
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -203,6 +150,22 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* Gallery Overlay */
+        .gallery-overlay {
+            background: linear-gradient(to top, rgba(127, 29, 29, 0.9) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+        .gallery-item img {
+            transition: transform 0.5s ease;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body class="gradient-bg min-h-screen flex flex-col">
@@ -221,7 +184,7 @@
         <div class="hidden md:flex space-x-8 font-medium">
             <a href="#top" class="hover:text-red-400 transition-colors">Beranda</a>
             <a href="#ai-section" class="hover:text-red-400 transition-colors">✨ AI Fitur</a>
-            <a href="#galeri-section" class="hover:text-red-400 transition-colors">Galeri</a>
+            <a href="#galeri-lokal" class="hover:text-red-400 transition-colors">Galeri</a>
             <a href="#live-chat" class="hover:text-red-400 transition-colors">ChatBox</a>
         </div>
         
@@ -275,24 +238,6 @@
                                 <a href="https://muhardian.eu.org" target="_blank" class="hover:text-red-400 block py-1 underline">Expansion Phase</a>
                             </div>
                         </div>
-                        <div class="mb-2">
-                            <span class="toggle-btn" onclick="toggleTree('content-2028', this)">+</span> Tahun 2028
-                            <div id="content-2028" class="tree-item hidden-content">
-                                <a href="https://muhardian.eu.org" target="_blank" class="hover:text-red-400 block py-1 underline">Crimson Development</a>
-                            </div>
-                        </div>
-                        <div class="mb-2">
-                            <span class="toggle-btn" onclick="toggleTree('content-2029', this)">+</span> Tahun 2029
-                            <div id="content-2029" class="tree-item hidden-content">
-                                <a href="https://muhardian.eu.org" target="_blank" class="hover:text-red-400 block py-1 underline">Global Connectivity</a>
-                            </div>
-                        </div>
-                        <div class="mb-2">
-                            <span class="toggle-btn" onclick="toggleTree('content-2030', this)">+</span> Tahun 2030
-                            <div id="content-2030" class="tree-item hidden-content">
-                                <a href="https://muhardian.eu.org" target="_blank" class="hover:text-red-400 block py-1 underline">Vision 2030 Alpha</a>
-                            </div>
-                        </div>
                     </div>
                 </section>
 
@@ -326,10 +271,10 @@
                         <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     </div>
                     <h3 class="text-xl font-bold mb-2 text-red-400">✨ AI Wisdom</h3>
-                    <div id="ai-wisdom-container" class="min-h-[120px] flex items-center justify-center italic text-red-100/80 mb-4 px-2">
+                    <div id="ai-wisdom-container" class="min-h-[120px] flex items-center justify-center italic text-red-100/80 mb-4 px-2 text-sm leading-relaxed">
                         Klik tombol di bawah untuk meminta nasihat bijak dari AI bertema "Merah Membara".
                     </div>
-                    <button onclick="getAIWisdom()" id="ai-wisdom-btn" class="mt-auto px-6 py-2 bg-red-900/40 border border-red-500/50 rounded-full hover:bg-red-600/50 transition-all text-sm font-bold flex items-center gap-2">
+                    <button onclick="getAIWisdom()" id="ai-wisdom-btn" class="mt-auto px-6 py-2 bg-red-900/40 border border-red-500/50 rounded-full hover:bg-red-600/50 transition-all text-xs font-bold flex items-center gap-2">
                         ✨ Minta Nasihat
                     </button>
                 </section>
@@ -343,9 +288,6 @@
                         <a href="#" class="social-link" title="Facebook">
                             <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                         </a>
-                        <a href="#" class="social-link" title="Twitter / X">
-                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                        </a>
                     </div>
                 </section>
             </div>
@@ -354,59 +296,82 @@
         <!-- AI IMAGE GENERATOR SECTION -->
         <section id="ai-section" class="mt-24 p-8 md:p-12 glass-card rounded-[3rem] relative overflow-hidden scroll-mt-32 border-red-500/20">
              <div class="flex flex-col md:flex-row items-center gap-12">
-                <div class="w-full md:w-1/2 space-y-6">
-                    <h2 class="text-4xl font-bold text-glow-red flex items-center gap-3">✨ AI Image Studio</h2>
+                <div class="w-full md:w-1/2 space-y-6 text-center md:text-left">
+                    <h2 class="text-4xl font-bold text-glow-red flex items-center justify-center md:justify-start gap-3">✨ AI Studio</h2>
                     <p class="text-red-100/70">
-                        Ingin melihat keajaiban? Masukkan deskripsi gambar bertema merah (misal: "Naga api merah", "Hutan kristal merah") dan AI akan membuatnya untukmu.
+                        Visualisasikan imajinasi merah Anda. Ketik deskripsi dan biarkan kecerdasan buatan melukisnya.
                     </p>
                     <div class="space-y-4">
-                        <input type="text" id="ai-prompt" placeholder="Masukkan ide visual..." class="w-full px-6 py-4 bg-black/40 border border-red-900/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500/50 text-red-100">
+                        <input type="text" id="ai-prompt" placeholder="Contoh: Matahari terbenam di planet merah..." class="w-full px-6 py-4 bg-black/40 border border-red-900/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500/50 text-red-100 placeholder:text-red-900/50">
                         <button onclick="generateAIImage()" id="gen-btn" class="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-black rounded-2xl transition-all shadow-[0_0_20px_#ef444455] flex items-center justify-center gap-3">
-                            ✨ BUAT GAMBAR AJAIB
+                            ✨ BUAT VISUAL
                         </button>
                     </div>
                 </div>
                 <div class="w-full md:w-1/2">
-                    <div id="ai-image-result" class="bg-red-950/30 w-full aspect-square md:aspect-video rounded-3xl glow-red border border-red-500/20 flex items-center justify-center relative overflow-hidden">
-                        <div class="text-red-400 text-center p-8">
-                            <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            <p class="italic opacity-50">Visual akan muncul di sini...</p>
+                    <div id="ai-image-result" class="bg-red-950/30 w-full aspect-video rounded-3xl glow-red border border-red-500/20 flex items-center justify-center relative overflow-hidden">
+                        <div class="text-red-400 text-center p-8 opacity-40">
+                            <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <p class="italic text-sm">Pratinjau visual AI muncul di sini...</p>
                         </div>
                     </div>
                 </div>
              </div>
         </section>
 
-        <!-- Galeri Section -->
-        <div id="galeri-section" class="mt-24 p-8 md:p-12 glass-card rounded-[3rem] flex flex-col md:flex-row items-center gap-12 relative overflow-hidden scroll-mt-32">
-            <div class="absolute -right-20 -bottom-20 w-64 h-64 bg-red-600/10 blur-[80px] rounded-full pointer-events-none"></div>
-            
-            <div class="w-full md:w-1/2">
-                <div class="bg-red-950/30 w-full aspect-video rounded-2xl glow-red overflow-hidden border border-red-500/20 relative">
-                    <div class="slideshow-container" id="nature-slideshow"></div>
-                </div>
+        <!-- BAGIAN GALERI LOKAL (Baru Ditambahkan di Atas Footer) -->
+        <section id="galeri-lokal" class="mt-24 mb-12 scroll-mt-32">
+            <div class="flex items-center gap-4 mb-10">
+                <div class="h-px flex-grow bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
+                <h2 class="text-3xl font-black text-glow-red uppercase tracking-tighter">Galeri Alam Lokal</h2>
+                <div class="h-px flex-grow bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
             </div>
 
-            <div class="w-full md:w-1/2 space-y-6">
-                <h2 class="text-4xl font-bold text-glow-red">Galeri Lokal</h2>
-                <p class="text-red-100/70">
-                    Menampilkan koleksi eksklusif dari galeri internal kami yang disimpan secara lokal.
-                </p>
-                <ul class="space-y-4">
-                    <li class="flex items-center gap-3 group">
-                        <div class="w-5 h-5 rounded-full bg-red-600 shadow-[0_0_15px_#dc2626] group-hover:scale-125 transition-transform"></div>
-                        <span class="group-hover:text-red-300 transition-colors text-red-100/80">Koleksi Visual Eksklusif Muhardian</span>
-                    </li>
-                </ul>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <!-- Nature 1 -->
+                <div class="gallery-item glass-card rounded-2xl overflow-hidden relative group aspect-[3/4]">
+                    <img src="/img/nature1.jpg" alt="Pemandangan Alam 1" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x600/450a0a/fecaca?text=Alam+1'">
+                    <div class="gallery-overlay absolute inset-0 flex flex-col justify-end p-4 text-center">
+                        <span class="text-[10px] font-bold tracking-widest text-white uppercase">Nature Collection I</span>
+                    </div>
+                </div>
+                <!-- Nature 2 -->
+                <div class="gallery-item glass-card rounded-2xl overflow-hidden relative group aspect-[3/4]">
+                    <img src="/img/nature2.jpg" alt="Pemandangan Alam 2" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x600/450a0a/fecaca?text=Alam+2'">
+                    <div class="gallery-overlay absolute inset-0 flex flex-col justify-end p-4 text-center">
+                        <span class="text-[10px] font-bold tracking-widest text-white uppercase">Nature Collection II</span>
+                    </div>
+                </div>
+                <!-- Nature 3 -->
+                <div class="gallery-item glass-card rounded-2xl overflow-hidden relative group aspect-[3/4]">
+                    <img src="/img/nature3.jpg" alt="Pemandangan Alam 3" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x600/450a0a/fecaca?text=Alam+3'">
+                    <div class="gallery-overlay absolute inset-0 flex flex-col justify-end p-4 text-center">
+                        <span class="text-[10px] font-bold tracking-widest text-white uppercase">Nature Collection III</span>
+                    </div>
+                </div>
+                <!-- Nature 4 -->
+                <div class="gallery-item glass-card rounded-2xl overflow-hidden relative group aspect-[3/4]">
+                    <img src="/img/nature4.jpg" alt="Pemandangan Alam 4" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x600/450a0a/fecaca?text=Alam+4'">
+                    <div class="gallery-overlay absolute inset-0 flex flex-col justify-end p-4 text-center">
+                        <span class="text-[10px] font-bold tracking-widest text-white uppercase">Nature Collection IV</span>
+                    </div>
+                </div>
+                <!-- Nature 5 -->
+                <div class="gallery-item glass-card rounded-2xl overflow-hidden relative group aspect-[3/4]">
+                    <img src="/img/nature5.jpg" alt="Pemandangan Alam 5" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x600/450a0a/fecaca?text=Alam+5'">
+                    <div class="gallery-overlay absolute inset-0 flex flex-col justify-end p-4 text-center">
+                        <span class="text-[10px] font-bold tracking-widest text-white uppercase">Nature Collection V</span>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
     </main>
 
     <!-- Footer -->
-    <footer id="kontak" class="mt-20 border-t border-red-900/50 bg-black/60 backdrop-blur-2xl py-12 px-4">
-        <div class="container mx-auto text-center">
-            <p class="text-red-100/30 italic">
-                <a href="https://muhardian.eu.org" target="_blank">© 2026 muhardian. All rights reserved. Powered by Gemini AI.</a>
+    <footer id="kontak" class="mt-8 border-t border-red-900/50 bg-black/60 backdrop-blur-2xl py-12 px-4 relative overflow-hidden">
+        <div class="container mx-auto text-center z-10 relative">
+            <p class="text-red-100/30 italic text-sm">
+                <a href="https://muhardian.eu.org" target="_blank" class="hover:text-red-400 transition-colors">© 2026 Muhardian. All rights reserved. Powered by Gemini Flash AI.</a>
             </p>
         </div>
     </footer>
@@ -425,78 +390,62 @@
                 await new Promise(res => setTimeout(res, delay));
                 delay *= 2;
             }
-            throw new Error("Gagal menghubungi AI setelah beberapa percobaan.");
+            throw new Error("Gagal menghubungi AI.");
         }
 
-        // Feature 1: AI WISDOM
+        // Fitur: AI WISDOM
         async function getAIWisdom() {
             const container = document.getElementById('ai-wisdom-container');
             const btn = document.getElementById('ai-wisdom-btn');
-            
             container.innerHTML = '<div class="spinner"></div>';
             btn.disabled = true;
 
             try {
-                const prompt = "Berikan satu kalimat nasihat bijak atau motivasi yang singkat dalam Bahasa Indonesia. Temanya harus berhubungan dengan 'api', 'semangat', 'merah', atau 'keberanian'. Jangan gunakan tanda kutip.";
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-                
-                const data = await fetchWithRetry(url, {
+                const prompt = "Berikan satu kalimat nasihat bijak singkat (maksimal 15 kata) bertema semangat, api, atau keberanian dalam Bahasa Indonesia.";
+                const data = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        systemInstruction: { parts: [{ text: "Anda adalah motivator bijak dengan gaya bahasa yang puitis namun kuat." }] }
-                    })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
-
-                const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Jadilah seperti api, menerangi kegelapan dan menghangatkan jiwa.";
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Jadilah seperti api yang menerangi kegelapan.";
                 container.innerHTML = `"${text.trim()}"`;
             } catch (err) {
-                container.innerHTML = "Maaf, AI sedang beristirahat. Coba lagi nanti.";
+                container.innerHTML = "AI sedang beristirahat. Tetaplah bersemangat!";
             } finally {
                 btn.disabled = false;
             }
         }
 
-        // Feature 2: AI IMAGE GENERATOR
+        // Fitur: AI IMAGE GENERATOR
         async function generateAIImage() {
             const promptInput = document.getElementById('ai-prompt');
             const resultArea = document.getElementById('ai-image-result');
             const btn = document.getElementById('gen-btn');
-            
             if (!promptInput.value.trim()) return;
 
-            resultArea.innerHTML = '<div class="flex flex-col items-center"><div class="spinner mb-4"></div><p class="text-sm animate-pulse">Menciptakan visual merah membara...</p></div>';
+            resultArea.innerHTML = '<div class="flex flex-col items-center"><div class="spinner mb-4"></div><p class="text-xs animate-pulse">Melukis imajinasi...</p></div>';
             btn.disabled = true;
 
             try {
-                const fullPrompt = `Exotic cinematic digital art, theme glowing red crimson aesthetic, deep shadows, neon highlights, 4k high resolution, concept: ${promptInput.value}`;
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
-                
-                const response = await fetch(url, {
+                const fullPrompt = `Cinematic digital art, aesthetic dark crimson red theme, 4k, concept: ${promptInput.value}`;
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        instances: { prompt: fullPrompt },
-                        parameters: { sampleCount: 1 }
-                    })
+                    body: JSON.stringify({ instances: { prompt: fullPrompt }, parameters: { sampleCount: 1 } })
                 });
-
                 const result = await response.json();
                 if (result.predictions?.[0]?.bytesBase64Encoded) {
                     const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
-                    resultArea.innerHTML = `<img src="${imageUrl}" class="w-full h-full object-cover animate-in fade-in duration-1000" alt="Generated AI Art">`;
-                } else {
-                    throw new Error();
-                }
+                    resultArea.innerHTML = `<img src="${imageUrl}" class="w-full h-full object-cover animate-in fade-in duration-700" alt="AI Art">`;
+                } else { throw new Error(); }
             } catch (err) {
-                resultArea.innerHTML = '<p class="text-red-400 p-4">Gagal membuat gambar. Pastikan deskripsi Anda aman dan coba lagi.</p>';
+                resultArea.innerHTML = '<p class="text-red-800 text-xs italic">Maaf, gagal memproses visual.</p>';
             } finally {
                 btn.disabled = false;
             }
         }
 
-        // UI Helpers (Clock, Tree, etc.)
+        // UI Helpers (Clock & Tree)
         function toggleTree(id, btn) {
             const element = document.getElementById(id);
             if(!element) return;
@@ -506,37 +455,11 @@
 
         function updateClock() {
             const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('digital-clock').textContent = `${hours}:${minutes}:${seconds}`;
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('digital-date').textContent = now.toLocaleDateString('id-ID', options);
+            document.getElementById('digital-clock').textContent = now.toLocaleTimeString('id-ID', { hour12: false });
+            document.getElementById('digital-date').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         }
         setInterval(updateClock, 1000);
         updateClock();
-
-        // Slideshow
-        const localImages = [
-            'https://images.unsplash.com/photo-1541450805268-4822a3a774ca?auto=format&fit=crop&q=80&w=800',
-            'https://images.unsplash.com/photo-1518116310214-80327778b4a2?auto=format&fit=crop&q=80&w=800',
-            'https://images.unsplash.com/photo-1516053303025-5d9f55f7c596?auto=format&fit=crop&q=80&w=800'
-        ];
-        const slideshowContainer = document.getElementById('nature-slideshow');
-        localImages.forEach((src, index) => {
-            const slide = document.createElement('div');
-            slide.className = `slide ${index === 0 ? 'active' : ''}`;
-            slide.style.backgroundImage = `url('${src}')`;
-            slideshowContainer.appendChild(slide);
-        });
-
-        let currentSlide = 0;
-        setInterval(() => {
-            const slides = document.querySelectorAll('.slide');
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }, 4000);
     </script>
 </body>
 </html>
