@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exotic Glowing Red | Muhardian Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0d0202;
+            color: #fecaca;
+            overflow-x: hidden;
+        }
+
+        .glow-red {
+            box-shadow: 0 0 25px rgba(220, 38, 38, 0.4);
+            border: 1px solid rgba(220, 38, 38, 0.5);
+        }
+
+        .text-glow-red {
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.7);
+        }
+
+        .gradient-bg {
+            background: radial-gradient(circle at top right, #450a0a 0%, #0d0202 100%);
+        }
+
+        .glass-card {
+            background: rgba(127, 29, 29, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            background: rgba(127, 29, 29, 0.25);
+            border-color: rgba(239, 68, 68, 0.6);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(185, 28, 28, 0.3);
+        }
+
+        /* Tree View Styles */
+        .tree-container {
+            font-family: 'Courier New', Courier, monospace;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+        .tree-item {
+            margin-left: 20px;
+            position: relative;
+            border-left: 1px dashed rgba(239, 68, 68, 0.3);
+            padding-left: 15px;
+        }
+        .tree-item::before {
+            content: "";
+            position: absolute;
+            top: 12px;
+            left: 0;
+            width: 10px;
+            border-top: 1px dashed rgba(239, 68, 68, 0.3);
+        }
+        .toggle-btn {
+            cursor: pointer;
+            color: #ef4444;
+            font-weight: bold;
+            display: inline-block;
+            width: 20px;
+            transition: transform 0.2s;
+        }
+        .hidden-content {
+            display: none;
+        }
+        .hidden-content.show {
+            display: block;
+        }
+
+        @keyframes shine-glow {
+            0%, 100% { 
+                box-shadow: 0 0 10px #ef4444, 0 0 20px #ef4444, 0 0 30px #991b1b;
+                text-shadow: 0 0 5px #fff, 0 0 10px #ef4444;
+            }
+            50% { 
+                box-shadow: 0 0 25px #ef4444, 0 0 50px #ef4444, 0 0 70px #b91c1c;
+                text-shadow: 0 0 10px #fff, 0 0 20px #ef4444;
+                transform: scale(1.05);
+            }
+        }
+
+        .btn-muhardian {
+            background: linear-gradient(45deg, #991b1b, #ef4444);
+            animation: shine-glow 2s ease-in-out infinite;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: inline-block;
+        }
+
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; filter: drop-shadow(0 0 10px #ef4444); }
+            50% { opacity: .6; filter: drop-shadow(0 0 25px #b91c1c); }
+        }
+
+        .red-gradient-text {
+            background: linear-gradient(to r, #f87171, #ef4444, #991b1b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 1rem;
+        }
+        .slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            background-size: cover;
+            background-position: center;
+        }
+        .slide.active {
+            opacity: 1;
+        }
+
+        .hadits-container {
+            position: relative;
+            min-height: 180px;
+            overflow: hidden;
+        }
+
+        .hadits-item {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s ease, transform 1s ease;
+            position: absolute;
+            width: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .hadits-item.active {
+            opacity: 1;
+            transform: translateY(0);
+            position: relative;
+            pointer-events: auto;
+        }
+
+        .hadits-item.exit {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+
+        .arabic {
+            font-family: 'Amiri', serif;
+            direction: rtl;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d0202;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #7f1d1d;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b91c1c;
+        }
+
+        /* Social Link Styles */
+        .social-link {
+            transition: all 0.3s ease;
+            color: #fca5a5;
+        }
+        .social-link:hover {
+            color: #ef4444;
+            transform: scale(1.1);
+        }
+        
+        /* AI Loading Spinner */
+        .spinner {
+            border: 3px solid rgba(239, 68, 68, 0.1);
+            border-left-color: #ef4444;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen flex flex-col">
+
+    <!-- Header / Navbar -->
+    <nav class="sticky top-0 z-50 p-6 glass-card mx-4 mt-4 rounded-2xl flex justify-between items-center">
+        <div class="flex flex-col">
+            <div id="digital-clock" class="text-3xl font-extrabold tracking-widest text-red-500 text-glow-red leading-none">
+                00:00:00
+            </div>
+            <div id="digital-date" class="text-[10px] uppercase tracking-[0.3em] text-white/60 mt-1 font-bold">
+                Memuat Tanggal...
+            </div>
+        </div>
+
+        <div class="hidden md:flex space-x-8 font-medium">
+            <a href="#top" class="hover:text-red-400 transition-colors">Beranda</a>
+            <a href="#ai-section" class="hover:text-red-400 transition-colors">✨ AI Fitur</a>
+            <a href="#galeri-section" class="hover:text-red-400 transition-colors">Galeri</a>
+            <a href="#live-chat" class="hover:text-red-400 transition-colors">ChatBox</a>
+        </div>
+        
+        <a href="https://muhardian.eu.org" target="_blank" class="btn-muhardian text-white px-8 py-2 rounded-full font-black tracking-widest transition-all text-center">
+            MUHARDIAN
+        </a>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="top" class="flex-grow container mx-auto px-4 py-12">
+        <header class="text-center mb-16 relative">
+            <div class="absolute inset-0 -top-20 bg-red-600/10 blur-[150px] rounded-full pointer-events-none"></div>
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight">
+                Rasakan Sensasi <br>
+                <span class="animate-pulse-slow red-gradient-text">Merah Membara</span>
+            </h1>
+            <p class="text-red-200/70 max-w-2xl mx-auto text-lg">
+                Perpaduan gradasi merah gelap dan cahaya neon yang memukau, kini didukung oleh kecerdasan buatan Gemini API.
+            </p>
+        </header>
+
+        <!-- Main Grid Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+            
+            <!-- Column 1: Project (Tree View) -->
+            <div class="flex flex-col gap-8 h-full">
+                <section class="glass-card p-8 rounded-3xl flex flex-col flex-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 bg-red-950/50 rounded-xl flex items-center justify-center glow-red">
+                            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold">Project</h3>
+                    </div>
+                    
+                    <div class="tree-container text-red-100/80 max-h-[300px] overflow-y-auto pr-2">
+                        <div class="mb-2">
+                            <span class="toggle-btn" onclick="toggleTree('content-2025', this)">+</span> Tahun 2025
+                            <div id="content-2025" class="tree-item hidden-content">
+                                <a href="https://www.google.com" target="_blank" class="hover:text-red-400 block py-1 underline">Project Inisial</a>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <span class="toggle-btn" onclick="toggleTree('content-2026', this)">+</span> Tahun 2026
+                            <div id="content-2026" class="tree-item hidden-content">
+                                <a href="https://muhardian.eu.org" target="_blank" class="hover:text-red-400 block py-1 underline">Muhardian Portal</a>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <span class="toggle-btn" onclick="toggleTree('content-2027', this)">+</span> Tahun 2027
+                            <div id="content-2027" class="tree-item hidden-content">
+                                <a href="https://muhardian.eu.org" target="_blank" class="hover:text-red-400 block py-1 underline">Expansion Phase</a>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <span class="toggle-btn" onclick="toggleTree('content-2028', this)">+</span> Tahun 2028
+                            <div id="content-2028" class="tree-item hidden-content">
+                                <a href="https://muhardian.eu.org" target="_blank" class="hover:text-red-400 block py-1 underline">Crimson Development</a>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <span class="toggle-btn" onclick="toggleTree('content-2029', this)">+</span> Tahun 2029
+                            <div id="content-2029" class="tree-item hidden-content">
+                                <a href="https://muhardian.eu.org" target="_blank" class="hover:text-red-400 block py-1 underline">Global Connectivity</a>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <span class="toggle-btn" onclick="toggleTree('content-2030', this)">+</span> Tahun 2030
+                            <div id="content-2030" class="tree-item hidden-content">
+                                <a href="https://muhardian.eu.org" target="_blank" class="hover:text-red-400 block py-1 underline">Vision 2030 Alpha</a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="glass-card p-8 rounded-3xl flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-red-950/50 rounded-2xl flex items-center justify-center mb-6 glow-red">
+                        <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Keamanan</h3>
+                    <p class="text-red-100/60 leading-relaxed">
+                        Keamanan enkripsi berlapis yang melindungi aset digital Anda.
+                    </p>
+                </section>
+            </div>
+
+            <!-- Column 2: ChatBox -->
+            <section id="live-chat" class="glass-card p-6 rounded-3xl overflow-hidden glow-red ring-2 ring-red-500/30 flex flex-col h-full scroll-mt-32">
+                <div class="flex items-center justify-center gap-3 mb-6">
+                    <div class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
+                    <h3 class="text-2xl font-bold tracking-widest text-red-400 uppercase">Live ChatBox</h3>
+                </div>
+                <div class="w-full bg-black/60 rounded-2xl overflow-hidden border border-red-900/50 shadow-inner flex-grow min-h-[400px]">
+                    <iframe src="https://muhardian.eu.org/deni/cbox/" width="100%" height="100%" frameborder="0" scrolling="auto" class="rounded-2xl opacity-90 hover:opacity-100"></iframe>
+                </div>
+            </section>
+
+            <!-- Column 3: AI Crimson Wisdom & Socials -->
+            <div class="flex flex-col gap-8 h-full">
+                <!-- AI WISDOM FEATURE -->
+                <section class="glass-card p-8 rounded-3xl flex flex-col items-center text-center flex-1 overflow-hidden border-red-500/30">
+                    <div class="w-16 h-16 bg-red-950/50 rounded-2xl flex items-center justify-center mb-4 glow-red">
+                        <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-red-400">✨ AI Wisdom</h3>
+                    <div id="ai-wisdom-container" class="min-h-[120px] flex items-center justify-center italic text-red-100/80 mb-4 px-2">
+                        Klik tombol di bawah untuk meminta nasihat bijak dari AI bertema "Merah Membara".
+                    </div>
+                    <button onclick="getAIWisdom()" id="ai-wisdom-btn" class="mt-auto px-6 py-2 bg-red-900/40 border border-red-500/50 rounded-full hover:bg-red-600/50 transition-all text-sm font-bold flex items-center gap-2">
+                        ✨ Minta Nasihat
+                    </button>
+                </section>
+
+                <section class="glass-card p-8 rounded-3xl flex flex-col items-center text-center">
+                    <h3 class="text-xl font-bold mb-6 text-red-400 uppercase tracking-widest">Connect With Us</h3>
+                    <div class="flex gap-8 justify-center items-center">
+                        <a href="#" class="social-link" title="Instagram">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                        </a>
+                        <a href="#" class="social-link" title="Facebook">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </a>
+                        <a href="#" class="social-link" title="Twitter / X">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </a>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- AI IMAGE GENERATOR SECTION -->
+        <section id="ai-section" class="mt-24 p-8 md:p-12 glass-card rounded-[3rem] relative overflow-hidden scroll-mt-32 border-red-500/20">
+             <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="w-full md:w-1/2 space-y-6">
+                    <h2 class="text-4xl font-bold text-glow-red flex items-center gap-3">✨ AI Image Studio</h2>
+                    <p class="text-red-100/70">
+                        Ingin melihat keajaiban? Masukkan deskripsi gambar bertema merah (misal: "Naga api merah", "Hutan kristal merah") dan AI akan membuatnya untukmu.
+                    </p>
+                    <div class="space-y-4">
+                        <input type="text" id="ai-prompt" placeholder="Masukkan ide visual..." class="w-full px-6 py-4 bg-black/40 border border-red-900/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500/50 text-red-100">
+                        <button onclick="generateAIImage()" id="gen-btn" class="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-black rounded-2xl transition-all shadow-[0_0_20px_#ef444455] flex items-center justify-center gap-3">
+                            ✨ BUAT GAMBAR AJAIB
+                        </button>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2">
+                    <div id="ai-image-result" class="bg-red-950/30 w-full aspect-square md:aspect-video rounded-3xl glow-red border border-red-500/20 flex items-center justify-center relative overflow-hidden">
+                        <div class="text-red-400 text-center p-8">
+                            <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <p class="italic opacity-50">Visual akan muncul di sini...</p>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </section>
+
+        <!-- Galeri Section -->
+        <div id="galeri-section" class="mt-24 p-8 md:p-12 glass-card rounded-[3rem] flex flex-col md:flex-row items-center gap-12 relative overflow-hidden scroll-mt-32">
+            <div class="absolute -right-20 -bottom-20 w-64 h-64 bg-red-600/10 blur-[80px] rounded-full pointer-events-none"></div>
+            
+            <div class="w-full md:w-1/2">
+                <div class="bg-red-950/30 w-full aspect-video rounded-2xl glow-red overflow-hidden border border-red-500/20 relative">
+                    <div class="slideshow-container" id="nature-slideshow"></div>
+                </div>
+            </div>
+
+            <div class="w-full md:w-1/2 space-y-6">
+                <h2 class="text-4xl font-bold text-glow-red">Galeri Lokal</h2>
+                <p class="text-red-100/70">
+                    Menampilkan koleksi eksklusif dari galeri internal kami yang disimpan secara lokal.
+                </p>
+                <ul class="space-y-4">
+                    <li class="flex items-center gap-3 group">
+                        <div class="w-5 h-5 rounded-full bg-red-600 shadow-[0_0_15px_#dc2626] group-hover:scale-125 transition-transform"></div>
+                        <span class="group-hover:text-red-300 transition-colors text-red-100/80">Koleksi Visual Eksklusif Muhardian</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="kontak" class="mt-20 border-t border-red-900/50 bg-black/60 backdrop-blur-2xl py-12 px-4">
+        <div class="container mx-auto text-center">
+            <p class="text-red-100/30 italic">
+                <a href="https://muhardian.eu.org" target="_blank">© 2026 muhardian. All rights reserved. Powered by Gemini AI.</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        const apiKey = ""; // Disediakan oleh environment
+
+        // Helper untuk Exponential Backoff
+        async function fetchWithRetry(url, options, retries = 5) {
+            let delay = 1000;
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) return await response.json();
+                } catch (e) {}
+                await new Promise(res => setTimeout(res, delay));
+                delay *= 2;
+            }
+            throw new Error("Gagal menghubungi AI setelah beberapa percobaan.");
+        }
+
+        // Feature 1: AI WISDOM
+        async function getAIWisdom() {
+            const container = document.getElementById('ai-wisdom-container');
+            const btn = document.getElementById('ai-wisdom-btn');
+            
+            container.innerHTML = '<div class="spinner"></div>';
+            btn.disabled = true;
+
+            try {
+                const prompt = "Berikan satu kalimat nasihat bijak atau motivasi yang singkat dalam Bahasa Indonesia. Temanya harus berhubungan dengan 'api', 'semangat', 'merah', atau 'keberanian'. Jangan gunakan tanda kutip.";
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                
+                const data = await fetchWithRetry(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        systemInstruction: { parts: [{ text: "Anda adalah motivator bijak dengan gaya bahasa yang puitis namun kuat." }] }
+                    })
+                });
+
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Jadilah seperti api, menerangi kegelapan dan menghangatkan jiwa.";
+                container.innerHTML = `"${text.trim()}"`;
+            } catch (err) {
+                container.innerHTML = "Maaf, AI sedang beristirahat. Coba lagi nanti.";
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // Feature 2: AI IMAGE GENERATOR
+        async function generateAIImage() {
+            const promptInput = document.getElementById('ai-prompt');
+            const resultArea = document.getElementById('ai-image-result');
+            const btn = document.getElementById('gen-btn');
+            
+            if (!promptInput.value.trim()) return;
+
+            resultArea.innerHTML = '<div class="flex flex-col items-center"><div class="spinner mb-4"></div><p class="text-sm animate-pulse">Menciptakan visual merah membara...</p></div>';
+            btn.disabled = true;
+
+            try {
+                const fullPrompt = `Exotic cinematic digital art, theme glowing red crimson aesthetic, deep shadows, neon highlights, 4k high resolution, concept: ${promptInput.value}`;
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        instances: { prompt: fullPrompt },
+                        parameters: { sampleCount: 1 }
+                    })
+                });
+
+                const result = await response.json();
+                if (result.predictions?.[0]?.bytesBase64Encoded) {
+                    const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                    resultArea.innerHTML = `<img src="${imageUrl}" class="w-full h-full object-cover animate-in fade-in duration-1000" alt="Generated AI Art">`;
+                } else {
+                    throw new Error();
+                }
+            } catch (err) {
+                resultArea.innerHTML = '<p class="text-red-400 p-4">Gagal membuat gambar. Pastikan deskripsi Anda aman dan coba lagi.</p>';
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // UI Helpers (Clock, Tree, etc.)
+        function toggleTree(id, btn) {
+            const element = document.getElementById(id);
+            if(!element) return;
+            element.classList.toggle('show');
+            btn.textContent = element.classList.contains('show') ? '-' : '+';
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('digital-clock').textContent = `${hours}:${minutes}:${seconds}`;
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('digital-date').textContent = now.toLocaleDateString('id-ID', options);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Slideshow
+        const localImages = [
+            'https://images.unsplash.com/photo-1541450805268-4822a3a774ca?auto=format&fit=crop&q=80&w=800',
+            'https://images.unsplash.com/photo-1518116310214-80327778b4a2?auto=format&fit=crop&q=80&w=800',
+            'https://images.unsplash.com/photo-1516053303025-5d9f55f7c596?auto=format&fit=crop&q=80&w=800'
+        ];
+        const slideshowContainer = document.getElementById('nature-slideshow');
+        localImages.forEach((src, index) => {
+            const slide = document.createElement('div');
+            slide.className = `slide ${index === 0 ? 'active' : ''}`;
+            slide.style.backgroundImage = `url('${src}')`;
+            slideshowContainer.appendChild(slide);
+        });
+
+        let currentSlide = 0;
+        setInterval(() => {
+            const slides = document.querySelectorAll('.slide');
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 4000);
+    </script>
+</body>
+</html>
