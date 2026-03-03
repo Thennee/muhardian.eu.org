@@ -164,6 +164,23 @@
         .gallery-item:hover img {
             transform: scale(1.1);
         }
+
+        /* Input styling for login */
+        .login-input {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            width: 100%;
+            transition: all 0.3s;
+            outline: none;
+            font-size: 0.875rem;
+        }
+        .login-input:focus {
+            border-color: #ef4444;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+        }
     </style>
 </head>
 <body class="gradient-bg min-h-screen flex flex-col">
@@ -211,15 +228,21 @@
             
             <!-- Kolom 1: Keamanan (Atas) & Project (Bawah) -->
             <div class="flex flex-col gap-8 h-full">
-                <!-- KOTAK KEAMANAN -->
+                <!-- KOTAK KEAMANAN (DENGAN LOGIN) -->
                 <section class="glass-card p-8 rounded-3xl flex flex-col items-center text-center">
                     <div class="w-16 h-16 bg-red-950/50 rounded-2xl flex items-center justify-center mb-6 glow-red">
                         <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                     </div>
-                    <h3 class="text-2xl font-bold mb-4 text-white">Keamanan</h3>
-                    <p class="text-red-100/60 leading-relaxed">
-                        Keamanan enkripsi berlapis yang melindungi aset digital Anda dari ancaman eksternal.
-                    </p>
+                    <h3 class="text-2xl font-bold mb-4 text-white uppercase tracking-widest">Keamanan</h3>
+                    
+                    <div id="login-form" class="w-full space-y-3 mt-2">
+                        <input type="text" id="username" placeholder="Username" class="login-input">
+                        <input type="password" id="password" placeholder="Password" class="login-input">
+                        <button onclick="handleLogin()" class="w-full py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+                            MASUK
+                        </button>
+                        <p id="login-error" class="text-red-500 text-[10px] hidden font-bold mt-2 uppercase tracking-tighter animate-pulse">Akses Ditolak: Kredensial Salah!</p>
+                    </div>
                 </section>
 
                 <!-- KOTAK PROJECT -->
@@ -389,6 +412,24 @@
 
     <script>
         const apiKey = ""; 
+
+        // Fungsi Login Sederhana
+        function handleLogin() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const errorMsg = document.getElementById('login-error');
+
+            // Validasi Kredensial
+            if (user === "admin" && pass === "321321") {
+                errorMsg.classList.add('hidden');
+                // Mengarahkan ke tautan yang diminta
+                window.location.href = "https://muhardian.eu.org";
+            } else {
+                errorMsg.classList.remove('hidden');
+                // Reset password input
+                document.getElementById('password').value = "";
+            }
+        }
 
         async function fetchWithRetry(url, options, retries = 5) {
             let delay = 1000;
