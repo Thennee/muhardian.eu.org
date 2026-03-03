@@ -292,7 +292,7 @@ if ($env:PATH -notlike "*$env:SystemRoot\system32;*") {
 #setup script
 #=====================================================================================
 
-Write-Host '~ ~ ~ Remove Windows AI by @zoicware ~ ~ ~' -ForegroundColor DarkCyan
+Write-Host '~ ~ ~ Remove Windows AI by @Muhardian2026 ~ ~ ~' -ForegroundColor DarkCyan
 
 if ($EnableLogging) {
     $date = (Get-Date).ToString('MM-dd-yyyy-HH:mm') -replace ':'
