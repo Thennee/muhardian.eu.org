@@ -3,464 +3,422 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deni Muhardian Project</title>
-    <link rel="icon" type="image/x-icon" href="https://muhardian.eu.org/deni/img/icon_merah.ico">
+    <title>Undian digital</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        html {
-            scroll-behavior: smooth;
+        :root {
+            --neon-pink: #ff00ff;
+            --neon-blue: #00ffff;
+            --neon-green: #0ff000;
+            --neon-yellow: #ffff00;
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #0d0202;
-            color: #fecaca;
-            overflow-x: hidden;
-        }
-
-        .glow-red {
-            box-shadow: 0 0 25px rgba(220, 38, 38, 0.4);
-            border: 1px solid rgba(220, 38, 38, 0.5);
-        }
-
-        .text-glow-red {
-            text-shadow: 0 0 15px rgba(239, 68, 68, 0.7);
-        }
-
-        .gradient-bg {
-            background: radial-gradient(circle at top right, #450a0a 0%, #0d0202 100%);
-        }
-
-        .glass-card {
-            background: rgba(127, 29, 29, 0.1);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(239, 68, 68, 0.15);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .glass-card:hover {
-            background: rgba(127, 29, 29, 0.25);
-            border-color: rgba(239, 68, 68, 0.6);
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 15px 40px rgba(185, 28, 28, 0.3);
-        }
-
-        /* Tree View Styles */
-        .tree-container {
-            font-family: 'Courier New', Courier, monospace;
-            text-align: left;
-            font-size: 0.85rem;
-        }
-        .tree-item {
-            margin-left: 20px;
-            position: relative;
-            border-left: 1px dashed rgba(239, 68, 68, 0.3);
-            padding-left: 15px;
-        }
-        .tree-item::before {
-            content: "";
-            position: absolute;
-            top: 12px;
-            left: 0;
-            width: 10px;
-            border-top: 1px dashed rgba(239, 68, 68, 0.3);
-        }
-        .toggle-btn {
-            cursor: pointer;
-            color: #ef4444;
-            font-weight: bold;
-            display: inline-block;
-            width: 20px;
-            transition: transform 0.2s;
-        }
-        .hidden-content {
-            display: none;
-        }
-        .hidden-content.show {
-            display: block;
-        }
-
-        @keyframes shine-glow {
-            0%, 100% { 
-                box-shadow: 0 0 10px #ef4444, 0 0 20px #ef4444, 0 0 30px #991b1b;
-                text-shadow: 0 0 5px #fff, 0 0 10px #ef4444;
-            }
-            50% { 
-                box-shadow: 0 0 25px #ef4444, 0 0 50px #ef4444, 0 0 70px #b91c1c;
-                text-shadow: 0 0 10px #fff, 0 0 20px #ef4444;
-                transform: scale(1.05);
-            }
-        }
-
-        .btn-muhardian {
-            background: linear-gradient(45deg, #991b1b, #ef4444);
-            animation: shine-glow 2s ease-in-out infinite;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            display: inline-block;
-        }
-
-        .animate-pulse-slow {
-            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; filter: drop-shadow(0 0 10px #ef4444); }
-            50% { opacity: .6; filter: drop-shadow(0 0 25px #b91c1c); }
-        }
-
-        .red-gradient-text {
-            background: linear-gradient(to r, #f87171, #ef4444, #991b1b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .login-input {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            background-color: #0a0a0a;
             color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.75rem;
-            width: 100%;
-            transition: all 0.3s;
-            outline: none;
-            font-size: 0.875rem;
-        }
-        .login-input:focus {
-            border-color: #ef4444;
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        .fade-in-out {
-            transition: opacity 1s ease-in-out;
-            opacity: 1;
-        }
-        .fade-hidden {
-            opacity: 0;
-        }
-
-        .arabic-text {
-            font-family: 'Amiri', serif;
-            direction: rtl;
-            font-size: 1.25rem;
-            line-height: 1.8;
+        /* Rainbow Neon Animation */
+        .neon-border {
+            border: 4px solid #fff;
+            box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px var(--neon-pink), 0 0 40px var(--neon-blue);
+            animation: rainbow-border 5s linear infinite;
         }
 
-        .social-link {
-            transition: all 0.3s ease;
-            color: rgba(254, 202, 202, 0.6);
-        }
-        .social-link:hover {
-            color: #ef4444;
-            transform: scale(1.2);
-            filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
+        @keyframes rainbow-border {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
         }
 
-        /* Gallery Random Fade Styles */
-        .gallery-container {
+        .neon-text {
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px var(--neon-pink), 0 0 30px var(--neon-blue);
+            animation: rainbow-text 5s linear infinite;
+        }
+
+        @keyframes rainbow-text {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        /* Compact Header Clock Style */
+        .header-clock {
+            font-family: 'Orbitron', sans-serif;
+            text-align: right;
+            line-height: 1.2;
+        }
+
+        /* Roulette Styles */
+        #wheel-container {
             position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            aspect-ratio: 16 / 9;
-            overflow: hidden;
-            border-radius: 1.5rem;
-            border: 2px solid rgba(239, 68, 68, 0.3);
+            width: 280px;
+            height: 280px;
+            margin: 20px auto;
         }
-        .gallery-img {
-            position: absolute;
-            top: 0;
-            left: 0;
+
+        @media (min-width: 480px) {
+            #wheel-container {
+                width: 350px;
+                height: 350px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            #wheel-container {
+                width: 450px;
+                height: 450px;
+            }
+        }
+
+        canvas {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 1.5s ease-in-out;
+            border-radius: 50%;
+            transition: transform 15s cubic-bezier(0.15, 0, 0.15, 1);
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.1);
         }
-        .gallery-img.active {
+
+        .pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            background: white;
+            clip-path: polygon(50% 100%, 0 0, 100% 0);
+            z-index: 10;
+            filter: drop-shadow(0 0 10px var(--neon-pink));
+        }
+
+        @media (min-width: 768px) {
+            .pointer {
+                top: -20px;
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        .center-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: #111;
+            border: 3px solid white;
+            border-radius: 50%;
+            z-index: 20;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            transition: all 0.3s;
+        }
+
+        @media (min-width: 768px) {
+            .center-btn {
+                width: 70px;
+                height: 70px;
+                border-width: 4px;
+            }
+        }
+
+        .center-btn:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            background: #222;
+        }
+
+        .center-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .input-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        footer a {
+            transition: opacity 0.3s;
+        }
+        footer a:hover {
             opacity: 1;
         }
     </style>
 </head>
-<body class="gradient-bg min-h-screen flex flex-col">
+<body class="p-4 items-center">
 
-    <!-- Header / Navbar -->
-    <nav class="sticky top-0 z-50 p-3 glass-card mx-4 mt-2 rounded-2xl flex justify-between items-center">
-        <div class="flex flex-col">
-            <div id="digital-clock" class="text-3xl font-extrabold tracking-widest text-red-500 text-glow-red leading-none">
-                00:00:00
-            </div>
-            <div id="digital-date" class="text-[10px] uppercase tracking-[0.3em] text-white/60 mt-1 font-bold">
-                Memuat Tanggal...
-            </div>
-        </div>
-
-        <div class="hidden md:flex space-x-8 font-medium">
-            <a href="#top" class="hover:text-red-400 transition-colors">Beranda</a>
-            <a href="#hadits-section" class="hover:text-red-400 transition-colors">Hadits</a>
-            <a href="#galeri-section" class="hover:text-red-400 transition-colors">Galeri</a>
-            <a href="#live-chat" class="hover:text-red-400 transition-colors">ChatBox</a>
-        </div>
-        
-        <a href="https://muhardian.eu.org" target="_blank" class="btn-muhardian text-white px-8 py-2 rounded-full font-black tracking-widest transition-all text-center">
-            MUHARDIAN
+    <nav class="w-full max-w-6xl flex justify-between items-start mb-8 md:mb-12">
+        <!-- Tombol HOME Kiri Atas -->
+        <a href="https://muhardian.eu.org/deni" class="px-4 py-2 md:px-6 md:py-2 bg-white/10 border border-white/20 rounded-full font-bold hover:bg-white/20 transition-all uppercase text-[10px] md:text-sm tracking-wider">
+            HOME
         </a>
+
+        <!-- Jam & Tanggal Kanan Atas -->
+        <div class="header-clock">
+            <div id="digitalClock" class="text-lg md:text-2xl font-bold neon-text">00:00:00</div>
+            <div id="digitalDate" class="text-[8px] md:text-xs text-white/50 uppercase tracking-widest">04 MARET 2026</div>
+        </div>
     </nav>
 
-    <!-- Konten Utama -->
-    <main id="top" class="flex-grow container mx-auto px-4 pt-4 pb-12">
-        <!-- Header Section -->
-        <header class="text-center mb-10 relative">
-            <div class="absolute inset-0 -top-20 bg-red-600/10 blur-[150px] rounded-full pointer-events-none"></div>
-            
-            <div class="max-w-3xl mx-auto space-y-2 pt-8">
-                <p class="text-red-400 font-bold text-2xl md:text-3xl tracking-wide italic">"Kobarkan api semangatmu, taklukkan batasanmu!"</p>
-                <p class="text-red-200/80 text-lg">"Nyala api semangatmu adalah obor yang terangi jalan impianmu."</p>
-                <p class="text-red-200/60 text-sm leading-relaxed italic">"Semangat adalah api, kobarkan, agar keberanianmu tak pudar, taklukkan setiap rintangan dengan keberanian."</p>
-            </div>
-        </header>
+    <!-- Nama Web -->
+    <h1 class="text-3xl md:text-6xl font-bold mb-6 md:mb-8 neon-text text-center uppercase tracking-widest">
+        Undian digital
+    </h1>
 
-        <!-- Tata Letak Grid Utama -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-            
-            <!-- Kolom 1: Login Admin & Hadits Pendek -->
-            <div class="flex flex-col gap-8 h-full">
-                <!-- LOGIN ADMIN -->
-                <section class="glass-card p-8 rounded-3xl flex flex-col items-center text-center">
-                    <div class="w-16 h-16 bg-red-950/50 rounded-2xl flex items-center justify-center mb-6 glow-red">
-                        <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4 text-white uppercase tracking-widest">Login Admin</h3>
-                    
-                    <div id="login-form" class="w-full space-y-3 mt-2">
-                        <input type="text" id="username" placeholder="Admin" class="login-input">
-                        <input type="password" id="password" placeholder="3-1*2" class="login-input">
-                        <button onclick="handleLogin()" class="w-full py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(239,68,68,0.3)]">
-                            MASUK
-                        </button>
-                        <p id="login-error" class="text-red-500 text-[10px] hidden font-bold mt-2 uppercase tracking-tighter animate-pulse">Akses Ditolak: Kredensial Salah!</p>
-                    </div>
-                </section>
-
-                <!-- HADITS BUKHORI MUSLIM -->
-                <section id="hadits-section" class="glass-card p-8 rounded-3xl flex flex-col items-center text-center flex-1 min-h-[350px] border-red-500/30">
-                    <div class="w-16 h-16 bg-red-950/50 rounded-2xl flex items-center justify-center mb-4 glow-red">
-                        <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4 text-red-400 tracking-wider">Kumpulan Hadits</h3>
-                    
-                    <div id="hadits-display" class="fade-in-out flex flex-col justify-center gap-4 flex-grow">
-                        <div id="hadits-arab" class="arabic-text text-white"></div>
-                        <div id="hadits-indo" class="text-sm italic text-red-100/80 leading-relaxed px-2"></div>
-                        <div id="hadits-no" class="text-[10px] font-bold text-red-500 uppercase tracking-widest mt-2"></div>
-                    </div>
-                </section>
-            </div>
-
-            <!-- Kolom 2: ChatBox -->
-            <section id="live-chat" class="glass-card p-6 rounded-3xl overflow-hidden glow-red ring-2 ring-red-500/30 flex flex-col h-full scroll-mt-32">
-                <div class="flex items-center justify-center gap-3 mb-6">
-                    <div class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
-                    <h3 class="text-2xl font-bold tracking-widest text-red-400 uppercase">Live ChatBox</h3>
-                </div>
-                <div class="w-full bg-black/60 rounded-2xl overflow-hidden border border-red-900/50 shadow-inner flex-grow min-h-[400px]">
-                    <iframe src="https://muhardian.eu.org/deni/cbox/" width="100%" height="100%" frameborder="0" scrolling="auto" class="rounded-2xl opacity-90 hover:opacity-100"></iframe>
-                </div>
-            </section>
-
-            <!-- Kolom 3: Project & Socials -->
-            <div class="flex flex-col gap-8 h-full">
-                <!-- KOTAK PROJECT -->
-                <section class="glass-card p-8 rounded-3xl flex flex-col flex-1">
-                    <div class="flex items-center gap-4 mb-6">
-                        <div class="w-12 h-12 bg-red-950/50 rounded-xl flex items-center justify-center glow-red">
-                            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        </div>
-                        <h3 class="text-2xl font-bold text-white">Project</h3>
-                    </div>
-                    
-                    <div class="tree-container text-red-100/80 max-h-[400px] overflow-y-auto pr-2">
-                        <div class="mb-2">
-                            <span class="toggle-btn" onclick="toggleTree('content-2025', this)">+</span> Tahun 2025
-                            <div id="content-2025" class="tree-item hidden-content">
-                                <a href="https://muhardian.eu.org/" target="_blank" class="hover:text-red-400 block py-1 underline text-xs">Main Web</a>
-                            </div>
-                        </div>
-                        <div class="mb-2">
-                            <span class="toggle-btn" onclick="toggleTree('content-2026', this)">+</span> Tahun 2026
-                            <div id="content-2026" class="tree-item hidden-content">
-                                <a href="http://muhardian.eu.org/deni/img" target="_blank" class="hover:text-red-400 block py-1 underline text-xs">Fade foto change</a>
-                                <a href="https://muhardian.eu.org/3D.html" target="_blank" class="hover:text-red-400 block py-1 underline text-xs">3D Project</a>
-                                <a href="https://muhardian.eu.org/riky/" target="_blank" class="hover:text-red-400 block py-1 underline text-xs">Riky Project</a>
-                                <a href="https://muhardian.eu.org/deni/jadwal/" target="_blank" class="hover:text-red-400 block py-1 underline text-xs">Jadwal Solat</a>
-                                <a href="https://muhardian.eu.org/deni/cal/" target="_blank" class="hover:text-red-400 block py-1 underline text-xs">Kalkulator</a>
-                                <a href="https://muhardian.eu.org/deni/mario/" target="_blank" class="hover:text-red-400 block py-1 underline text-xs">Game Mario</a>
-                                <a href="https://muhardian.eu.org/deni/cbox" target="_blank" class="hover:text-red-400 block py-1 underline text-xs">Chat Box</a>
-                                <a href="https://muhardian.eu.org/deni/sfi/" target="_blank" class="hover:text-red-400 block py-1 underline text-xs">Foto Kuda SFI</a>
-                                <a href="https://muhardian.eu.org/cms" target="_blank" class="hover:text-red-400 block py-1 underline text-xs">CMS</a>
-                                <a href="https://muhardian.eu.org/scan/" target="_blank" class="hover:text-red-400 block py-1 underline text-xs">Scan QR</a>
-                                <a href="https://muhardian.eu.org/Db/" target="_blank" class="hover:text-red-400 block py-1 underline text-xs">Inv Barang</a>
-                                <a href="https://muhardian.eu.org/deni/undian" target="_blank" class="hover:text-red-400 block py-1 underline text-xs">Undian</a>
-                               
-                            </div>
-                        </div>
-                        <div class="mb-2">
-                            <span class="toggle-btn" onclick="toggleTree('content-2027', this)">+</span> Tahun 2027
-                            <div id="content-2027" class="tree-item hidden-content">
-                                <a href="https://muhardian.eu.org" target="_blank" class="hover:text-red-400 block py-1 underline text-xs">Expansion Phase</a>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- HUBUNGI KAMI -->
-                <section class="glass-card p-8 rounded-3xl flex flex-col items-center text-center">
-                    <h3 class="text-xl font-bold mb-6 text-red-400 uppercase tracking-widest">Hubungi Kami</h3>
-                    <div class="grid grid-cols-5 gap-4 justify-center items-center w-full">
-                        <a href="https://www.instagram.com/justmindeal/" target="_blank" class="social-link flex justify-center" title="Instagram">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                        </a>
-                        <a href="https://www.facebook.com/justmind" target="_blank" class="social-link flex justify-center" title="Facebook">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                        </a>
-                        <a href="https://x.com/just_mind" target="_blank" class="social-link flex justify-center" title="X (Twitter)">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
-                        </a>
-                        <a href="https://www.youtube.com/@DeniMuhardian/videos" target="_blank" class="social-link flex justify-center" title="YouTube">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                        </a>
-                        <a href="https://about.me/denimuhardian" target="_blank" class="social-link flex justify-center" title="About.me">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </a>
-                    </div>
-                </section>
+    <div class="w-full max-w-6xl flex flex-col md:flex-row gap-6 md:gap-8 items-center justify-center flex-grow">
+        
+        <!-- Wheel Section (Dipindah ke atas untuk mobile agar fokus utama) -->
+        <div class="w-full md:w-1/2 flex justify-center order-1 md:order-2">
+            <div id="wheel-container">
+                <div class="pointer"></div>
+                <canvas id="wheelCanvas"></canvas>
+                <button id="spinBtn" class="center-btn text-[10px] md:text-sm" onclick="startSpin()">
+                    SPIN
+                </button>
             </div>
         </div>
 
-        <!-- BAGIAN GALERI RANDOM FADE -->
-        <section id="galeri-section" class="mt-24 mb-12 scroll-mt-32">
-            <div class="flex items-center gap-4 mb-10">
-                <div class="h-px flex-grow bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
-                <h2 class="text-3xl font-black text-glow-red uppercase tracking-tighter">Galeri</h2>
-                <div class="h-px flex-grow bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
-            </div>
+        <!-- Input Section -->
+        <div class="w-full md:w-1/3 order-2 md:order-1">
+            <div class="input-card p-5 md:p-6 rounded-2xl shadow-2xl">
+                <h2 class="text-lg md:text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span>
+                    Peserta Undian
+                </h2>
+                
+                <!-- Layout Input diperbaiki agar tidak overflow di mobile -->
+                <div class="flex flex-col sm:flex-row gap-2 mb-4">
+                    <input type="text" id="nameInput" placeholder="Ketik nama..." 
+                        class="w-full bg-black border border-gray-700 rounded-lg sm:rounded-l-lg sm:rounded-r-none px-4 py-2 focus:outline-none focus:border-pink-500 transition-colors text-sm">
+                    <button onclick="addParticipant()" 
+                        class="w-full sm:w-auto bg-pink-600 hover:bg-pink-500 px-6 py-2 rounded-lg sm:rounded-r-lg sm:rounded-l-none font-bold transition-all text-sm whitespace-nowrap">
+                        TAMBAH
+                    </button>
+                </div>
 
-            <div class="flex flex-col items-center">
-                <div class="gallery-container glass-card shadow-2xl">
-                    <img src="https://muhardian.eu.org/deni/img/nature1.jpg" alt="Nature 1" class="gallery-img active">
-                    <img src="https://muhardian.eu.org/deni/img/nature2.jpg" alt="Nature 2" class="gallery-img">
-                    <img src="https://muhardian.eu.org/deni/img/nature3.jpg" alt="Nature 3" class="gallery-img">
-                    <img src="https://muhardian.eu.org/deni/img/nature4.jpg" alt="Nature 4" class="gallery-img">
-                    <img src="https://muhardian.eu.org/deni/img/nature5.jpg" alt="Nature 5" class="gallery-img">
-                    <img src="https://muhardian.eu.org/deni/img/nature6.jpg" alt="Nature 6" class="gallery-img">
+                <div id="participantList" class="max-h-[200px] md:max-h-[300px] overflow-y-auto space-y-2 pr-2">
+                    <!-- List will be populated by JS -->
+                </div>
+                
+                <p class="text-[10px] md:text-xs text-gray-500 mt-4 italic text-center md:text-left">*Kosongkan untuk mode angka 1-12</p>
+            </div>
+        </div>
+
+        <!-- Result Section (Pop Up) -->
+        <div id="winnerDisplay" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 animate-fade-in">
+            <div class="text-center p-8 md:p-10 neon-border bg-black rounded-3xl max-w-sm w-full mx-4">
+                <p class="text-lg text-gray-300 mb-2">Pemenangnya Adalah:</p>
+                <h2 id="winnerName" class="text-4xl md:text-5xl font-bold neon-text mb-8">NAMA</h2>
+                
+                <div class="flex flex-col gap-3">
+                    <button onclick="closeWinner()" class="bg-white text-black font-bold px-8 py-3 rounded-full hover:bg-gray-200 transition-all uppercase text-sm">
+                        TUTUP
+                    </button>
                 </div>
             </div>
-        </section>
-    </main>
+        </div>
 
-    <!-- Footer -->
-    <footer id="kontak" class="mt-8 border-t border-red-900/50 bg-black/60 backdrop-blur-2xl py-12 px-4 relative overflow-hidden text-center">
-        <p class="text-red-100/30 italic text-sm">
-            <a href="https://muhardian.eu.org" target="_blank" class="hover:text-red-400 transition-colors">© 2026 Muhardian. Seluruh hak cipta dilindungi.</a>
-        </p>
-    </footer>
+    </div>
+
+    <!-- Area Navigasi Bawah -->
+    <div class="mt-8 md:mt-12 flex flex-col items-center gap-4">
+        <a href="https://muhardian.eu.org/deni" class="px-8 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-widest text-white/50 hover:text-white hover:bg-white/10 transition-all">
+            HOME
+        </a>
+        
+        <footer class="mb-4">
+            <a href="https://muhardian.eu.org" class="text-white/20 text-xs md:text-sm hover:text-white/50 no-underline italic tracking-wide">
+                Muhardian @ 2026
+            </a>
+        </footer>
+    </div>
 
     <script>
-        const daftarHadits = [
-            { no: "HR. Bukhari No. 1", arab: "إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ", indo: "Sesungguhnya setiap amalan tergantung pada niatnya." },
-            { no: "HR. Bukhari & Muslim", arab: "الدِّينُ النَّصِيحَةُ", indo: "Agama itu adalah nasihat." },
-            { no: "HR. Muslim No. 223", arab: "الطُّهُورُ شَطْرُ الإِيمَانِ", indo: "Kebersihan itu sebagian dari iman." },
-            { no: "HR. Bukhari No. 6018", arab: "مَنْ لاَ يَرْحَمُ لاَ يُرْحَمُ", indo: "Siapa yang tidak menyayangi maka tidak akan disayangi." },
-            { no: "HR. Muslim No. 145", arab: "بَدَأَ الإِسْلاَمُ غَرِيبًا", indo: "Islam muncul dalam keadaan asing." },
-            { no: "HR. Bukhari No. 6416", arab: "نِعْمَتَانِ مَغْبُونٌ فِيهِمَا كَثِيرٌ مِنَ النَّاسِ الصِّحَّةُ وَالْفَرَاغُ", indo: "Dua kenikmatan yang kebanyakan manusia tertipu padanya: kesehatan dan waktu luang." },
-            { no: "HR. Bukhari No. 13", arab: "لاَ يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لأَخِيهِ مَا يُحِبُّ LINTASAN_DIRINYA_SENDIRI", indo: "Tidak sempurna iman seseorang hingga ia mencintai saudaranya seperti mencintai dirinya sendiri." },
-            { no: "HR. Muslim No. 2674", arab: "الدُّنْيَا سِجْنُ الْمُؤْمِنِ وَجَنَّةُ الْكَافِرِ", indo: "Dunia adalah penjara bagi orang mukmin dan surga bagi orang kafir." },
-            { no: "HR. Bukhari No. 6114", arab: "الْحَيَاءُ لاَ يَأْتِي إِلاَّ بِخَيْرٍ", indo: "Rasa malu itu tidaklah mendatangkan kecuali kebaikan." },
-            { no: "HR. Bukhari No. 6035", arab: "الْكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ", indo: "Kata-kata yang baik adalah sedekah." }
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const spinBtn = document.getElementById('spinBtn');
+        const nameInput = document.getElementById('nameInput');
+        const participantList = document.getElementById('participantList');
+        
+        let participants = [];
+        let isSpinning = false;
+        let currentRotation = 0;
+
+        const neonColors = [
+            '#FF0055', '#FF00AA', '#AA00FF', '#5500FF', 
+            '#0055FF', '#00AAFF', '#00FFFF', '#00FF55',
+            '#00FF00', '#AAFF00', '#FFFF00', '#FF5500'
         ];
-
-        let currentHaditsIndex = 0;
-
-        function updateHadits() {
-            const display = document.getElementById('hadits-display');
-            const arab = document.getElementById('hadits-arab');
-            const indo = document.getElementById('hadits-indo');
-            const no = document.getElementById('hadits-no');
-
-            if (!display) return;
-            display.classList.add('fade-hidden');
-
-            setTimeout(() => {
-                const h = daftarHadits[currentHaditsIndex];
-                if (h) {
-                    arab.textContent = h.arab;
-                    indo.textContent = h.indo;
-                    no.textContent = h.no;
-                }
-
-                display.classList.remove('fade-hidden');
-                currentHaditsIndex = (currentHaditsIndex + 1) % daftarHadits.length;
-            }, 1000);
-        }
-
-        setInterval(updateHadits, 5000);
-        updateHadits();
-
-        // Gallery Random Fade Logic
-        const galleryImgs = document.querySelectorAll('.gallery-img');
-        let currentImgIndex = 0;
-
-        function changeGalleryImage() {
-            // Hilangkan status aktif dari gambar saat ini
-            galleryImgs[currentImgIndex].classList.remove('active');
-
-            // Pilih index baru secara acak (tapi tidak boleh sama dengan yang sekarang)
-            let nextIndex;
-            do {
-                nextIndex = Math.floor(Math.random() * galleryImgs.length);
-            } while (nextIndex === currentImgIndex);
-
-            currentImgIndex = nextIndex;
-
-            // Tambahkan status aktif ke gambar baru
-            setTimeout(() => {
-                galleryImgs[currentImgIndex].classList.add('active');
-            }, 100); 
-        }
-
-        // Jalankan transisi setiap 6 detik
-        setInterval(changeGalleryImage, 6000);
-
-        function handleLogin() {
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-            const errorMsg = document.getElementById('login-error');
-
-            if (user === "admin" && pass === "321321") {
-                errorMsg.classList.add('hidden');
-                window.location.href = "https://muhardian.eu.org";
-            } else {
-                errorMsg.classList.remove('hidden');
-                document.getElementById('password').value = "";
-            }
-        }
-
-        function toggleTree(id, btn) {
-            const element = document.getElementById(id);
-            if(!element) return;
-            element.classList.toggle('show');
-            btn.textContent = element.classList.contains('show') ? '-' : '+';
-        }
 
         function updateClock() {
             const now = new Date();
-            const clockEl = document.getElementById('digital-clock');
-            const dateEl = document.getElementById('digital-date');
-            if (clockEl) clockEl.textContent = now.toLocaleTimeString('id-ID', { hour12: false });
-            if (dateEl) dateEl.textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            document.getElementById('digitalClock').textContent = `${hours}:${minutes}:${seconds}`;
+
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            document.getElementById('digitalDate').textContent = now.toLocaleDateString('id-ID', options).toUpperCase();
         }
+
         setInterval(updateClock, 1000);
-        updateClock();
+
+        function init() {
+            canvas.width = 1000;
+            canvas.height = 1000;
+            updateClock();
+            drawWheel();
+        }
+
+        function getItems() {
+            return participants.length > 0 ? participants : ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+        }
+
+        function drawWheel() {
+            const items = getItems();
+            const arcSize = (2 * Math.PI) / items.length;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = canvas.width / 2 - 20;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            items.forEach((item, i) => {
+                const angle = i * arcSize;
+                
+                ctx.beginPath();
+                ctx.fillStyle = neonColors[i % neonColors.length];
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, angle, angle + arcSize);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+                ctx.lineWidth = 5;
+                ctx.stroke();
+
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(angle + arcSize / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = "white";
+                ctx.font = "bold 40px Poppins";
+                
+                const displayText = item.toString().length > 12 ? item.toString().substring(0, 10) + '...' : item;
+                ctx.fillText(displayText, radius - 40, 15);
+                ctx.restore();
+            });
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 10;
+            ctx.stroke();
+        }
+
+        function addParticipant() {
+            const name = nameInput.value.trim();
+            if (name) {
+                participants.push(name);
+                nameInput.value = '';
+                updateList();
+                drawWheel();
+            }
+        }
+
+        function removeParticipant(index) {
+            participants.splice(index, 1);
+            updateList();
+            drawWheel();
+        }
+
+        function updateList() {
+            participantList.innerHTML = '';
+            participants.forEach((p, i) => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center bg-white/10 p-2 rounded border border-white/5';
+                div.innerHTML = `
+                    <span class="truncate pr-2 text-sm">${p}</span>
+                    <button onclick="removeParticipant(${i})" class="text-red-500 hover:text-red-400 font-bold px-2">×</button>
+                `;
+                participantList.appendChild(div);
+            });
+        }
+
+        function startSpin() {
+            if (isSpinning) return;
+
+            isSpinning = true;
+            spinBtn.disabled = true;
+            spinBtn.innerText = "WAIT";
+
+            const items = getItems();
+            const spinDuration = 15000;
+            const extraDegrees = Math.floor(Math.random() * 360);
+            const totalRotation = (360 * 20) + extraDegrees;
+            
+            currentRotation += totalRotation;
+            canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => {
+                determineWinner(currentRotation, items);
+                isSpinning = false;
+                spinBtn.disabled = false;
+                spinBtn.innerText = "SPIN";
+            }, spinDuration);
+        }
+
+        function determineWinner(rotation, items) {
+            const actualDegree = (rotation % 360);
+            const arcSizeDeg = 360 / items.length;
+            let index = Math.floor((360 - actualDegree + 270) % 360 / arcSizeDeg);
+            index = index % items.length;
+            
+            const winner = items[index];
+            showWinner(winner);
+        }
+
+        function playWinnerSound() {
+            const soundUrl = "https://muhardian.eu.org/deni/mario/coin.mp3";
+            let count = 0;
+
+            const playNext = () => {
+                if (count < 3) {
+                    const soundClone = new Audio(soundUrl);
+                    soundClone.play().catch(e => console.log("Audio play error:", e));
+                    count++;
+                    setTimeout(playNext, 200); 
+                }
+            };
+            
+            playNext();
+        }
+
+        function showWinner(name) {
+            document.getElementById('winnerName').innerText = name;
+            document.getElementById('winnerDisplay').classList.remove('hidden');
+            playWinnerSound();
+        }
+
+        function closeWinner() {
+            document.getElementById('winnerDisplay').classList.add('hidden');
+        }
+
+        nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addParticipant();
+        });
+
+        window.onload = init;
     </script>
 </body>
 </html>
