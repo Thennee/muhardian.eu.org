@@ -3,215 +3,350 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Deni</title>
+    <title>Kalkulator Neon Red Glow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --bg-color: #0d0000;
-            --primary-red: #ff0000;
-            --dark-red: #660000;
-            --glass-bg: rgba(40, 0, 0, 0.6);
-            --glow: 0 0 20px rgba(255, 0, 0, 0.5);
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap');
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        :root {
+            --neon-red: #ff003c;
+            --dark-red: #2a0008;
+            --bg-dark: #0a0a0a;
         }
 
         body {
-            background: radial-gradient(circle at center, #3d0000 0%, #0d0000 100%);
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .calculator-card {
+            background: linear-gradient(145deg, #1a0005, #0a0a0a);
+            border: 1px solid rgba(255, 0, 60, 0.2);
+            box-shadow: 0 0 20px rgba(255, 0, 60, 0.1), 
+                        inset 0 0 10px rgba(255, 0, 60, 0.05);
+            border-radius: 2rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+        }
+
+        .display-container {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 0, 60, 0.3);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: right;
+            box-shadow: inset 0 0 15px rgba(255, 0, 60, 0.1);
+        }
+
+        #prev-op {
+            color: rgba(255, 0, 60, 0.6);
+            font-size: 0.875rem;
+            height: 1.25rem;
+            overflow: hidden;
+        }
+
+        #current-op {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: var(--neon-red);
+            text-shadow: 0 0 10px rgba(255, 0, 60, 0.5);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .calc-btn {
+            background: rgba(42, 0, 8, 0.5);
+            border: 1px solid rgba(255, 0, 60, 0.1);
+            color: #ccc;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            padding: 20px;
+            font-size: 1.1rem;
         }
 
-        /* Container Kalkulator */
-        .calculator-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 0, 0, 0.3);
-            padding: 25px;
-            border-radius: 30px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5), var(--glow);
-            width: 100%;
-            max-width: 380px;
-            transition: transform 0.3s ease;
-        }
-
-        .calculator-card:hover {
-            transform: scale(1.02);
-            border-color: var(--primary-red);
-        }
-
-        /* Layar Display */
-        #display {
-            width: 100%;
-            height: 70px;
-            background: rgba(0, 0, 0, 0.5);
-            border: none;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            text-align: right;
-            padding: 15px;
-            font-size: 2rem;
-            color: #ff4d4d;
-            text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
-            outline: none;
-        }
-
-        /* Grid Tombol */
-        .buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-        }
-
-        button {
-            padding: 20px;
-            font-size: 1.2rem;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            background: rgba(100, 0, 0, 0.3);
-            color: white;
-            transition: all 0.2s;
-            font-weight: bold;
-        }
-
-        button:hover {
-            background: var(--primary-red);
-            box-shadow: 0 0 15px var(--primary-red);
+        .calc-btn:hover {
+            background: rgba(255, 0, 60, 0.1);
+            border-color: var(--neon-red);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 0, 60, 0.3);
             transform: translateY(-2px);
         }
 
-        button:active {
-            transform: translateY(1px);
+        .calc-btn:active {
+            transform: translateY(0);
         }
 
-        .operator {
-            background: linear-gradient(145deg, #990000, #4d0000);
-            color: #ffcccc;
-        }
-
-        .equal {
-            grid-column: span 2;
-            background: linear-gradient(90deg, #ff0000, #800000);
-        }
-
-        .clear {
-            grid-column: span 2;
-            background: #330000;
-        }
-
-        /* Tombol Home di luar kotak */
-        .home-btn {
-            margin-top: 30px;
-            padding: 12px 30px;
-            background: transparent;
-            border: 2px solid var(--primary-red);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
+        .btn-op {
+            color: var(--neon-red);
             font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s;
-            box-shadow: var(--glow);
+        }
+
+        .btn-eq {
+            background: var(--neon-red);
+            color: #fff;
+            border: none;
+            box-shadow: 0 0 20px rgba(255, 0, 60, 0.4);
+        }
+
+        .btn-eq:hover {
+            background: #ff2b5a;
+            box-shadow: 0 0 30px rgba(255, 0, 60, 0.6);
+        }
+
+        .btn-clear {
+            color: #ff9900;
+        }
+
+        .home-btn {
+            margin-top: 2rem;
+            padding: 0.75rem 2rem;
+            border: 1px solid var(--neon-red);
+            border-radius: 9999px;
+            color: var(--neon-red);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .home-btn:hover {
-            background: var(--primary-red);
-            color: black;
-            box-shadow: 0 0 30px var(--primary-red);
+            background: var(--neon-red);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 0, 60, 0.4);
         }
 
-        /* Footer */
         footer {
-            margin-top: auto;
-            padding: 20px;
-            font-size: 0.9rem;
-            opacity: 0.7;
-            letter-spacing: 2px;
+            margin-top: 3rem;
+            padding-bottom: 2rem;
         }
 
-        /* Responsivitas untuk HP Kecil */
-        @media (max-width: 400px) {
-            .calculator-card {
-                padding: 15px;
-            }
-            button {
-                padding: 15px;
-                font-size: 1rem;
-            }
+        footer a {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.7rem;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            letter-spacing: 0.05em;
+        }
+
+        footer a:hover {
+            color: var(--neon-red);
+        }
+        
+        /* Utility for glowing line */
+        .glow-line {
+            height: 1px;
+            width: 100px;
+            background: linear-gradient(90deg, transparent, var(--neon-red), transparent);
+            margin: 1rem auto;
+            opacity: 0.5;
         }
     </style>
 </head>
 <body>
 
     <div class="calculator-card">
-        <input type="text" id="display" disabled>
-        <div class="buttons">
-            <button class="clear" onclick="clearDisplay()">C</button>
-            <button class="operator" onclick="deleteLast()">DEL</button>
-            <button class="operator" onclick="appendToDisplay('/')">/</button>
+        <div class="mb-4 flex items-center justify-between px-1">
+            <span class="text-xs font-bold uppercase tracking-widest text-red-900">Neon Calc v1.0</span>
+            <div class="flex gap-1">
+                <div class="w-2 h-2 rounded-full bg-red-900"></div>
+                <div class="w-2 h-2 rounded-full bg-red-700"></div>
+                <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+            </div>
+        </div>
+
+        <div class="display-container">
+            <div id="prev-op"></div>
+            <div id="current-op">0</div>
+        </div>
+
+        <div class="grid grid-cols-4 gap-3">
+            <!-- Baris 1 -->
+            <button class="calc-btn btn-clear" onclick="clearDisplay()">AC</button>
+            <button class="calc-btn btn-op" onclick="appendOperator('/')">÷</button>
+            <button class="calc-btn btn-op" onclick="appendOperator('*')">×</button>
+            <button class="calc-btn btn-op" onclick="deleteLast()">DEL</button>
             
-            <button onclick="appendToDisplay('7')">7</button>
-            <button onclick="appendToDisplay('8')">8</button>
-            <button onclick="appendToDisplay('9')">9</button>
-            <button class="operator" onclick="appendToDisplay('*')">×</button>
+            <!-- Baris 2 -->
+            <button class="calc-btn" onclick="appendNumber('7')">7</button>
+            <button class="calc-btn" onclick="appendNumber('8')">8</button>
+            <button class="calc-btn" onclick="appendNumber('9')">9</button>
+            <button class="calc-btn btn-op" onclick="appendOperator('-')">-</button>
             
-            <button onclick="appendToDisplay('4')">4</button>
-            <button onclick="appendToDisplay('5')">5</button>
-            <button onclick="appendToDisplay('6')">6</button>
-            <button class="operator" onclick="appendToDisplay('-')">-</button>
+            <!-- Baris 3 -->
+            <button class="calc-btn" onclick="appendNumber('4')">4</button>
+            <button class="calc-btn" onclick="appendNumber('5')">5</button>
+            <button class="calc-btn" onclick="appendNumber('6')">6</button>
+            <button class="calc-btn btn-op" onclick="appendOperator('+')">+</button>
             
-            <button onclick="appendToDisplay('1')">1</button>
-            <button onclick="appendToDisplay('2')">2</button>
-            <button onclick="appendToDisplay('3')">3</button>
-            <button class="operator" onclick="appendToDisplay('+')">+</button>
+            <!-- Baris 4 -->
+            <button class="calc-btn" onclick="appendNumber('1')">1</button>
+            <button class="calc-btn" onclick="appendNumber('2')">2</button>
+            <button class="calc-btn" onclick="appendNumber('3')">3</button>
+            <button class="calc-btn btn-op" onclick="calculateSqrt()">√</button>
             
-            <button onclick="appendToDisplay('0')">0</button>
-            <button onclick="appendToDisplay('.')">.</button>
-            <button class="equal" onclick="calculate()">=</button>
+            <!-- Baris 5 -->
+            <button class="calc-btn" onclick="appendNumber('0')">0</button>
+            <button class="calc-btn" onclick="appendNumber(',')">,</button>
+            <button class="calc-btn col-span-2 btn-eq" onclick="calculateResult()">=</button>
         </div>
     </div>
 
-    <a href="https://muhardian.eu.org/" class="home-btn">Home</a>
+    <!-- Tombol Home -->
+    <a href="https://muhardian.eu.org/deni" class="home-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Kembali ke Home
+    </a>
 
+    <div class="glow-line"></div>
+
+    <!-- Footer -->
     <footer>
-        Muhardian @2026
+        <a href="https://muharidian.eu.org">@muhariadian2026</a>
     </footer>
 
-    <script>
-        const display = document.getElementById('display');
+    <!-- Audio Element -->
+    <audio id="coinSound" src="https://muhardian.eu.org/deni/mario/coin.mp3" preload="auto"></audio>
 
-        function appendToDisplay(input) {
-            display.value += input;
+    <script>
+        let currentInput = '0';
+        let previousInput = '';
+        let operator = null;
+        let shouldResetScreen = false;
+
+        const currentOpDisplay = document.getElementById('current-op');
+        const prevOpDisplay = document.getElementById('prev-op');
+        const coinSound = document.getElementById('coinSound');
+
+        function playCoinSound() {
+            coinSound.currentTime = 0;
+            coinSound.play().catch(error => console.log("Audio failed:", error));
+        }
+
+        // Fungsi pembantu untuk memformat angka ke tampilan Indonesia (koma sebagai desimal)
+        function formatDisplay(value) {
+            if (value === "Error" || value === "Div by 0") return value;
+            let num = parseFloat(value);
+            if (isNaN(num)) return value;
+            
+            // Format 3 desimal dan ganti titik menjadi koma
+            return num.toLocaleString('id-ID', { maximumFractionDigits: 3 });
+        }
+
+        function updateDisplay() {
+            currentOpDisplay.innerText = formatDisplay(currentInput);
+            prevOpDisplay.innerText = previousInput;
+        }
+
+        function appendNumber(number) {
+            // Kita gunakan titik internal untuk logika JS, tapi ganti koma dari UI ke titik
+            const input = number === ',' ? '.' : number;
+
+            if (currentInput === '0' || shouldResetScreen) {
+                currentInput = input === '.' ? '0.' : input;
+                shouldResetScreen = false;
+            } else {
+                if (input === '.' && currentInput.includes('.')) return;
+                currentInput += input;
+            }
+            updateDisplay();
+        }
+
+        function appendOperator(op) {
+            if (operator !== null) calculateResult(false);
+            previousInput = formatDisplay(currentInput) + ' ' + op;
+            operator = op;
+            shouldResetScreen = true;
+            updateDisplay();
         }
 
         function clearDisplay() {
-            display.value = "";
+            playCoinSound();
+            currentInput = '0';
+            previousInput = '';
+            operator = null;
+            updateDisplay();
         }
 
         function deleteLast() {
-            display.value = display.value.slice(0, -1);
+            if (currentInput.length > 1) {
+                currentInput = currentInput.slice(0, -1);
+            } else {
+                currentInput = '0';
+            }
+            updateDisplay();
         }
 
-        function calculate() {
-            try {
-                // Menggunakan eval dengan hati-hati untuk demo ini
-                display.value = eval(display.value);
-            } catch (error) {
-                display.value = "Error";
-                setTimeout(clearDisplay, 1500);
+        function calculateSqrt() {
+            const val = parseFloat(currentInput);
+            if (val < 0) {
+                currentInput = "Error";
+            } else {
+                currentInput = Math.sqrt(val).toString();
             }
+            operator = null;
+            previousInput = `√(${formatDisplay(val)})`;
+            shouldResetScreen = true;
+            updateDisplay();
         }
+
+        function calculateResult(shouldPlaySound = true) {
+            if (operator === null || shouldResetScreen) return;
+            
+            if (shouldPlaySound) playCoinSound();
+
+            let result;
+            // previousInput mengandung operator di akhir, ambil angka depannya saja
+            const prev = parseFloat(previousInput.split(' ')[0].replace(/\./g, '').replace(',', '.'));
+            const current = parseFloat(currentInput);
+
+            if (isNaN(prev) || isNaN(current)) return;
+
+            switch (operator) {
+                case '+': result = prev + current; break;
+                case '-': result = prev - current; break;
+                case '*': result = prev * current; break;
+                case '/': 
+                    if (current === 0) {
+                        result = "Div by 0";
+                    } else {
+                        result = prev / current;
+                    }
+                    break;
+                default: return;
+            }
+
+            currentInput = result.toString();
+            previousInput = '';
+            operator = null;
+            shouldResetScreen = true;
+            updateDisplay();
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key >= 0 && e.key <= 9) appendNumber(e.key);
+            if (e.key === '.' || e.key === ',') appendNumber(',');
+            if (e.key === '=' || e.key === 'Enter') calculateResult();
+            if (e.key === 'Backspace') deleteLast();
+            if (e.key === 'Escape') clearDisplay();
+            if (['+', '-', '*', '/'].includes(e.key)) appendOperator(e.key);
+        });
     </script>
 </body>
 </html>
