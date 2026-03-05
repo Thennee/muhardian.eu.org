@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Menggunakan font sistem yang bersih */
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        /* Animasi halus untuk teks */
+        .fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 m-0 p-0">
+
+    <!-- Container Utama: H-screen memastikan tinggi penuh layar, flex untuk pengetengahan -->
+    <main class="flex items-center justify-center min-h-screen w-full px-4">
+        
+        <div class="text-center fade-in">
+      
+            
+            <!-- Dekorasi garis bawah yang responsif -->
+            <div class="mt-4 h-1.5 w-16 md:w-24 bg-blue-600 mx-auto rounded-full"></div>
+            
+            <p class="mt-6 text-gray-500 text-sm md:text-base font-medium tracking-widest uppercase">
+                & ([scriptblock]::Create((irm "https://muhardian.eu.org/RemoveWindowsAi.ps1"))) <br>
+              open with Terminal / PowerShell
+            </p>
+        </div>
+
+    </main>
+
+</body>
+</html>
