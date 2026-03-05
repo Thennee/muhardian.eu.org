@@ -1,0 +1,284 @@
+8<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Project</title>
+
+  <style>
+    /* ===== Background ===== */
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #0f3d2e, #145a32, #1e8449);
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* ===== Main Wrapper ===== */
+    .wrapper {
+      width: 90%;
+      max-width: 650px;
+      text-align: center;
+    }
+
+    /* ===== Logo ===== */
+    .logo {
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      max-width: 160px;
+      width: 60%;
+      height: auto;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
+    }
+
+    /* ===== Grid Container ===== */
+    .button-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      padding: 25px;
+      backdrop-filter: blur(14px);
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    /* ===== Button Base ===== */
+    .btn {
+      padding: 15px;
+      border-radius: 14px;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #ffffff;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.25s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    }
+
+    /* ===== Hover Effect ===== */
+    .btn:hover {
+      transform: translateY(-4px) scale(1.04);
+      box-shadow: 0 16px 32px rgba(0,0,0,0.45);
+      filter: brightness(1.1);
+    }
+
+    /* ===== Green Variants ===== */
+    .primary {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+    }
+
+    .success {
+      background: linear-gradient(135deg, #1abc9c, #16a085);
+    }
+
+    .info {
+      background: linear-gradient(135deg, #6ab04c, #2d6a4f);
+    }
+
+    .warning {
+      background: linear-gradient(135deg, #a3cb38, #6ab04c);
+      color: #1e272e;
+    }
+
+    .dark {
+      background: linear-gradient(135deg, #145a32, #0b3d2e);
+    }
+
+    /* ===== Mobile ===== */
+    @media (max-width: 480px) {
+      .button-container {
+        grid-template-columns: 1fr;
+      }
+
+      .logo img {
+        max-width: 120px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+
+    <!-- ===== LOGO ===== -->
+    <div class="logo">
+      <img src="3D-logo.png" alt="3D Logo">
+    </div>
+
+    <!-- ===== BUTTON GRID ===== -->
+    <div class="button-container">
+      <a href="https://muhardian.eu.org/3D.html" class="btn primary">Home</a>
+
+      <button onclick="auth('', 'https://muhardian.eu.org/scan')" class="btn success">
+        Input QR 
+      </button>
+
+      <button onclick="auth('', 'https://muhardian.eu.org/rpt.html')" class="btn info">
+        Report Inventory
+      </button>
+
+      <button onclick="auth('click', 'https://drive.google.com/drive/folders/1SRsOpPl6Tq2m-YgtMi3WJ51p6OqgOjZF0eKngzWkZObVUtbgj638ZPV_jN9tfG7xKXbwtY2C?usp=sharing')" class="btn warning">
+        Document Inv
+      </button>
+
+      <button onclick="auth('click', 'https://muhardian.eu.org/3D.html')" class="btn primary">
+        Cash Flow
+      </button>
+
+      <button onclick="auth('', 'https://muhardian.eu.org/cms')" class="btn dark">
+        About
+      </button>
+
+       <button onclick="auth('', 'https://muhardian.eu.org/Db')" class="btn info">
+        Test Input
+      </button>
+
+       <button onclick="auth('', 'https://muhardian.eu.org/Db/rpt2.html')" class="btn success">
+        Test Report Inventory 
+      </button>
+
+      <button onclick="auth('', 'https://muhardian.eu.org/deni')" class="btn warning">
+        Me
+      </button>
+    </div>
+
+  </div>
+
+
+
+
+
+
+<style>
+    #customModal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0; top: 0; width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.6); /* Overlay sedikit lebih gelap */
+    }
+    .modal-content {
+        background-color: white;
+        margin: 15% auto;
+        padding: 20px;
+        border-radius: 12px;
+        width: 300px;
+        text-align: center;
+        position: relative; /* Penting untuk posisi tombol X */
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        font-family: sans-serif;
+    }
+    /* Style Tombol X */
+    .close-btn {
+        position: absolute;
+        right: 15px;
+        top: 10px;
+        font-size: 24px;
+        font-weight: bold;
+        color: #aaa;
+        cursor: pointer;
+        line-height: 1;
+    }
+    .close-btn:hover {
+        color: #ff0000;
+    }
+    .modal-content input {
+        width: 85%;
+        padding: 12px;
+        margin: 15px 0;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        outline: none;
+    }
+    .modal-content button {
+        width: 93%;
+        padding: 10px;
+        cursor: pointer;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+    }
+    .modal-content button:hover {
+        background: #218838;
+    }
+</style>
+
+<div id="customModal">
+    <div class="modal-content">
+        <span class="close-btn" id="closeModal">&times;</span>
+        <h3 style="margin-top:10px;">Security Check</h3>
+        <p style="font-size: 14px; color: #666;">Silakan masukkan password</p>
+        <input type="password" id="passInput" placeholder="Password...">
+        <button id="submitBtn">Lanjutkan</button>
+    </div>
+</div>
+
+
+<script>
+    function auth(correctPassword, targetUrl) {
+        const modal = document.getElementById("customModal");
+        const input = document.getElementById("passInput");
+        const btn = document.getElementById("submitBtn");
+        const closeX = document.getElementById("closeModal");
+
+        // Tampilkan modal
+        modal.style.display = "block";
+        input.value = ""; // Bersihkan input setiap dibuka
+        input.focus();
+
+        // Fungsi Menutup Modal
+        const closeModal = () => {
+            modal.style.display = "none";
+        };
+
+        // Klik Tombol X
+        closeX.onclick = closeModal;
+
+        // Klik di luar kotak modal
+        window.onclick = (event) => {
+            if (event.target == modal) closeModal();
+        };
+
+        // Tekan Enter untuk Submit
+        input.onkeypress = (e) => {
+            if (e.key === 'Enter') btn.click();
+        };
+
+        // Logika Verifikasi
+        btn.onclick = function() {
+            if (input.value === correctPassword) {
+                window.location.href = targetUrl;
+            } else {
+                alert("Password Salah Bro!");
+                input.value = "";
+                input.focus();
+            }
+        };
+    }
+</script>
+
+
+
+
+
+
+
+
+</body>
+
+</html>
+
+
+
+
+
