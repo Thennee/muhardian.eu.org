@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Countdown Lebaran @2026</title>
+    <title>Countdown Lebaran & Jadwal Salat @2026</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-grad: linear-gradient(135deg, #0f9b0f 0%, #004d40 100%);
             --glass: rgba(255, 255, 255, 0.1);
             --text-light: #f0fdf4;
+            --accent: #34d399;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
@@ -29,7 +30,6 @@
 
         .container { width: 100%; max-width: 900px; text-align: center; }
 
-        /* Header & Clock Section */
         .glass-card {
             background: var(--glass);
             backdrop-filter: blur(12px);
@@ -53,7 +53,6 @@
 
         .label { font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; }
 
-        /* Grid Layout */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -61,18 +60,64 @@
             width: 100%;
         }
 
-        .info-box h3 { border-bottom: 2px solid #34d399; margin-bottom: 15px; padding-bottom: 5px; }
+        .info-box h3 { border-bottom: 2px solid var(--accent); margin-bottom: 15px; padding-bottom: 5px; text-align: left; }
+
+        .hijri-calendar {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .hijri-header {
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            font-size: 0.8rem;
+        }
+
+        .calendar-day-label {
+            opacity: 0.6;
+            font-weight: 600;
+            padding-bottom: 5px;
+        }
+
+        .calendar-day {
+            padding: 8px 2px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+        }
+
+        .calendar-day.today {
+            background: var(--accent);
+            color: #022c22;
+            font-weight: bold;
+            box-shadow: 0 0 10px var(--accent);
+        }
 
         .prayer-time {
             display: flex;
             justify-content: space-between;
-            padding: 10px;
+            padding: 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.3s;
+            border-radius: 8px;
+        }
+        
+        .prayer-time.active {
+            background: rgba(52, 211, 153, 0.2);
+            border-left: 4px solid var(--accent);
         }
 
-        .highlight { color: #34d399; font-weight: 600; }
+        .highlight { color: var(--accent); font-weight: 600; }
 
-        /* Footer */
         footer {
             margin-top: auto;
             padding: 40px 0 20px;
@@ -83,7 +128,6 @@
         footer:hover { opacity: 1; }
         footer a { color: inherit; text-decoration: none; border-bottom: 1px dotted; }
 
-        /* Responsive PC adjustments */
         @media (min-width: 1024px) {
             .container { padding: 40px 0; }
         }
@@ -96,6 +140,7 @@
         <div class="label">Waktu Saat Ini</div>
         <div id="clock">00:00:00</div>
         <div id="date-now" style="font-size: 1.1rem; opacity: 0.8;">Memuat kalender...</div>
+        <div id="hijri-date-top" style="font-size: 0.9rem; color: var(--accent); margin-top: 5px;">Sinkronisasi Kalender Hijriah...</div>
     </div>
 
     <div class="glass-card" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(0, 0, 0, 0.2));">
@@ -105,19 +150,33 @@
 
     <div class="grid">
         <div class="glass-card info-box">
-            <h3>Jadwal Sholat Hari Ini</h3>
+            <h3>Kalender & Jadwal Salat</h3>
+            
+            <div class="hijri-calendar">
+                <div class="hijri-header" id="hijri-month-name">Memuat Bulan Hijriah...</div>
+                <div class="calendar-grid" id="calendar-grid">
+                    <div class="calendar-day-label">Min</div>
+                    <div class="calendar-day-label">Sen</div>
+                    <div class="calendar-day-label">Sel</div>
+                    <div class="calendar-day-label">Rab</div>
+                    <div class="calendar-day-label">Kam</div>
+                    <div class="calendar-day-label">Jum</div>
+                    <div class="calendar-day-label">Sab</div>
+                </div>
+            </div>
+
             <div id="prayer-list">
-                <div class="prayer-time">Memuat data...</div>
+                <div class="prayer-time">Mengambil data Aladhan API...</div>
             </div>
         </div>
 
         <div class="glass-card info-box">
-            <h3>Info Islami & Puasa</h3>
+            <h3>Info Ramadan & Lebaran</h3>
             <div id="islamic-info" style="text-align: left; line-height: 1.8;">
-                <p>• Lokasi: <span class="highlight">Otomatis (Jakarta)</span></p>
-                <p>• Status: <span class="highlight">Tahun 2026</span></p>
-                <p>• Estimasi Ramadan: <span class="highlight">Februari - Maret 2026</span></p>
-                <p>• Idul Fitri: <span class="highlight">~20 Maret 2026</span></p>
+                <p>• Kota: <span class="highlight" id="location-text">Jakarta</span></p>
+                <p>• Estimasi Puasa: <span class="highlight">~18 Feb 2026</span></p>
+                <p>• Estimasi Lebaran: <span class="highlight">~20 Mar 2026</span></p>
+                <p>• Metode: <span class="highlight">Kemenag RI (via Aladhan)</span></p>
             </div>
         </div>
     </div>
@@ -128,60 +187,133 @@
 </footer>
 
 <script>
-    // 1. Jam Digital & Tanggal Masehi
+    let currentPrayerTimes = {};
+
     function updateClock() {
         const now = new Date();
-        const h = String(now.getHours()).padStart(2, '0');
-        const m = String(now.getMinutes()).padStart(2, '0');
-        const s = String(now.getSeconds()).padStart(2, '0');
-        document.getElementById('clock').textContent = `${h}:${m}:${s}`;
-        
+        document.getElementById('clock').textContent = now.toLocaleTimeString('id-ID', { hour12: false });
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('date-now').textContent = now.toLocaleDateString('id-ID', options);
+        highlightCurrentPrayer(now);
     }
     setInterval(updateClock, 1000);
-    updateClock();
 
-    // 2. Hitung Mundur Idul Fitri (Estimasi 20 Maret 2026)
     function updateCountdown() {
         const target = new Date('March 20, 2026 00:00:00').getTime();
         const now = new Date().getTime();
         const diff = target - now;
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        
+        const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
         document.getElementById('countdown-number').textContent = days > 0 ? days : 0;
     }
     updateCountdown();
 
-    // 3. Ambil Jadwal Sholat API (Aladhan - Berdasarkan Geolocation atau Default Jakarta)
     async function getPrayerTimes() {
         try {
-            const res = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Jakarta&country=Indonesia&method=11');
-            const data = await res.json();
-            const times = data.data.timings;
-            const prayerDiv = document.getElementById('prayer-list');
+            // Menggunakan Aladhan API dengan metode Kemenag RI (Method ID: 11)
+            const city = "Jakarta";
+            const country = "Indonesia";
+            const method = 11; // Kemenag RI
+            const now = new Date();
+            const day = now.getDate();
+            const month = now.getMonth() + 1;
+            const year = now.getFullYear();
+
+            const url = `https://api.aladhan.com/v1/timingsByCity/${day}-${month}-${year}?city=${city}&country=${country}&method=${method}`;
             
-            const list = [
-                {n: 'Imsak', t: times.Imsak},
-                {n: 'Subuh', t: times.Fajr},
-                {n: 'Dzuhur', t: times.Dhuhr},
-                {n: 'Ashar', t: times.Asr},
-                {n: 'Maghrib', t: times.Maghrib},
-                {n: 'Isya', t: times.Isha}
-            ];
+            const res = await fetch(url);
+            const json = await res.json();
+            
+            if (json && json.data) {
+                const data = json.data;
+                const timings = data.timings;
+                const hijri = data.date.hijri;
 
-            prayerDiv.innerHTML = list.map(p => `
-                <div class="prayer-time">
-                    <span>${p.n}</span>
-                    <span class="highlight">${p.t}</span>
-                </div>
-            `).join('');
+                // Update info Hijriah
+                const hijriStr = `${hijri.day} ${hijri.month.en} ${hijri.year} H`;
+                document.getElementById('hijri-date-top').textContent = `${hijri.day} ${hijri.month.ar} / ${hijri.month.en} ${hijri.year} H`;
+                document.getElementById('hijri-month-name').textContent = `${hijri.month.en} ${hijri.year} H`;
 
+                currentPrayerTimes = {
+                    'Imsak': timings.Imsak,
+                    'Subuh': timings.Fajr,
+                    'Terbit': timings.Sunrise,
+                    'Dzuhur': timings.Dhuhr,
+                    'Ashar': timings.Asr,
+                    'Maghrib': timings.Maghrib,
+                    'Isya': timings.Isha
+                };
+
+                renderPrayers();
+                generateHijriCalendar(parseInt(hijri.day), month, year);
+            }
         } catch (err) {
-            document.getElementById('prayer-list').innerHTML = "Gagal memuat jadwal.";
+            console.error("API Error:", err);
+            document.getElementById('prayer-list').innerHTML = "Gagal memuat jadwal dari Aladhan.";
         }
     }
+
+    function renderPrayers() {
+        const prayerDiv = document.getElementById('prayer-list');
+        prayerDiv.innerHTML = Object.entries(currentPrayerTimes).map(([name, time]) => `
+            <div class="prayer-time" id="p-${name}">
+                <span>${name}</span>
+                <span class="highlight">${time}</span>
+            </div>
+        `).join('');
+    }
+
+    function generateHijriCalendar(hijriDay, m, y) {
+        const grid = document.getElementById('calendar-grid');
+        const today = new Date();
+        const currentDay = today.getDate();
+        
+        const labels = grid.querySelectorAll('.calendar-day-label');
+        grid.innerHTML = '';
+        labels.forEach(l => grid.appendChild(l));
+
+        const firstDayOfMonth = new Date(y, m - 1, 1).getDay();
+        const daysInMonth = new Date(y, m, 0).getDate();
+
+        // Padding awal bulan
+        for (let i = 0; i < firstDayOfMonth; i++) {
+            grid.appendChild(document.createElement('div'));
+        }
+
+        for (let i = 1; i <= daysInMonth; i++) {
+            const dayEl = document.createElement('div');
+            dayEl.className = 'calendar-day';
+            if (i === currentDay) dayEl.className += ' today';
+            
+            const diff = i - currentDay;
+            let hDay = hijriDay + diff;
+            
+            // Perkiraan siklus Hijriah (29/30)
+            if (hDay <= 0) hDay += 30;
+            if (hDay > 30) hDay -= 30;
+            
+            dayEl.textContent = hDay;
+            grid.appendChild(dayEl);
+        }
+    }
+
+    function highlightCurrentPrayer(now) {
+        if (!currentPrayerTimes) return;
+        const currentTime = now.getHours() * 60 + now.getMinutes();
+        
+        Object.entries(currentPrayerTimes).forEach(([name, time]) => {
+            if (!time) return;
+            const [h, min] = time.split(':').map(Number);
+            const pTime = h * 60 + min;
+            const row = document.getElementById(`p-${name}`);
+            if (row) {
+                // Highlight jika waktu sekarang sudah masuk waktu salat tersebut (durasi 45 menit untuk visual)
+                row.classList.toggle('active', currentTime >= pTime && currentTime < pTime + 45);
+            }
+        });
+    }
+
     getPrayerTimes();
+    updateClock();
 </script>
 
 </body>
