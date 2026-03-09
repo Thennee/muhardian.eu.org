@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muhardian CMS - Rich Editor</title>
+    <title>Muhardian CMS - Rich Editor Pro</title>
     <link rel="icon" type="image/x-icon" href="https://muhardian.eu.org/iconWA.ico">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -15,19 +14,19 @@
             --dark-green: #054705;
             --light-green: #59c959;
             --gradient: linear-gradient(135deg, #0f9b0f, #00d2ff);
-            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-bg: rgba(255, 255, 255, 0.95);
             --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         
-        body { background: #f0f9f0; color: #333; overflow-x: hidden; }
+        body { background: #f4f7f4; color: #333; line-height: 1.6; }
 
         header {
             background: var(--gradient);
-            padding: 20px;
+            padding: 15px 5%;
             color: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -36,188 +35,232 @@
             align-items: center;
         }
 
-        .logo { font-size: 1.5rem; font-weight: 700; letter-spacing: 1px; }
+        .logo { font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        
         .admin-btn {
             background: rgba(255,255,255,0.2);
             border: 1px solid white;
-            padding: 8px 15px;
+            padding: 8px 20px;
             color: white;
-            border-radius: 20px;
+            border-radius: 25px;
             cursor: pointer;
             transition: 0.3s;
-            backdrop-filter: blur(5px);
+            font-weight: 600;
         }
-        .admin-btn:hover { background: white; color: var(--primary); }
+        .admin-btn:hover { background: white; color: var(--primary); transform: scale(1.05); }
 
-        .hero { text-align: center; padding: 60px 20px; background: linear-gradient(to bottom, #e0f7fa, #f0f9f0); }
+        .hero { 
+            text-align: center; 
+            padding: 80px 20px; 
+            background: white;
+            border-bottom: 1px solid #eee;
+        }
         .hero h1 {
-            font-size: 2.5rem;
+            font-size: 3rem;
             background: var(--gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .posts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        
+        .posts-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+            gap: 30px; 
+        }
 
         .card {
             background: white;
-            border-radius: 15px;
+            border-radius: 20px;
             overflow: hidden;
             box-shadow: var(--shadow);
-            transition: transform 0.3s ease;
-        }
-        .card:hover { transform: translateY(-10px); }
-        .card img { width: 100%; height: 200px; object-fit: cover; }
-        .card-body { padding: 20px; }
-        .card-title { font-size: 1.2rem; margin-bottom: 10px; color: var(--dark-green); }
-
-        /* --- STYLES UNTUK EDITOR --- */
-        .editor-container {
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            overflow: hidden;
-            background: white;
-        }
-        .toolbar {
-            background: #f1f1f1;
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
-            gap: 5px;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        .card:hover { transform: translateY(-12px); box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
+        .card-img-wrapper { position: relative; height: 220px; overflow: hidden; background: #eee; }
+        .card img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .card:hover img { transform: scale(1.1); }
+        
+        .card-body { padding: 25px; flex-grow: 1; }
+        .date-badge { font-size: 0.75rem; color: #888; margin-bottom: 8px; display: block; }
+        .card-title { font-size: 1.3rem; margin-bottom: 12px; color: var(--dark-green); font-weight: 700; }
+        .card-text { color: #666; font-size: 0.95rem; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+        .editor-container { border: 2px solid #eee; border-radius: 12px; overflow: hidden; background: white; transition: 0.3s; }
+        .editor-container:focus-within { border-color: var(--primary); }
+        .toolbar {
+            background: #f8faf8;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 8px;
             flex-wrap: wrap;
         }
         .toolbar button, .toolbar select {
-            padding: 5px 10px;
-            cursor: pointer;
-            border: 1px solid #ccc;
-            background: white;
-            border-radius: 4px;
-            font-size: 0.8rem;
+            width: 35px; height: 35px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: 1px solid #ddd; background: white;
+            border-radius: 6px; font-size: 0.9rem; transition: 0.2s;
         }
-        .toolbar button:hover { background: #e0e0e0; }
+        .toolbar select { width: auto; padding: 0 10px; }
+        .toolbar button:hover { background: var(--primary); color: white; border-color: var(--primary); }
         
         #editor {
-            min-height: 200px;
-            padding: 15px;
+            min-height: 250px;
+            padding: 20px;
             outline: none;
             overflow-y: auto;
-            max-height: 300px;
-            text-align: left;
+            max-height: 400px;
+            background: #fff;
         }
 
-        /* --- Modal --- */
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.7);
             z-index: 1000;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px);
+            padding: 15px;
         }
         .modal-content {
-            background: var(--glass-bg);
-            padding: 25px;
-            border-radius: 20px;
-            width: 95%;
-            max-width: 600px;
+            background: white;
+            padding: 30px;
+            border-radius: 25px;
+            width: 100%;
+            max-width: 700px;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
+            animation: slideUp 0.4s ease;
         }
-        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; }
-        .form-group { margin-bottom: 15px; }
-        input[type="text"], input[type="date"] {
-            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px;
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 1.8rem; cursor: pointer; color: #999; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; color: #555; }
+        
+        input[type="text"], input[type="password"], input[type="date"] {
+            width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 12px; transition: 0.3s;
         }
+
         .submit-btn {
-            width: 100%; padding: 12px; background: var(--gradient); color: white;
-            border: none; border-radius: 10px; font-weight: 600; cursor: pointer;
+            width: 100%; padding: 15px; background: var(--gradient); color: white;
+            border: none; border-radius: 12px; font-weight: 700; cursor: pointer;
+            font-size: 1rem; transition: 0.3s;
         }
-        .loader { display: none; text-align: center; color: var(--primary); margin-top: 10px; }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        #loader { display: none; text-align: center; margin-top: 15px; color: var(--primary); font-weight: 600; }
+
+        #detailContent img { width: 100%; max-height: 450px; object-fit: cover; border-radius: 15px; margin: 20px 0; display: block; }
+        #detailContent h1 { margin: 15px 0; color: var(--dark-green); font-size: 2rem; line-height: 1.2; }
+
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 2rem; }
+        }
     </style>
 </head>
 <body>
 
     <header>
         <div class="logo"><i class="fas fa-leaf"></i> Muhardian News</div>
-        <button class="admin-btn" onclick="openLogin()">
-            <i class="fas fa-user-lock"></i> Login Admin
+        <button class="admin-btn" id="loginBtn" onclick="openLogin()">
+            <i class="fas fa-lock"></i> Login Admin
         </button>
     </header>
 
     <div class="hero">
-        <h1>Selamat Datang di Muhardian News</h1>
-        <p>Mari kira HIJAUKAN dunia.</p>
+        <h1>Muhardian News</h1>
+        <p>Inspirasi Hijau Untuk Masa Depan yang Lebih Cerah.</p>
     </div>
 
     <div class="container">
         <div class="posts-grid" id="posts-container">
-            </div>
-    </div>
-
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
-            <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">Admin Login</h2>
-            <div class="form-group">
-                <input type="password" id="adminPass" placeholder="Masukkan Password Admin">
-            </div>
-            <button class="submit-btn" onclick="checkLogin()">Masuk</button>
+            <!-- Posts Grid -->
         </div>
     </div>
 
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
+            <h2 style="text-align: center; margin-bottom: 25px; color: var(--primary);">Akses Admin</h2>
+            <div class="form-group">
+                <input type="password" id="adminPass" placeholder="Masukkan Kode Rahasia">
+            </div>
+            <button class="submit-btn" onclick="checkLogin()">Verifikasi</button>
+        </div>
+    </div>
+
+    <!-- Input Modal -->
     <div class="modal" id="inputModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('inputModal')">&times;</span>
-            <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">Tambah Konten</h2>
+            <h2 style="text-align: center; margin-bottom: 25px; color: var(--primary);">Buat Artikel Baru</h2>
             <form id="contentForm" onsubmit="submitContent(event)">
                 <div class="form-group">
-                    <input type="text" id="judul" placeholder="Judul Artikel" required>
+                    <label>Judul Artikel</label>
+                    <input type="text" id="judul" placeholder="Masukkan judul..." required>
                 </div>
                 <div class="form-group">
+                    <label>Tanggal Publikasi</label>
                     <input type="date" id="tanggal" required>
                 </div>
-                
                 <div class="form-group">
-                    <label style="font-size: 0.9rem; font-weight: 600;">Isi Konten:</label>
+                    <label>Konten Lengkap</label>
                     <div class="editor-container">
                         <div class="toolbar">
-                            <button type="button" onclick="formatDoc('bold')" title="Tebal"><i class="fas fa-bold"></i></button>
-                            <button type="button" onclick="formatDoc('italic')" title="Miring"><i class="fas fa-italic"></i></button>
-                            <button type="button" onclick="formatDoc('underline')" title="Garis Bawah"><i class="fas fa-underline"></i></button>
+                            <button type="button" onclick="formatDoc('bold')"><i class="fas fa-bold"></i></button>
+                            <button type="button" onclick="formatDoc('italic')"><i class="fas fa-italic"></i></button>
                             <select onchange="formatDoc('formatBlock', this.value); this.selectedIndex=0;">
                                 <option value="" selected disabled>Ukuran</option>
-                                <option value="h1">Judul Besar</option>
-                                <option value="h3">Judul Kecil</option>
-                                <option value="p">Paragraf</option>
+                                <option value="h1">Judul Utama</option>
+                                <option value="p">Normal</option>
                             </select>
                             <button type="button" onclick="formatDoc('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
                         </div>
                         <div id="editor" contenteditable="true"></div>
                     </div>
                 </div>
-
                 <div class="form-group">
-                    <label style="font-size: 0.8rem; color: #666;">Upload Gambar</label>
-                    <input type="file" id="gambar" accept="image/*">
+                    <label>Gambar Utama (Pilih File)</label>
+                    <input type="file" id="gambar" accept="image/*" style="border:none;">
                 </div>
-                <button type="submit" class="submit-btn">Simpan ke Database</button>
-                <div class="loader" id="loader"><i class="fas fa-spinner fa-spin"></i> Menyimpan...</div>
+                <button type="submit" class="submit-btn" id="btnSubmit">Publikasikan Sekarang</button>
+                <div id="loader"><i class="fas fa-circle-notch fa-spin"></i> Sedang mengunggah data...</div>
             </form>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('detailModal')">&times;</span>
+            <div id="detailContent"></div>
         </div>
     </div>
 
 <script>
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4Q5Ca2w8jwyXRnE1lWwMKo7C8q9ILCMNsmvM7rCcmfpnDY0jhCnvsr7Wmj5yLXy4k/exec'; 
     const ADMIN_PASSWORD = 'denie'; 
+    const DEFAULT_IMG = 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1000&q=80';
+    let allPosts = [];
 
     window.addEventListener('DOMContentLoaded', loadContent);
 
-    function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+    function openLogin() { 
+        document.getElementById('loginModal').style.display = 'flex'; 
+        document.getElementById('adminPass').focus();
+    }
+    
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
     function checkLogin() {
@@ -225,56 +268,77 @@
             closeModal('loginModal');
             document.getElementById('inputModal').style.display = 'flex';
             document.getElementById('tanggal').valueAsDate = new Date();
+            document.getElementById('adminPass').value = '';
         } else { alert('Password Salah!'); }
     }
 
-    // FUNGSI RICH TEXT EDITOR
-    function formatDoc(cmd, value = null) {
-        if (value) {
-            document.execCommand(cmd, false, value);
-        } else {
-            document.execCommand(cmd, false, null);
-        }
-    }
+    function formatDoc(cmd, value = null) { document.execCommand(cmd, false, value); }
 
     function loadContent() {
         const container = document.getElementById('posts-container');
-        container.innerHTML = '<p>Memuat konten...</p>';
+        container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:50px"><i class="fas fa-sync fa-spin"></i> Memuat Artikel...</div>';
 
         fetch(GOOGLE_SCRIPT_URL)
         .then(res => res.json())
         .then(data => {
-            container.innerHTML = '';
-            data.reverse().forEach((post) => {
-                const imageSrc = post.gambar || 'https://via.placeholder.com/400x200';
-                // Kita tampilkan teks mentah (strip HTML) untuk ringkasan di halaman depan
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = post.isi;
-                const textOnly = tempDiv.textContent || tempDiv.innerText || "";
-                const ringkasan = textOnly.substring(0, 100) + "...";
+            allPosts = data.reverse();
+            renderPosts();
+        })
+        .catch(() => container.innerHTML = '<p>Gagal memuat konten.</p>');
+    }
 
-                container.innerHTML += `
-                    <div class="card">
-                        <img src="${imageSrc}">
-                        <div class="card-body">
-                            <span style="font-size:0.7rem;">${post.tanggal}</span>
-                            <h3 class="card-title">${post.judul}</h3>
-                            <p class="card-text">${ringkasan}</p>
-                            <button onclick="alert('Buka detail untuk melihat format lengkap')" style="border:none; background:none; color:var(--primary); cursor:pointer; font-weight:600;">Baca Selengkapnya</button>
-                        </div>
-                    </div>`;
-            });
+    function renderPosts() {
+        const container = document.getElementById('posts-container');
+        container.innerHTML = '';
+        
+        allPosts.forEach((post, index) => {
+            // Perbaikan: Pastikan jika post.gambar kosong, gunakan default
+            const imageSrc = (post.gambar && post.gambar !== "") ? post.gambar : DEFAULT_IMG;
+            
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = post.isi;
+            const textOnly = tempDiv.textContent || tempDiv.innerText || "";
+            const ringkasan = textOnly.length > 100 ? textOnly.substring(0, 100) + "..." : textOnly;
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.onclick = () => showDetail(index);
+            card.innerHTML = `
+                <div class="card-img-wrapper">
+                    <img src="${imageSrc}" alt="Gambar Artikel" onerror="this.src='${DEFAULT_IMG}'">
+                </div>
+                <div class="card-body">
+                    <span class="date-badge">${post.tanggal}</span>
+                    <h3 class="card-title">${post.judul}</h3>
+                    <p class="card-text">${ringkasan}</p>
+                </div>`;
+            container.appendChild(card);
         });
+    }
+
+    function showDetail(index) {
+        const post = allPosts[index];
+        const detail = document.getElementById('detailContent');
+        const imageSrc = (post.gambar && post.gambar !== "") ? post.gambar : DEFAULT_IMG;
+        
+        detail.innerHTML = `
+            <span class="date-badge">${post.tanggal}</span>
+            <h1>${post.judul}</h1>
+            <img src="${imageSrc}" onerror="this.style.display='none'">
+            <div style="font-size:1.1rem; color:#444; margin-top:20px">${post.isi}</div>
+            <button class="submit-btn" onclick="closeModal('detailModal')" style="background:#666; margin-top:30px">Kembali</button>
+        `;
+        document.getElementById('detailModal').style.display = 'flex';
     }
 
     function submitContent(e) {
         e.preventDefault();
         const loader = document.getElementById('loader');
-        const submitBtn = document.querySelector('.submit-btn');
-        const editorContent = document.getElementById('editor').innerHTML; // AMBIL HTML DARI EDITOR
+        const submitBtn = document.getElementById('btnSubmit');
+        const editor = document.getElementById('editor');
 
-        if (editorContent.trim() === "") {
-            alert("Isi konten tidak boleh kosong!");
+        if (editor.innerText.trim() === "") {
+            alert("Konten tidak boleh kosong!");
             return;
         }
 
@@ -283,40 +347,43 @@
 
         const fileInput = document.getElementById('gambar');
         const file = fileInput.files[0];
-        const reader = new FileReader();
 
-        const handlePost = (imgData = '', imgName = '', mimeType = '') => {
-            const data = {
+        const sendData = (imgBase64 = '', fileName = '', mimeType = '') => {
+            const payload = {
                 judul: document.getElementById('judul').value,
                 tanggal: document.getElementById('tanggal').value,
-                isi: editorContent, // DATA HTML TERKIRIM KE GOOGLE SHEETS
-                imgName: imgName,
-                imgData: imgData,
+                isi: editor.innerHTML,
+                imgData: imgBase64, // Data base64 murni tanpa prefix
+                imgName: fileName,
                 mimeType: mimeType
             };
 
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                body: JSON.stringify(data)
+                body: JSON.stringify(payload)
             })
+            .then(res => res.text())
             .then(() => {
                 alert('Berhasil!');
-                closeModal('inputModal');
-                document.getElementById('contentForm').reset();
-                document.getElementById('editor').innerHTML = '';
-                loadContent();
+                location.reload(); // Refresh untuk melihat update
             })
-            .finally(() => {
+            .catch(err => {
+                alert('Error: ' + err);
                 loader.style.display = 'none';
                 submitBtn.disabled = false;
             });
         };
 
         if (file) {
-            reader.onload = (e) => handlePost(e.target.result.split(',')[1], file.name, file.type);
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                // Mengambil string base64 setelah koma (data murni)
+                const base64Content = event.target.result.split(',')[1];
+                sendData(base64Content, file.name, file.type);
+            };
             reader.readAsDataURL(file);
         } else {
-            handlePost();
+            sendData();
         }
     }
 </script>
