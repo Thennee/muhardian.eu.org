@@ -258,7 +258,7 @@
         </div>
     </div>
 
-<!-- Tombol Reset -->
+    <!-- Tombol Reset -->
     <button onclick="resetCounter()" class="reset-btn-top">
         MUAT ULANG / RESET
     </button>
@@ -314,16 +314,29 @@
             audio.play().catch(e => console.log("Audio play failed"));
         }
 
+        // Fungsi Getaran
+        function vibrate(pattern) {
+            if ("vibrate" in navigator) {
+                navigator.vibrate(pattern);
+            }
+        }
+
         clickBtn.addEventListener('click', () => {
             if (!isActive) return;
 
             count++;
             updateDisplay();
             playSound(audioKey);
+            
+            // Getaran pendek setiap klik (50ms)
+            vibrate(50);
 
             if (modeSwitch33.checked) {
                 if (count === 33 || count === 66 || count === 99) {
                     playSound(audioHint);
+                    // Getaran 2 kali (200ms getar, 100ms jeda, 200ms getar)
+                    vibrate([200, 100, 200]);
+                    
                     if (count === 99 && !modeSwitch100.checked) {
                         finishSession();
                     }
@@ -332,6 +345,8 @@
 
             if (modeSwitch100.checked && count === 100) {
                 playSound(audioHint);
+                // Getaran 2 kali untuk target 100
+                vibrate([200, 100, 200]);
                 finishSession();
             }
         });
