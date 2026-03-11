@@ -145,33 +145,28 @@
 
         /* Keterangan Zikir */
         .zikir-info {
-            max-width: 85%;
+            max-width: 90%;
             text-align: center;
-            font-size: 0.75rem;
-            color: #888;
             margin-top: 5px;
             line-height: 1.4;
             padding: 10px;
             border-top: 1px solid #222;
-            font-style: italic;
         }
 
-        .zikir-arabic {
+        .zikir-text {
             display: block;
             color: #ccc;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             font-size: 0.85rem;
-            font-style: normal;
+            font-weight: 500;
         }
 
-        .sub-zikir-info {
-            font-size: 0.7rem;
-            color: #777;
-            text-align: center;
-            margin-bottom: 12px;
-            border-bottom: 1px solid #222;
-            padding-bottom: 8px;
-            width: 180px;
+        .zikir-arti {
+            display: block;
+            color: #666; /* Samar */
+            font-size: 0.65rem; /* Lebih kecil */
+            font-style: italic; /* Miring */
+            margin-bottom: 8px;
         }
 
         /* Pesan Selesai */
@@ -246,11 +241,12 @@
             </label>
         </div>
 
-        <!-- Keterangan Subhanallah dkk -->
-        <div class="sub-zikir-info">
-            Subhanallah, Alhamdulillah, Allahu Akbar
+        <!-- Keterangan Zikir 33 -->
+        <div class="zikir-info mb-2">
+            <span class="zikir-text">"Subhanallah, Alhamdulillah, Allahu Akbar"</span>
+            <span class="zikir-arti">(Maha Suci Allah, Segala puji bagi Allah, Allah Maha Besar)</span>
         </div>
-        
+            
         <!-- Saklar 100 -->
         <div class="mode-container">
             <span class="mode-label">TARGET 100</span>
@@ -262,8 +258,8 @@
 
         <!-- Keterangan Zikir Tahlil -->
         <div class="zikir-info">
-            <span class="zikir-arabic">Dzikir tahlil: "Laa ilaha illallah wahdahu laa syarikalah, lahul mulku walahul hamdu, wa huwa 'ala kulli syai'in qadir"</span>
-            (Tidak ada Tuhan selain Allah, tidak ada sekutu bagi-Nya, milik-Nya segala kekuasaan dan bagi-Nya segala pujian, dan Dialah Yang Mahakuasa atas segala sesuatu)
+            <span class="zikir-text">"Laa ilaha illallah wahdahu laa syarikalah, lahul mulku walahul hamdu, wa huwa 'ala kulli syai'in qadir"</span>
+            <span class="zikir-arti">(Tidak ada Tuhan selain Allah, tidak ada sekutu bagi-Nya, milik-Nya segala kekuasaan dan bagi-Nya segala pujian, dan Dialah Yang Mahakuasa atas segala sesuatu)</span>
         </div>
     </div>
 
