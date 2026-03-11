@@ -71,6 +71,18 @@
             box-shadow: 0 0 10px #ff0000, 0 0 30px #ff0000;
         }
 
+        /* Progress Circle untuk Long Press */
+        .press-progress {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 200px;
+            height: 200px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
         .btn-neon span {
             font-size: 1.8rem;
             font-weight: bold;
@@ -78,6 +90,7 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            z-index: 2;
         }
 
         /* Switch Toggle Styling */
@@ -202,6 +215,14 @@
             transform: scale(0.95);
         }
 
+        /* Info Reset Hint */
+        .reset-hint {
+            font-size: 0.6rem;
+            color: #444;
+            margin-top: 5px;
+            text-align: center;
+        }
+
         /* Footer */
         .footer {
             margin-top: 30px;
@@ -268,10 +289,15 @@
 
     <!-- Tombol Utama -->
     <div class="btn-neon" id="clickBtn">
+        <svg class="press-progress" id="progressCircle" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="48" fill="none" stroke="#ff0000" stroke-width="2" stroke-dasharray="301.59" stroke-dashoffset="301.59" stroke-linecap="round" />
+        </svg>
         <span>KLIK</span>
     </div>
 
     <div id="message">SELESAI<br><span style="font-size: 0.8rem; font-weight: normal;">Target Tercapai</span></div>
+    
+    <div class="reset-hint">Tahan tombol 3 detik untuk Muat Ulang Otomatis</div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -287,6 +313,7 @@
     <script>
         let count = 0;
         let isActive = true;
+        let pressTimer;
         const counterDisplay = document.getElementById('counter-display');
         const clickBtn = document.getElementById('clickBtn');
         const modeSwitch33 = document.getElementById('modeSwitch33');
@@ -295,6 +322,8 @@
         const audioHint = document.getElementById('audioHint');
         const glow = document.getElementById('glow');
         const message = document.getElementById('message');
+        const progressCircle = document.getElementById('progressCircle').querySelector('circle');
+        const progressSvg = document.getElementById('progressCircle');
 
         function updateDisplay() {
             counterDisplay.innerText = count;
@@ -320,6 +349,36 @@
                 navigator.vibrate(pattern);
             }
         }
+
+        function startPress() {
+            // Animasi progress circle
+            progressSvg.style.opacity = "1";
+            progressCircle.style.transition = "stroke-dashoffset 3s linear";
+            progressCircle.style.strokeDashoffset = "0";
+
+            pressTimer = setTimeout(() => {
+                vibrate([100, 50, 100]); // Getar tanda reset berhasil
+                resetCounter();
+                cancelPress();
+            }, 3000); // 3 detik
+        }
+
+        function cancelPress() {
+            clearTimeout(pressTimer);
+            progressSvg.style.opacity = "0";
+            progressCircle.style.transition = "none";
+            progressCircle.style.strokeDashoffset = "301.59";
+        }
+
+        // Handle Klik Biasa & Tekan Lama
+        clickBtn.addEventListener('mousedown', startPress);
+        clickBtn.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) e.preventDefault();
+            startPress();
+        }, { passive: false });
+
+        window.addEventListener('mouseup', cancelPress);
+        window.addEventListener('touchend', cancelPress);
 
         clickBtn.addEventListener('click', () => {
             if (!isActive) return;
@@ -354,9 +413,9 @@
         function finishSession() {
             isActive = false;
             message.style.opacity = "1";
-            clickBtn.style.opacity = "0.3";
-            clickBtn.style.cursor = "default";
-            clickBtn.style.filter = "grayscale(1)";
+            clickBtn.style.opacity = "0.6"; // Sedikit lebih terang agar progress reset terlihat
+            clickBtn.style.cursor = "pointer";
+            clickBtn.style.filter = "grayscale(0.5)";
         }
 
         function resetCounter() {
@@ -368,10 +427,6 @@
             clickBtn.style.filter = "none";
             updateDisplay();
         }
-
-        document.addEventListener('touchstart', (e) => {
-            if (e.touches.length > 1) e.preventDefault();
-        }, { passive: false });
     </script>
 </body>
 </html>
