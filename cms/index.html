@@ -3,389 +3,426 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muhardian CMS - Rich Editor Pro</title>
-    <link rel="icon" type="image/x-icon" href="https://muhardian.eu.org/iconWA.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Emerald CMS - Professional & Elegant</title>
+    <!-- Tailwind CSS for Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Quill Rich Text Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     
     <style>
         :root {
-            --primary: #0f9b0f;
-            --dark-green: #054705;
-            --light-green: #59c959;
-            --gradient: linear-gradient(135deg, #0f9b0f, #00d2ff);
-            --glass-bg: rgba(255, 255, 255, 0.95);
-            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --dark-green: #064e3b;
+            --emerald: #10b981;
+            --bg-dark: #022c22;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        
-        body { background: #f4f7f4; color: #333; line-height: 1.6; }
-
-        header {
-            background: var(--gradient);
-            padding: 15px 5%;
-            color: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        body {
+            background-color: var(--bg-dark);
+            color: #ecfdf5;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
         }
-
-        .logo { font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        
-        .admin-btn {
-            background: rgba(255,255,255,0.2);
-            border: 1px solid white;
-            padding: 8px 20px;
-            color: white;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-weight: 600;
+        .glass-morphism {
+            background: rgba(6, 78, 59, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 1rem;
         }
-        .admin-btn:hover { background: white; color: var(--primary); transform: scale(1.05); }
-
-        .hero { 
-            text-align: center; 
-            padding: 80px 20px; 
+        .card-hover:hover {
+            transform: translateY(-5px);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
+        }
+        .emerald-gradient {
+            background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+        }
+        #editor-container {
+            height: 250px;
             background: white;
-            border-bottom: 1px solid #eee;
+            color: black;
+            border-radius: 0 0 0.5rem 0.5rem;
         }
-        .hero h1 {
-            font-size: 3rem;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 15px;
+        .ql-toolbar {
+            background: #f3f4f6;
+            border-radius: 0.5rem 0.5rem 0 0;
         }
-
-        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
-        
-        .posts-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
-            gap: 30px; 
-        }
-
-        .card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            flex-direction: column;
-            cursor: pointer;
-        }
-        .card:hover { transform: translateY(-12px); box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
-        .card-img-wrapper { position: relative; height: 220px; overflow: hidden; background: #eee; }
-        .card img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .card:hover img { transform: scale(1.1); }
-        
-        .card-body { padding: 25px; flex-grow: 1; }
-        .date-badge { font-size: 0.75rem; color: #888; margin-bottom: 8px; display: block; }
-        .card-title { font-size: 1.3rem; margin-bottom: 12px; color: var(--dark-green); font-weight: 700; }
-        .card-text { color: #666; font-size: 0.95rem; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-
-        .editor-container { border: 2px solid #eee; border-radius: 12px; overflow: hidden; background: white; transition: 0.3s; }
-        .editor-container:focus-within { border-color: var(--primary); }
-        .toolbar {
-            background: #f8faf8;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .toolbar button, .toolbar select {
-            width: 35px; height: 35px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; border: 1px solid #ddd; background: white;
-            border-radius: 6px; font-size: 0.9rem; transition: 0.2s;
-        }
-        .toolbar select { width: auto; padding: 0 10px; }
-        .toolbar button:hover { background: var(--primary); color: white; border-color: var(--primary); }
-        
-        #editor {
-            min-height: 250px;
-            padding: 20px;
-            outline: none;
-            overflow-y: auto;
-            max-height: 400px;
-            background: #fff;
-        }
-
         .modal {
-            display: none;
+            display: none; 
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 15px;
-        }
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 25px;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 700px;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            animation: slideUp 0.4s ease;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            backdrop-filter: blur(8px);
         }
-        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .loader {
+            border: 3px solid #064e3b;
+            border-top: 3px solid #10b981;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 1.8rem; cursor: pointer; color: #999; }
-        
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; color: #555; }
-        
-        input[type="text"], input[type="password"], input[type="date"] {
-            width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 12px; transition: 0.3s;
-        }
-
-        .submit-btn {
-            width: 100%; padding: 15px; background: var(--gradient); color: white;
-            border: none; border-radius: 12px; font-weight: 700; cursor: pointer;
-            font-size: 1rem; transition: 0.3s;
-        }
-        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-        #loader { display: none; text-align: center; margin-top: 15px; color: var(--primary); font-weight: 600; }
-
-        #detailContent img { width: 100%; max-height: 450px; object-fit: cover; border-radius: 15px; margin: 20px 0; display: block; }
-        #detailContent h1 { margin: 15px 0; color: var(--dark-green); font-size: 2rem; line-height: 1.2; }
-
-        @media (max-width: 600px) {
-            .hero h1 { font-size: 2rem; }
-        }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body>
+<body class="min-h-screen">
 
-    <header>
-        <div class="logo"><i class="fas fa-leaf"></i> Muhardian News</div>
-        <button class="admin-btn" id="loginBtn" onclick="openLogin()">
-            <i class="fas fa-lock"></i> Login Admin
-        </button>
-    </header>
-
-    <div class="hero">
-        <h1>Muhardian News</h1>
-        <p>Inspirasi Hijau Untuk Masa Depan yang Lebih Cerah.</p>
-    </div>
-
-    <div class="container">
-        <div class="posts-grid" id="posts-container">
-            <!-- Posts Grid -->
-        </div>
-    </div>
-
-    <!-- Login Modal -->
-    <div class="modal" id="loginModal">
-        <div class="modal-content" style="max-width: 400px;">
-            <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
-            <h2 style="text-align: center; margin-bottom: 25px; color: var(--primary);">Akses Admin</h2>
-            <div class="form-group">
-                <input type="password" id="adminPass" placeholder="Masukkan Kode Rahasia">
+    <!-- Header / Navbar -->
+    <nav class="sticky top-0 z-50 glass-morphism m-4 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 emerald-gradient rounded-lg flex items-center justify-center shadow-lg">
+                <i class="fas fa-leaf text-white"></i>
             </div>
-            <button class="submit-btn" onclick="checkLogin()">Verifikasi</button>
+            <h1 class="text-xl font-bold tracking-tight">EMERALD<span class="text-emerald-400">CMS</span></h1>
         </div>
-    </div>
+        <div class="flex items-center gap-4">
+            <button id="logoutBtn" onclick="handleLogout()" class="hidden text-emerald-300 hover:text-white text-sm font-medium transition-colors">
+                Logout
+            </button>
+            <button onclick="toggleAdminModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-full text-sm font-semibold transition-all shadow-lg active:scale-95">
+                <i class="fas fa-user-shield mr-2"></i>Admin Panel
+            </button>
+        </div>
+    </nav>
 
-    <!-- Input Modal -->
-    <div class="modal" id="inputModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('inputModal')">&times;</span>
-            <h2 style="text-align: center; margin-bottom: 25px; color: var(--primary);">Buat Artikel Baru</h2>
-            <form id="contentForm" onsubmit="submitContent(event)">
-                <div class="form-group">
-                    <label>Judul Artikel</label>
-                    <input type="text" id="judul" placeholder="Masukkan judul..." required>
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <section class="text-center mb-16 fade-in">
+            <h2 class="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">Wawasan Hijau untuk <br><span class="text-emerald-400 italic">Masa Depan</span></h2>
+            <p class="text-emerald-200/70 max-w-2xl mx-auto text-lg">Kelola konten informasi lingkungan Anda dengan panel admin yang aman, cepat, dan terintegrasi Google Ecosystem.</p>
+        </section>
+
+        <!-- Container Artikel -->
+        <div id="article-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Loading State -->
+            <div id="skeleton-loader" class="contents">
+                <div class="animate-pulse glass-morphism p-6 h-80"></div>
+                <div class="animate-pulse glass-morphism p-6 h-80"></div>
+                <div class="animate-pulse glass-morphism p-6 h-80"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-10 text-emerald-300/40 text-sm border-t border-emerald-900/50 mt-20">
+        &copy; 2024 Emerald CMS. Dirancang secara profesional untuk pengelolaan data efisien.
+    </footer>
+
+    <!-- Universal Admin Modal -->
+    <div id="adminModal" class="modal flex items-center justify-center p-4">
+        
+        <!-- Login Section -->
+        <div id="loginSection" class="glass-morphism w-full max-w-md p-8 bg-[#064e3b] shadow-2xl scale-in">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 emerald-gradient rounded-2xl flex items-center justify-center shadow-lg mx-auto mb-4">
+                    <i class="fas fa-lock text-2xl text-white"></i>
                 </div>
-                <div class="form-group">
-                    <label>Tanggal Publikasi</label>
-                    <input type="date" id="tanggal" required>
+                <h3 class="text-2xl font-bold text-white">Autentikasi Admin</h3>
+                <p class="text-emerald-300/60 text-sm">Silakan login untuk mengakses editor</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-emerald-400">Username</label>
+                    <input type="text" id="username" required class="w-full bg-emerald-900/50 border border-emerald-700 rounded-xl p-4 outline-none focus:border-emerald-400 transition-all text-white placeholder-emerald-800" placeholder="admin">
                 </div>
-                <div class="form-group">
-                    <label>Konten Lengkap</label>
-                    <div class="editor-container">
-                        <div class="toolbar">
-                            <button type="button" onclick="formatDoc('bold')"><i class="fas fa-bold"></i></button>
-                            <button type="button" onclick="formatDoc('italic')"><i class="fas fa-italic"></i></button>
-                            <select onchange="formatDoc('formatBlock', this.value); this.selectedIndex=0;">
-                                <option value="" selected disabled>Ukuran</option>
-                                <option value="h1">Judul Utama</option>
-                                <option value="p">Normal</option>
-                            </select>
-                            <button type="button" onclick="formatDoc('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
-                        </div>
-                        <div id="editor" contenteditable="true"></div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-emerald-400">Password</label>
+                    <input type="password" id="password" required class="w-full bg-emerald-900/50 border border-emerald-700 rounded-xl p-4 outline-none focus:border-emerald-400 transition-all text-white placeholder-emerald-800" placeholder="••••••••">
+                </div>
+                <div id="loginError" class="hidden text-red-400 text-sm text-center font-medium bg-red-900/20 py-3 rounded-lg border border-red-900/50">
+                    Kredensial yang Anda masukkan salah.
+                </div>
+                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-[#022c22] font-bold py-4 rounded-xl transition-all shadow-xl active:scale-95">
+                    Masuk ke Panel
+                </button>
+                <button type="button" onclick="toggleAdminModal()" class="w-full text-emerald-300 text-sm py-2 hover:text-white transition-colors">Batal</button>
+            </form>
+        </div>
+
+        <!-- Editor Section -->
+        <div id="editorSection" class="glass-morphism w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 bg-[#064e3b] shadow-2xl hidden">
+            <div class="flex justify-between items-center mb-8 border-b border-emerald-800 pb-6">
+                <div>
+                    <h3 class="text-2xl font-bold text-emerald-400">Panel Artikel</h3>
+                    <p class="text-emerald-300/50 text-sm">Terhubung sebagai: <span class="text-emerald-100 italic">Administrator</span></p>
+                </div>
+                <button onclick="toggleAdminModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-emerald-900/50 hover:bg-red-900/40 text-white transition-all">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="cmsForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-emerald-400">Judul Artikel</label>
+                        <input type="text" id="title" required class="w-full bg-emerald-900/50 border border-emerald-700 rounded-xl p-3 outline-none focus:border-emerald-400 transition-all text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-emerald-400">Tanggal</label>
+                        <input type="date" id="date" required class="w-full bg-emerald-900/50 border border-emerald-700 rounded-xl p-3 outline-none focus:border-emerald-400 transition-all text-white">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Gambar Utama (Pilih File)</label>
-                    <input type="file" id="gambar" accept="image/*" style="border:none;">
+                
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-emerald-400">Banner (Google Drive)</label>
+                    <div class="relative group">
+                        <input type="file" id="image" accept="image/*" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                        <div class="w-full border-2 border-dashed border-emerald-700 rounded-xl p-10 text-center group-hover:border-emerald-400 group-hover:bg-emerald-900/20 transition-all">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-emerald-500 mb-3"></i>
+                            <p class="text-sm text-emerald-300 font-medium">Klik untuk pilih gambar atau tarik file ke sini</p>
+                            <p class="text-[10px] text-emerald-600 mt-2 uppercase tracking-tighter">Format: JPG, PNG, WEBP</p>
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="submit-btn" id="btnSubmit">Publikasikan Sekarang</button>
-                <div id="loader"><i class="fas fa-circle-notch fa-spin"></i> Sedang mengunggah data...</div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-emerald-400">Isi Konten</label>
+                    <div id="editor-container"></div>
+                </div>
+
+                <div class="pt-6 border-t border-emerald-800">
+                    <button type="submit" id="submitBtn" class="w-full bg-emerald-500 hover:bg-emerald-400 text-[#022c22] font-bold py-4 rounded-xl transition-all flex justify-center items-center shadow-2xl active:scale-95">
+                        <span id="btnText">Simpan & Publish Artikel</span>
+                        <div id="btnLoader" class="loader ml-3 hidden"></div>
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 
-    <!-- Detail Modal -->
-    <div class="modal" id="detailModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('detailModal')">&times;</span>
-            <div id="detailContent"></div>
-        </div>
-    </div>
-
-<script>
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby67mXRslwjvgXdyyDqQTTn8DlLgObDsGLZgcGsi8Nbn10hiW8Z0UOgf82tOt2vhg37/exec'; 
-    const ADMIN_PASSWORD = '321321'; 
-    const DEFAULT_IMG = 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1000&q=80';
-    let allPosts = [];
-
-    window.addEventListener('DOMContentLoaded', loadContent);
-
-    function openLogin() { 
-        document.getElementById('loginModal').style.display = 'flex'; 
-        document.getElementById('adminPass').focus();
-    }
-    
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-    function checkLogin() {
-        if(document.getElementById('adminPass').value === ADMIN_PASSWORD) {
-            closeModal('loginModal');
-            document.getElementById('inputModal').style.display = 'flex';
-            document.getElementById('tanggal').valueAsDate = new Date();
-            document.getElementById('adminPass').value = '';
-        } else { alert('Password Salah!'); }
-    }
-
-    function formatDoc(cmd, value = null) { document.execCommand(cmd, false, value); }
-
-    function loadContent() {
-        const container = document.getElementById('posts-container');
-        container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:50px"><i class="fas fa-sync fa-spin"></i> Memuat Artikel...</div>';
-
-        fetch(GOOGLE_SCRIPT_URL)
-        .then(res => res.json())
-        .then(data => {
-            allPosts = data.reverse();
-            renderPosts();
-        })
-        .catch(() => container.innerHTML = '<p>Gagal memuat konten.</p>');
-    }
-
-    function renderPosts() {
-        const container = document.getElementById('posts-container');
-        container.innerHTML = '';
+    <!-- Scripts -->
+    <script>
+        /**
+         * PENGATURAN HOSTING:
+         * Masukkan URL Web App dari Google Apps Script Anda di sini.
+         */
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyqM9zVwE21NMraa041lWms2A7Do4smoJpM2b7c6HdD25fujcKvEd7atlkbvdYxM-gUKw/exec';
         
-        allPosts.forEach((post, index) => {
-            // Perbaikan: Pastikan jika post.gambar kosong, gunakan default
-            const imageSrc = (post.gambar && post.gambar !== "") ? post.gambar : DEFAULT_IMG;
-            
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = post.isi;
-            const textOnly = tempDiv.textContent || tempDiv.innerText || "";
-            const ringkasan = textOnly.length > 100 ? textOnly.substring(0, 100) + "..." : textOnly;
+        let isLoggedIn = false;
 
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.onclick = () => showDetail(index);
-            card.innerHTML = `
-                <div class="card-img-wrapper">
-                    <img src="${imageSrc}" alt="Gambar Artikel" onerror="this.src='${DEFAULT_IMG}'">
-                </div>
-                <div class="card-body">
-                    <span class="date-badge">${post.tanggal}</span>
-                    <h3 class="card-title">${post.judul}</h3>
-                    <p class="card-text">${ringkasan}</p>
-                </div>`;
-            container.appendChild(card);
+        // Inisialisasi Quill Editor
+        var quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Mulai menulis konten yang menarik...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['link', 'blockquote'],
+                    ['clean']
+                ]
+            }
         });
-    }
 
-    function showDetail(index) {
-        const post = allPosts[index];
-        const detail = document.getElementById('detailContent');
-        const imageSrc = (post.gambar && post.gambar !== "") ? post.gambar : DEFAULT_IMG;
-        
-        detail.innerHTML = `
-            <span class="date-badge">${post.tanggal}</span>
-            <h1>${post.judul}</h1>
-            <img src="${imageSrc}" onerror="this.style.display='none'">
-            <div style="font-size:1.1rem; color:#444; margin-top:20px">${post.isi}</div>
-            <button class="submit-btn" onclick="closeModal('detailModal')" style="background:#666; margin-top:30px">Kembali</button>
-        `;
-        document.getElementById('detailModal').style.display = 'flex';
-    }
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('adminModal');
+            modal.style.display = 'none';
+            loadArticles();
+        });
 
-    function submitContent(e) {
-        e.preventDefault();
-        const loader = document.getElementById('loader');
-        const submitBtn = document.getElementById('btnSubmit');
-        const editor = document.getElementById('editor');
+        function toggleAdminModal() {
+            const modal = document.getElementById('adminModal');
+            const loginSection = document.getElementById('loginSection');
+            const editorSection = document.getElementById('editorSection');
 
-        if (editor.innerText.trim() === "") {
-            alert("Konten tidak boleh kosong!");
-            return;
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            } else {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                
+                if (isLoggedIn) {
+                    loginSection.classList.add('hidden');
+                    editorSection.classList.remove('hidden');
+                } else {
+                    loginSection.classList.remove('hidden');
+                    editorSection.classList.add('hidden');
+                }
+            }
         }
 
-        loader.style.display = 'block';
-        submitBtn.disabled = true;
+        document.getElementById('loginForm').onsubmit = (e) => {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const errorMsg = document.getElementById('loginError');
 
-        const fileInput = document.getElementById('gambar');
-        const file = fileInput.files[0];
-
-        const sendData = (imgBase64 = '', fileName = '', mimeType = '') => {
-            const payload = {
-                judul: document.getElementById('judul').value,
-                tanggal: document.getElementById('tanggal').value,
-                isi: editor.innerHTML,
-                imgData: imgBase64, // Data base64 murni tanpa prefix
-                imgName: fileName,
-                mimeType: mimeType
-            };
-
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            })
-            .then(res => res.text())
-            .then(() => {
-                alert('Berhasil!');
-                location.reload(); // Refresh untuk melihat update
-            })
-            .catch(err => {
-                alert('Error: ' + err);
-                loader.style.display = 'none';
-                submitBtn.disabled = false;
-            });
+            if (user === 'admin' && pass === 'admin123') {
+                isLoggedIn = true;
+                errorMsg.classList.add('hidden');
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('editorSection').classList.remove('hidden');
+                document.getElementById('logoutBtn').classList.remove('hidden');
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+            } else {
+                errorMsg.classList.remove('hidden');
+                const loginBox = document.getElementById('loginSection');
+                loginBox.classList.add('animate-bounce');
+                setTimeout(() => loginBox.classList.remove('animate-bounce'), 500);
+            }
         };
 
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                // Mengambil string base64 setelah koma (data murni)
-                const base64Content = event.target.result.split(',')[1];
-                sendData(base64Content, file.name, file.type);
-            };
-            reader.readAsDataURL(file);
-        } else {
-            sendData();
+        function handleLogout() {
+            isLoggedIn = false;
+            document.getElementById('logoutBtn').classList.add('hidden');
+            alert('Sesi admin berakhir.');
+            location.reload();
         }
-    }
-</script>
+
+        function setLoading(isLoading) {
+            const btnText = document.getElementById('btnText');
+            const btnLoader = document.getElementById('btnLoader');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (isLoading) {
+                btnText.textContent = "Sinkronisasi ke Cloud...";
+                btnLoader.classList.remove('hidden');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-70');
+            } else {
+                btnText.textContent = "Simpan & Publish Artikel";
+                btnLoader.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-70');
+            }
+        }
+
+        /**
+         * Mengambil data dari Google Sheets melalui Apps Script
+         * Menggunakan mekanisme fallback jika fetch biasa gagal
+         */
+        async function loadArticles() {
+            const grid = document.getElementById('article-grid');
+            
+            if (!WEB_APP_URL || WEB_APP_URL.includes('...YOUR_ID...')) {
+                renderEmptyState(grid, "Konfigurasi Belum Lengkap", "URL Web App belum diatur dengan benar di kode sumber.");
+                return;
+            }
+
+            try {
+                // Mencoba fetch standar dengan parameter no-cache untuk menghindari data lama
+                const response = await fetch(WEB_APP_URL + '?t=' + new Date().getTime(), { 
+                    method: 'GET',
+                    cache: 'no-store'
+                });
+                
+                if (!response.ok) throw new Error('Network response not ok');
+                
+                const articles = await response.json();
+                renderArticles(articles);
+
+            } catch (error) {
+                console.warn('Fetch standar gagal, mencoba metode alternatif...', error);
+                
+                // Jika fetch standar gagal karena CORS, instruksikan user
+                renderEmptyState(grid, "Masalah Koneksi (CORS)", 
+                    "Browser memblokir permintaan data. Pastikan di Google Apps Script Anda telah memilih 'Anyone' pada 'Who has access'. <br><br> <a href='" + WEB_APP_URL + "' target='_blank' class='underline text-emerald-400'>Klik di sini untuk memverifikasi URL</a>");
+            }
+        }
+
+        function renderArticles(articles) {
+            const grid = document.getElementById('article-grid');
+            if (!articles || articles.length === 0) {
+                renderEmptyState(grid, "Belum Ada Artikel", "Gunakan Admin Panel untuk mempublikasikan konten pertama Anda.");
+                return;
+            }
+
+            grid.innerHTML = '';
+            articles.reverse().forEach((item, index) => {
+                grid.innerHTML += `
+                    <article class="glass-morphism overflow-hidden card-hover flex flex-col fade-in" style="animation-delay: ${index * 0.1}s">
+                        <div class="h-52 emerald-gradient flex items-center justify-center relative overflow-hidden">
+                            <img src="https://lh3.googleusercontent.com/d/${item.imageId}" class="w-full h-full object-cover opacity-80" onerror="this.src='https://via.placeholder.com/400x300?text=Emerald+CMS'">
+                            <div class="absolute bottom-4 left-4">
+                                <span class="bg-black/50 backdrop-blur-md text-[10px] px-2 py-1 rounded text-emerald-300 uppercase font-bold tracking-widest italic">Berita</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-2 mb-3">
+                                <i class="far fa-calendar-alt text-emerald-500 text-xs"></i>
+                                <span class="text-[10px] text-emerald-400 font-mono uppercase tracking-widest">${new Date(item.date).toLocaleDateString('id-ID')}</span>
+                            </div>
+                            <h3 class="text-xl font-bold mt-1 mb-3 text-white leading-tight">${item.title}</h3>
+                            <div class="text-sm text-emerald-100/60 line-clamp-3 mb-5">${item.content.replace(/<[^>]*>?/gm, '')}</div>
+                            <button class="mt-auto flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase hover:gap-3 transition-all">
+                                Baca Detail <i class="fas fa-chevron-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </article>
+                `;
+            });
+        }
+
+        function renderEmptyState(container, title, message) {
+            container.innerHTML = `
+                <div class="col-span-full py-20 text-center fade-in">
+                    <div class="w-20 h-20 bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-800">
+                        <i class="fas fa-satellite-dish text-emerald-700 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-emerald-100">${title}</h3>
+                    <p class="text-emerald-500 text-sm mt-2 max-w-md mx-auto leading-relaxed">${message}</p>
+                </div>
+            `;
+        }
+
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+        });
+
+        document.getElementById('cmsForm').onsubmit = async (e) => {
+            e.preventDefault();
+            setLoading(true);
+
+            try {
+                const file = document.getElementById('image').files[0];
+                const base64Image = await toBase64(file);
+
+                const payload = {
+                    title: document.getElementById('title').value,
+                    date: document.getElementById('date').value,
+                    content: quill.root.innerHTML,
+                    image: base64Image,
+                    filename: file.name
+                };
+
+                // Menggunakan fetch dengan mode no-cors untuk bypass CORS pada POST
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                alert('Data telah dikirim ke Google Sheets! Halaman akan dimuat ulang dalam 3 detik.');
+                document.getElementById('cmsForm').reset();
+                quill.setContents([]);
+                toggleAdminModal();
+                
+                // Jeda sebentar agar Apps Script selesai memproses sebelum refresh data
+                setTimeout(loadArticles, 3500);
+
+            } catch (error) {
+                alert('Gagal mengirim data: ' + error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+    </script>
 </body>
 </html>
