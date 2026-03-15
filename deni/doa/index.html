@@ -36,7 +36,7 @@
             perspective: 1500px;
             overflow: hidden;
             display: flex;
-            flex-direction: column; /* Ubah ke kolom agar footer bisa diatur relatif terhadap kontainer ini */
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             background-color: #121212;
@@ -45,7 +45,7 @@
         .calendar-page {
             position: absolute;
             width: 90%;
-            height: 80%; /* Sedikit dikurangi agar tidak menabrak info atas/bawah */
+            height: 82%; /* Menyesuaikan agar ada ruang untuk footer di bawahnya */
             background: #2d2d2d;
             box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
             border-radius: 8px;
@@ -56,7 +56,7 @@
             align-items: center;
             z-index: 10;
             backface-visibility: hidden;
-            top: 5%; /* Jarak dari atas kontainer */
+            top: 15px; /* Jarak dari atas */
         }
 
         .calendar-page.active, 
@@ -82,7 +82,7 @@
             z-index: 10;
             transform: scale(0.95);
             opacity: 0.5;
-            top: 7%; /* Sedikit lebih rendah untuk efek kedalaman */
+            top: 25px;
         }
 
         canvas {
@@ -149,22 +149,29 @@
             font-weight: 600;
         }
 
-        /* Footer menempel ke bawah kontainer halaman */
+        /* Footer Melayang dinaikkan posisinya */
         .copyright-footer {
-            background: transparent;
-            color: #9ca3af;
+            position: absolute;
+            bottom: 45px; /* Menaikkan posisi footer */
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            color: #d1d5db;
             font-size: 10px;
-            text-align: center;
-            height: 40px;
+            padding: 5px 14px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 60;
-            width: 100%;
+            z-index: 70;
+            pointer-events: auto;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
         .copyright-footer a {
-            color: #6366f1;
+            color: #818cf8;
             font-weight: bold;
             margin-left: 4px;
         }
@@ -187,11 +194,11 @@
         <button id="nextBtn" class="nav-overlay">&#10095;</button>
         
         <!-- Halaman dimasukkan di sini oleh JS -->
-    </div>
 
-    <!-- Footer di bawah, menempel ke area utama -->
-    <div class="copyright-footer">
-        Deploy Code by <a href="https://muhardian.eu.org/deni" target="_blank">Muhardian@2026</a>
+        <!-- Footer melayang dinaikkan lokasinya -->
+        <div class="copyright-footer">
+            Deploy Code by <a href="https://muhardian.eu.org/deni" target="_blank">Muhardian@2026</a>
+        </div>
     </div>
 
     <script>
@@ -298,7 +305,7 @@
         };
 
         viewer.onclick = (e) => {
-            if (e.target.closest('.nav-overlay')) return;
+            if (e.target.closest('.nav-overlay') || e.target.closest('.copyright-footer')) return;
             const clickX = e.clientX;
             const screenWidth = window.innerWidth;
             if (clickX < screenWidth / 2) {
