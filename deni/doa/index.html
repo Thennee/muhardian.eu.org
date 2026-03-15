@@ -96,30 +96,52 @@
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        .controls {
-            background: #262626;
-            height: 70px;
-            padding: 0 20px;
+        /* Desain Tombol Transparan Melayang */
+        .nav-overlay {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 60px; /* Area klik di sisi layar */
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-top: 1px solid #404040;
-            z-index: 60;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0); /* Transparan penuh default */
+            border: none;
+            color: rgba(255, 255, 255, 0.3); /* Ikon samar */
+            font-size: 2rem;
+            z-index: 100;
+            transition: background 0.3s, color 0.3s;
+            cursor: pointer;
+            outline: none;
         }
 
-        .btn-nav {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            background: #4f46e5;
+        .nav-overlay:hover:not(:disabled) {
+            background: rgba(0, 0, 0, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .nav-overlay:active:not(:disabled) {
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .nav-overlay:disabled {
+            opacity: 0;
+            cursor: default;
+        }
+
+        #prevBtn { left: 0; }
+        #nextBtn { right: 0; }
+
+        .page-counter-floating {
+            position: absolute;
+            bottom: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
             color: white;
-            transition: 0.2s;
-        }
-
-        .btn-nav:disabled {
-            background: #4b5563;
-            opacity: 0.5;
+            z-index: 50;
+            pointer-events: none;
         }
 
         .copyright-footer {
@@ -143,13 +165,13 @@
     </div>
 
     <div id="viewer-container">
-        <!-- Pages injected here -->
-    </div>
-
-    <div class="controls">
-        <button id="prevBtn" class="btn-nav" disabled>Sebelumnya</button>
-        <span id="pageInfo" class="text-xs font-mono text-gray-400">Halaman -- / --</span>
-        <button id="nextBtn" class="btn-nav">Berikutnya</button>
+        <!-- Tombol Transparan di dalam kontainer viewer -->
+        <button id="prevBtn" class="nav-overlay" disabled>&#10094;</button>
+        <button id="nextBtn" class="nav-overlay">&#10095;</button>
+        
+        <div id="pageInfo" class="page-counter-floating">Halaman -- / --</div>
+        
+        <!-- Halaman akan dimasukkan di sini -->
     </div>
 
     <div class="copyright-footer">
@@ -244,7 +266,8 @@
             document.getElementById('nextBtn').disabled = currentPage === totalPages;
         }
 
-        document.getElementById('nextBtn').onclick = () => {
+        document.getElementById('nextBtn').onclick = (e) => {
+            e.stopPropagation(); // Cegah konflik dengan listener lain jika ada
             if (currentPage < totalPages) {
                 currentPage++;
                 playFeedback();
@@ -252,7 +275,8 @@
             }
         };
 
-        document.getElementById('prevBtn').onclick = () => {
+        document.getElementById('prevBtn').onclick = (e) => {
+            e.stopPropagation();
             if (currentPage > 1) {
                 currentPage--;
                 playFeedback();
@@ -260,7 +284,19 @@
             }
         };
 
-        // Swipe support sederhana
+        // Memungkinkan klik pada area layar samping kiri/kanan di luar tombol secara eksplisit
+        viewer.onclick = (e) => {
+            const clickX = e.clientX;
+            const screenWidth = window.innerWidth;
+            
+            if (clickX < screenWidth / 2) {
+                document.getElementById('prevBtn').click();
+            } else {
+                document.getElementById('nextBtn').click();
+            }
+        };
+
+        // Swipe support sederhana (Vertikal untuk efek kalender)
         let touchStartY = 0;
         viewer.addEventListener('touchstart', e => touchStartY = e.touches[0].clientY);
         viewer.addEventListener('touchend', e => {
