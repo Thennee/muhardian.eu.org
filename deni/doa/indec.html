@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PDF Flip Book - Doa</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PDF.js for rendering PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- PageFlip library for book effect -->
+    <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
+    
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #e5e7eb;
+            overflow: hidden;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            font-family: sans-serif;
+        }
+
+        #canvas-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            position: relative;
+        }
+
+        .flip-book {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background: #2d2d2d;
+        }
+
+        .page {
+            background-color: #333;
+            overflow: hidden;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Loading Spinner */
+        #loader {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #6366f1;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .controls {
+            background: #262626;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #404040;
+        }
+
+        .copyright-footer {
+            background: #f9fafb;
+            color: #4b5563;
+            font-size: 10px;
+            text-align: center;
+            padding: 4px 0;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .copyright-footer a {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="p-4 text-center font-bold text-lg border-b border-gray-700 bg-[#262626]">
+        Doa-Doa Pilihan
+    </div>
+
+    <!-- Loading State -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <p class="mt-2 text-sm text-gray-400">Memuat PDF...</p>
+    </div>
+
+    <!-- Main Viewer Area -->
+    <div id="canvas-container">
+        <div id="book-container">
+            <div id="flipbook" class="flip-book">
+                <!-- Halaman akan dimasukkan di sini secara dinamis -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Controls -->
+    <div class="controls">
+        <button id="prevBtn" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-sm transition">
+            Kembali
+        </button>
+        <span id="pageInfo" class="text-xs text-gray-400">Halaman -- / --</span>
+        <button id="nextBtn" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded text-sm transition">
+            Lanjut
+        </button>
+    </div>
+
+    <!-- Copyright Footer -->
+    <div class="copyright-footer">
+        Deploy Code by <a href="https://muhardian.eu.org/deni" target="_blank">Muhardian@2026</a>
+    </div>
+
+    <script>
+        const pdfUrl = 'https://muhardian.eu.org/deni/doa/doa.pdf';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        let pageFlip = null;
+        const flipbookEl = document.getElementById('flipbook');
+        const loader = document.getElementById('loader');
+        const pageInfo = document.getElementById('pageInfo');
+
+        async function initFlipBook() {
+            try {
+                // 1. Ambil PDF
+                const loadingTask = pdfjsLib.getDocument(pdfUrl);
+                const pdf = await loadingTask.promise;
+                const totalPages = pdf.numPages;
+
+                // 2. Render setiap halaman ke canvas
+                for (let i = 1; i <= totalPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const viewport = page.getViewport({ scale: 2 }); // Skala tinggi untuk kualitas bagus
+                    
+                    const pageWrapper = document.createElement('div');
+                    pageWrapper.className = 'page';
+                    
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    await page.render({ canvasContext: context, viewport: viewport }).promise;
+                    
+                    pageWrapper.appendChild(canvas);
+                    flipbookEl.appendChild(pageWrapper);
+                }
+
+                // 3. Inisialisasi Efek Flip (Mode Kalender: Bawah ke Atas)
+                const screenWidth = window.innerWidth;
+                const bookWidth = screenWidth - 40;
+                const bookHeight = (bookWidth * 1.4); // Rasio aspek halaman standar
+
+                pageFlip = new St.PageFlip(flipbookEl, {
+                    width: bookWidth,
+                    height: bookHeight,
+                    size: "stretch",
+                    minWidth: 300,
+                    maxWidth: 600,
+                    minHeight: 400,
+                    maxHeight: 900,
+                    drawShadow: true,
+                    flippingTime: 1000,
+                    usePortrait: true, // Satu halaman saja
+                    startPage: 0,
+                    showCover: false,
+                    mobileScrollSupport: false,
+                });
+
+                pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+
+                // Update UI
+                loader.style.display = 'none';
+                updatePageCounter();
+
+                // Event Listeners
+                pageFlip.on('flip', (e) => {
+                    updatePageCounter();
+                });
+
+                document.getElementById('prevBtn').onclick = () => pageFlip.flipPrev();
+                document.getElementById('nextBtn').onclick = () => pageFlip.flipNext();
+
+            } catch (error) {
+                console.error('Gagal memuat PDF:', error);
+                loader.innerHTML = '<p class="text-red-500 text-center px-4">Gagal memuat PDF. Pastikan URL dapat diakses dan CORS diizinkan.</p>';
+            }
+        }
+
+        function updatePageCounter() {
+            if (pageFlip) {
+                const current = pageFlip.getCurrentPageIndex() + 1;
+                const total = pageFlip.getPageCount();
+                pageInfo.innerText = `Halaman ${current} / ${total}`;
+            }
+        }
+
+        window.onload = initFlipBook;
+
+        // Handle resize agar tetap responsif
+        window.onresize = () => {
+            if (pageFlip) {
+                const screenWidth = window.innerWidth;
+                const newWidth = screenWidth - 40;
+                pageFlip.updateFromHtml(document.querySelectorAll('.page'));
+            }
+        };
+    </script>
+</body>
+</html>
