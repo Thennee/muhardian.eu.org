@@ -20,12 +20,23 @@
             font-family: sans-serif;
         }
 
+        /* Header Area untuk Halaman */
+        #top-info {
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 60;
+            background: #1a1a1a;
+        }
+
         #viewer-container {
             flex-grow: 1;
             position: relative;
-            perspective: 1500px; /* Memberikan efek 3D */
+            perspective: 1500px;
             overflow: hidden;
             display: flex;
+            flex-direction: column; /* Ubah ke kolom agar footer bisa diatur relatif terhadap kontainer ini */
             justify-content: center;
             align-items: center;
             background-color: #121212;
@@ -34,38 +45,44 @@
         .calendar-page {
             position: absolute;
             width: 90%;
-            height: 85%;
+            height: 80%; /* Sedikit dikurangi agar tidak menabrak info atas/bawah */
             background: #2d2d2d;
             box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
             border-radius: 8px;
             transform-origin: top center;
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s;
-            display: flex;
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 10;
             backface-visibility: hidden;
+            top: 5%; /* Jarak dari atas kontainer */
         }
 
-        /* Animasi Flip ke Atas (Kalender) */
+        .calendar-page.active, 
+        .calendar-page.flipped, 
+        .calendar-page.next {
+            display: flex;
+        }
+
         .calendar-page.flipped {
             transform: rotateX(-120deg);
             opacity: 0;
             pointer-events: none;
+            z-index: 5;
         }
 
-        /* Halaman yang sedang aktif */
         .calendar-page.active {
             z-index: 20;
             transform: rotateX(0deg);
             opacity: 1;
         }
 
-        /* Halaman berikutnya (di bawah) */
         .calendar-page.next {
             z-index: 10;
             transform: scale(0.95);
             opacity: 0.5;
+            top: 7%; /* Sedikit lebih rendah untuk efek kedalaman */
         }
 
         canvas {
@@ -96,18 +113,17 @@
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* Desain Tombol Transparan Melayang */
         .nav-overlay {
             position: absolute;
             top: 0;
             height: 100%;
-            width: 60px; /* Area klik di sisi layar */
+            width: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 0, 0, 0); /* Transparan penuh default */
+            background: rgba(0, 0, 0, 0);
             border: none;
-            color: rgba(255, 255, 255, 0.3); /* Ikon samar */
+            color: rgba(255, 255, 255, 0.3);
             font-size: 2rem;
             z-index: 100;
             transition: background 0.3s, color 0.3s;
@@ -116,44 +132,41 @@
         }
 
         .nav-overlay:hover:not(:disabled) {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.1);
             color: rgba(255, 255, 255, 0.8);
-        }
-
-        .nav-overlay:active:not(:disabled) {
-            background: rgba(0, 0, 0, 0.4);
-        }
-
-        .nav-overlay:disabled {
-            opacity: 0;
-            cursor: default;
         }
 
         #prevBtn { left: 0; }
         #nextBtn { right: 0; }
 
-        .page-counter-floating {
-            position: absolute;
-            bottom: 20px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 4px 12px;
+        .page-counter-pill {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 4px 16px;
             border-radius: 20px;
-            font-size: 0.75rem;
-            color: white;
-            z-index: 50;
-            pointer-events: none;
+            font-size: 0.85rem;
+            color: #a5b4fc;
+            font-weight: 600;
         }
 
+        /* Footer menempel ke bawah kontainer halaman */
         .copyright-footer {
-            background: #f9fafb;
-            color: #4b5563;
+            background: transparent;
+            color: #9ca3af;
             font-size: 10px;
             text-align: center;
-            height: 25px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 60;
+            width: 100%;
+        }
+
+        .copyright-footer a {
+            color: #6366f1;
+            font-weight: bold;
+            margin-left: 4px;
         }
     </style>
 </head>
@@ -164,18 +177,21 @@
         <p class="text-xs text-gray-400">Memuat Kalender Doa...</p>
     </div>
 
+    <!-- Header info di atas -->
+    <div id="top-info">
+        <div id="pageInfo" class="page-counter-pill">Halaman -- / --</div>
+    </div>
+
     <div id="viewer-container">
-        <!-- Tombol Transparan di dalam kontainer viewer -->
         <button id="prevBtn" class="nav-overlay" disabled>&#10094;</button>
         <button id="nextBtn" class="nav-overlay">&#10095;</button>
         
-        <div id="pageInfo" class="page-counter-floating">Halaman -- / --</div>
-        
-        <!-- Halaman akan dimasukkan di sini -->
+        <!-- Halaman dimasukkan di sini oleh JS -->
     </div>
 
+    <!-- Footer di bawah, menempel ke area utama -->
     <div class="copyright-footer">
-        Deploy Code by <a href="https://muhardian.eu.org/deni" target="_blank" class="ml-1 font-bold text-indigo-600">Muhardian@2026</a>
+        Deploy Code by <a href="https://muhardian.eu.org/deni" target="_blank">Muhardian@2026</a>
     </div>
 
     <script>
@@ -221,16 +237,12 @@
                 pdfDoc = await loadingTask.promise;
                 totalPages = pdfDoc.numPages;
 
-                // Load 3 halaman pertama untuk awal yang cepat
-                for (let i = 1; i <= Math.min(totalPages, 3); i++) {
-                    const el = await createPageElement(i);
-                    viewer.appendChild(el);
-                }
-
+                const el1 = await createPageElement(1);
+                viewer.appendChild(el1);
+                
                 updateUI();
                 document.getElementById('loader').style.display = 'none';
 
-                // Load sisanya di background
                 loadRemaining();
 
             } catch (e) {
@@ -240,9 +252,10 @@
         }
 
         async function loadRemaining() {
-            for (let i = 4; i <= totalPages; i++) {
+            for (let i = 2; i <= totalPages; i++) {
                 const el = await createPageElement(i);
                 viewer.appendChild(el);
+                if (i === currentPage + 1) updateUI();
             }
         }
 
@@ -267,7 +280,7 @@
         }
 
         document.getElementById('nextBtn').onclick = (e) => {
-            e.stopPropagation(); // Cegah konflik dengan listener lain jika ada
+            e.stopPropagation();
             if (currentPage < totalPages) {
                 currentPage++;
                 playFeedback();
@@ -284,11 +297,10 @@
             }
         };
 
-        // Memungkinkan klik pada area layar samping kiri/kanan di luar tombol secara eksplisit
         viewer.onclick = (e) => {
+            if (e.target.closest('.nav-overlay')) return;
             const clickX = e.clientX;
             const screenWidth = window.innerWidth;
-            
             if (clickX < screenWidth / 2) {
                 document.getElementById('prevBtn').click();
             } else {
@@ -296,7 +308,6 @@
             }
         };
 
-        // Swipe support sederhana (Vertikal untuk efek kalender)
         let touchStartY = 0;
         viewer.addEventListener('touchstart', e => touchStartY = e.touches[0].clientY);
         viewer.addEventListener('touchend', e => {
