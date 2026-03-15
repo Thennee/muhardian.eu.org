@@ -26,6 +26,7 @@
             height: 100vh;
             width: 100vw;
             font-family: 'Inter', sans-serif;
+            touch-action: none; /* Mencegah pull-to-refresh dan scroll default browser */
         }
 
         #main-wrapper {
@@ -38,7 +39,6 @@
             position: relative;
         }
 
-        /* Container untuk Header dan Footer yang menempel ke buku */
         .book-label {
             width: 85%;
             max-width: var(--book-width);
@@ -206,19 +206,16 @@
     </div>
 
     <div id="main-wrapper">
-        <!-- Header Label -->
         <div id="page-header" class="book-label">
             <div id="pageInfo">Memuat Halaman...</div>
         </div>
 
-        <!-- Book Container -->
         <div id="book-container">
             <div id="prevArea" class="nav-overlay">❮</div>
             <div id="nextArea" class="nav-overlay">❯</div>
             <div class="book-base"></div>
         </div>
 
-        <!-- Footer Label (Sekarang menempel ke buku) -->
         <div id="page-footer" class="book-label">
             Deploy Code by <a href="https://muhardian.eu.org/deni" target="_blank" class="copyright-link">Muhardian @ 2026</a>
         </div>
@@ -228,7 +225,8 @@
         const CONFIG = {
             pdfUrl: 'https://muhardian.eu.org/deni/doa/doa.pdf',
             flipSoundUrl: 'https://muhardian.eu.org/deni/doa/kertas.mp3',
-            renderScale: 2
+            renderScale: 2,
+            swipeThreshold: 50 // Jarak minimal usapan (pixel) untuk memicu pindah halaman
         };
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -238,7 +236,9 @@
             currentSheetIndex: 0,
             totalPages: 0,
             isMoving: false,
-            sheets: []
+            sheets: [],
+            touchStartX: 0,
+            touchStartY: 0
         };
 
         const container = document.getElementById('book-container');
@@ -257,6 +257,7 @@
                 }
 
                 updateBook();
+                setupTouchEvents();
                 document.getElementById('loader').style.display = 'none';
             } catch (err) {
                 console.error(err);
@@ -339,6 +340,38 @@
         function playSound() {
             sound.currentTime = 0;
             sound.play().catch(() => {});
+        }
+
+        // Logic Swipe / Sapu Layar
+        function setupTouchEvents() {
+            window.addEventListener('touchstart', (e) => {
+                state.touchStartX = e.changedTouches[0].screenX;
+                state.touchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+
+            window.addEventListener('touchend', (e) => {
+                const touchEndX = e.changedTouches[0].screenX;
+                const touchEndY = e.changedTouches[0].screenY;
+                handleGesture(state.touchStartX, touchEndX, state.touchStartY, touchEndY);
+            }, { passive: true });
+        }
+
+        function handleGesture(startX, endX, startY, endY) {
+            const diffX = endX - startX;
+            const diffY = endY - startY;
+
+            // Pastikan gerakan lebih dominan horizontal daripada vertikal
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (Math.abs(diffX) > CONFIG.swipeThreshold) {
+                    if (diffX < 0) {
+                        // Sapu ke kiri -> Halaman Berikutnya
+                        flip('next');
+                    } else {
+                        // Sapu ke kanan -> Halaman Sebelumnya
+                        flip('prev');
+                    }
+                }
+            }
         }
 
         document.getElementById('nextArea').onclick = (e) => {
