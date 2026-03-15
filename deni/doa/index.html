@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Doa Doa Piliha - Muhardian Project</title>
+    <title>Doa Doa Pilihan - Muhardian Project</title>
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- PDF.js for rendering PDF -->
@@ -47,6 +47,7 @@
         .flip-book {
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
             background: #1a1a1a;
+            visibility: hidden; /* Sembunyikan sampai halaman 1 siap */
         }
 
         .page {
@@ -127,20 +128,17 @@
 </head>
 <body>
 
-    <!-- Header -->
-   
-
     <!-- Loading State -->
     <div id="loader">
         <div class="spinner"></div>
-        <p class="text-xs text-gray-400">Menyiapkan Halaman...</p>
+        <p id="loader-text" class="text-xs text-gray-400">Menyiapkan Halaman 1...</p>
     </div>
 
     <!-- Main Viewer Area -->
     <div id="canvas-container">
         <div id="book-container">
             <div id="flipbook" class="flip-book">
-                <!-- Pages injected here -->
+                <!-- Pages will be injected dynamically -->
             </div>
         </div>
     </div>
@@ -163,12 +161,42 @@
 
     <script>
         const pdfUrl = 'https://muhardian.eu.org/deni/doa/doa.pdf';
+        const flipSoundUrl = 'https://muhardian.eu.org/deni/doa/kertas.mp3';
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
         let pageFlip = null;
         const flipbookEl = document.getElementById('flipbook');
         const loader = document.getElementById('loader');
+        const loaderText = document.getElementById('loader-text');
         const pageInfo = document.getElementById('pageInfo');
+        const flipSound = new Audio(flipSoundUrl);
+
+        function playFeedback() {
+            flipSound.currentTime = 0;
+            flipSound.play().catch(() => {});
+            if (navigator.vibrate) navigator.vibrate(50);
+        }
+
+        async function renderPage(pdf, pageNum, vw) {
+            const page = await pdf.getPage(pageNum);
+            const unscaledViewport = page.getViewport({ scale: 1 });
+            // Gunakan vw dengan fallback jika window.innerWidth bermasalah
+            const currentVW = vw || window.innerWidth || 300;
+            const scale = (currentVW / unscaledViewport.width) * 2; 
+            const viewport = page.getViewport({ scale: scale });
+            
+            const pageWrapper = document.createElement('div');
+            pageWrapper.className = 'page';
+            
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            await page.render({ canvasContext: context, viewport: viewport }).promise;
+            pageWrapper.appendChild(canvas);
+            return pageWrapper;
+        }
 
         async function initFlipBook() {
             try {
@@ -176,46 +204,33 @@
                 const pdf = await loadingTask.promise;
                 const totalPages = pdf.numPages;
 
-                const vw = window.innerWidth;
-                // Hitung tinggi yang tersedia (viewport minus header, controls, copyright)
-                const vh = window.innerHeight - (48 + 57 + 23); 
+                // Memastikan nilai dimensi valid dan tidak nol
+                const vw = Math.max(window.innerWidth, 200);
+                const vh = Math.max(window.innerHeight - (48 + 57 + 23), 300); 
 
-                for (let i = 1; i <= totalPages; i++) {
-                    const page = await pdf.getPage(i);
-                    
-                    // Render dengan kualitas tinggi
-                    const unscaledViewport = page.getViewport({ scale: 1 });
-                    const scale = (vw / unscaledViewport.width) * 2; 
-                    const viewport = page.getViewport({ scale: scale });
-                    
-                    const pageWrapper = document.createElement('div');
-                    pageWrapper.className = 'page';
-                    
-                    const canvas = document.createElement('canvas');
-                    const context = canvas.getContext('2d');
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
+                // 1. Render hanya halaman pertama dahulu
+                const firstPage = await renderPage(pdf, 1, vw);
+                flipbookEl.appendChild(firstPage);
 
-                    await page.render({ canvasContext: context, viewport: viewport }).promise;
-                    
-                    pageWrapper.appendChild(canvas);
-                    flipbookEl.appendChild(pageWrapper);
+                // 2. Inisialisasi PageFlip
+                // Menambahkan pengecekan dimensi sebelum inisialisasi
+                if (vw <= 0 || vh <= 0) {
+                    throw new Error("Invalid viewport dimensions detected.");
                 }
 
-                // Pengaturan untuk memastikan HANYA 1 HALAMAN (Portrait)
                 pageFlip = new St.PageFlip(flipbookEl, {
                     width: vw,
                     height: vh,
                     size: "stretch",
-                    minWidth: 200,
-                    maxWidth: 2000,
-                    minHeight: 200,
-                    maxHeight: 2000,
+                    minWidth: 100,
+                    maxWidth: 3000,
+                    minHeight: 100,
+                    maxHeight: 3000,
                     drawShadow: true,
                     flippingTime: 800,
-                    usePortrait: true,        // Kunci ke mode portrait (1 halaman)
+                    usePortrait: true,
                     startPage: 0,
-                    showCover: false,         // Jangan anggap halaman pertama sebagai cover 2-halaman
+                    showCover: false,
                     mobileScrollSupport: false,
                     clickEventForward: false,
                     useMouseEvents: true,
@@ -223,27 +238,46 @@
                 });
 
                 pageFlip.loadFromHTML(document.querySelectorAll('.page'));
-
+                
+                // Tampilkan buku dan sembunyikan loader setelah halaman 1 siap
+                flipbookEl.style.visibility = 'visible';
                 loader.style.display = 'none';
-                updatePageCounter();
+                updatePageCounter(1, totalPages);
+
+                // 3. Render sisa halaman di latar belakang
+                renderRemainingPages(pdf, totalPages, vw);
 
                 pageFlip.on('flip', (e) => {
-                    updatePageCounter();
+                    updatePageCounter(e.data + 1, totalPages);
+                    playFeedback();
                 });
 
                 document.getElementById('prevBtn').onclick = () => pageFlip.flipPrev();
                 document.getElementById('nextBtn').onclick = () => pageFlip.flipNext();
 
             } catch (error) {
-                console.error('PDF Error:', error);
-                loader.innerHTML = '<p class="text-red-500 p-4">Gagal memuat PDF. Pastikan URL benar atau CORS diizinkan.</p>';
+                console.error('PDF/FlipBook Error:', error);
+                loader.innerHTML = `<p class="text-red-500 p-4">Terjadi kesalahan: ${error.message || 'Gagal memuat PDF'}</p>`;
             }
         }
 
-        function updatePageCounter() {
+        async function renderRemainingPages(pdf, totalPages, vw) {
+            for (let i = 2; i <= totalPages; i++) {
+                try {
+                    const nextPage = await renderPage(pdf, i, vw);
+                    flipbookEl.appendChild(nextPage);
+                } catch (e) {
+                    console.warn(`Gagal merender halaman ${i}`, e);
+                }
+            }
+            // Update data PageFlip setelah semua halaman masuk ke DOM
             if (pageFlip) {
-                const current = pageFlip.getCurrentPageIndex() + 1;
-                const total = pageFlip.getPageCount();
+                pageFlip.updateFromHtml(document.querySelectorAll('.page'));
+            }
+        }
+
+        function updatePageCounter(current, total) {
+            if (pageInfo) {
                 pageInfo.innerText = `Halaman ${current} / ${total}`;
             }
         }
@@ -254,8 +288,9 @@
         window.onresize = () => {
             clearTimeout(timer);
             timer = setTimeout(() => {
+                // Hanya reload jika ukuran berubah signifikan untuk menghindari error loop
                 location.reload(); 
-            }, 300);
+            }, 500);
         };
     </script>
 </body>
