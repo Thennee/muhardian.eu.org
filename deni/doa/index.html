@@ -8,8 +8,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     
     <style>
+        :root {
+            --primary-bg: #121212;
+            --accent: #6366f1;
+            --book-width: 450px;
+            --book-height: 70vh;
+            --transition-speed: 1.8s;
+        }
+
         body {
-            background-color: #1a1a1a;
+            background-color: var(--primary-bg);
             color: #e5e7eb;
             overflow: hidden;
             margin: 0;
@@ -17,163 +25,160 @@
             flex-direction: column;
             height: 100vh;
             width: 100vw;
-            font-family: sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
-        /* Header Area untuk Halaman */
         #top-info {
-            height: 50px;
+            height: 60px;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 60;
-            background: #1a1a1a;
+            z-index: 100;
+            background: rgba(18, 18, 18, 0.9);
+            backdrop-filter: blur(10px);
         }
 
-        #viewer-container {
+        #book-container {
             flex-grow: 1;
             position: relative;
-            perspective: 1500px;
-            overflow: hidden;
+            perspective: 4000px;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            background-color: #121212;
+            background: radial-gradient(circle, #252525 0%, #0a0a0a 100%);
         }
 
-        .calendar-page {
+        /* Struktur Lembaran Buku */
+        .sheet {
             position: absolute;
-            width: 90%;
-            height: 82%; /* Menyesuaikan agar ada ruang untuk footer di bawahnya */
+            width: 85%;
+            max-width: var(--book-width);
+            height: var(--book-height);
+            transform-style: preserve-3d;
+            transition: transform var(--transition-speed) cubic-bezier(0.645, 0.045, 0.355, 1);
+            transform-origin: left center;
+            z-index: 10;
+        }
+
+        /* Bagian depan dan belakang lembaran */
+        .page-front, .page-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
             background: #2d2d2d;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
-            border-radius: 8px;
-            transform-origin: top center;
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s;
-            display: none;
+            border-radius: 4px 12px 12px 4px;
+            box-shadow: inset 5px 0 15px rgba(0,0,0,0.5), 5px 5px 25px rgba(0,0,0,0.5);
+            display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 10;
-            backface-visibility: hidden;
-            top: 15px; /* Jarak dari atas */
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .calendar-page.active, 
-        .calendar-page.flipped, 
-        .calendar-page.next {
-            display: flex;
+        /* Halaman belakang diputar 180 derajat */
+        .page-back {
+            transform: rotateY(180deg);
+            background: #252525;
+            border-radius: 12px 4px 4px 12px;
         }
 
-        .calendar-page.flipped {
-            transform: rotateX(-120deg);
-            opacity: 0;
-            pointer-events: none;
+        /* Efek lengkungan jilidan di tengah */
+        .sheet::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0.5), transparent);
             z-index: 5;
+            pointer-events: none;
         }
 
-        .calendar-page.active {
-            z-index: 20;
-            transform: rotateX(0deg);
-            opacity: 1;
+        /* State Halaman */
+        .sheet.flipped {
+            transform: rotateY(-180deg);
         }
 
-        .calendar-page.next {
-            z-index: 10;
-            transform: scale(0.95);
-            opacity: 0.5;
-            top: 25px;
+        /* Tumpukan Statis di Bawah */
+        .book-base {
+            position: absolute;
+            width: 85%;
+            max-width: var(--book-width);
+            height: var(--book-height);
+            background: #1a1a1a;
+            border-radius: 4px 12px 12px 4px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            z-index: 1;
+            transform: translateZ(-20px);
         }
 
         canvas {
-            max-width: 100%;
-            max-height: 100%;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
-            border-radius: 4px;
         }
-
-        #loader {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 100;
-            text-align: center;
-        }
-
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border-left-color: #6366f1;
-            animation: spin 1s linear infinite;
-            margin-bottom: 10px;
-        }
-
-        @keyframes spin { 100% { transform: rotate(360deg); } }
 
         .nav-overlay {
             position: absolute;
             top: 0;
             height: 100%;
-            width: 60px;
+            width: 15%;
+            z-index: 200;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 0, 0, 0);
-            border: none;
-            color: rgba(255, 255, 255, 0.3);
+            color: rgba(255,255,255,0.1);
             font-size: 2rem;
-            z-index: 100;
-            transition: background 0.3s, color 0.3s;
-            cursor: pointer;
-            outline: none;
+            transition: color 0.3s;
         }
-
-        .nav-overlay:hover:not(:disabled) {
-            background: rgba(0, 0, 0, 0.1);
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        #prevBtn { left: 0; }
-        #nextBtn { right: 0; }
+        .nav-overlay:hover { color: white; }
+        #prevArea { left: 0; }
+        #nextArea { right: 0; }
 
         .page-counter-pill {
-            background: rgba(99, 102, 241, 0.2);
-            border: 1px solid rgba(99, 102, 241, 0.4);
-            padding: 4px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 8px 24px;
+            border-radius: 99px;
             color: #a5b4fc;
             font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        /* Footer Melayang dinaikkan posisinya */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #121212;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border-left-color: var(--accent);
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
         .copyright-footer {
             position: absolute;
-            bottom: 45px; /* Menaikkan posisi footer */
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(6px);
-            color: #d1d5db;
+            bottom: 20px;
+            background: rgba(0,0,0,0.6);
+            padding: 5px 15px;
+            border-radius: 20px;
             font-size: 10px;
-            padding: 5px 14px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 70;
-            pointer-events: auto;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        .copyright-footer a {
-            color: #818cf8;
-            font-weight: bold;
-            margin-left: 4px;
+            color: #666;
+            z-index: 300;
         }
     </style>
 </head>
@@ -181,146 +186,148 @@
 
     <div id="loader">
         <div class="spinner"></div>
-        <p class="text-xs text-gray-400">Memuat Kalender Doa...</p>
+        <p class="text-xs uppercase tracking-widest text-gray-500">Membuka Lembaran Doa...</p>
     </div>
 
-    <!-- Header info di atas -->
     <div id="top-info">
-        <div id="pageInfo" class="page-counter-pill">Halaman -- / --</div>
+        <div id="pageInfo" class="page-counter-pill">Halaman 1</div>
     </div>
 
-    <div id="viewer-container">
-        <button id="prevBtn" class="nav-overlay" disabled>&#10094;</button>
-        <button id="nextBtn" class="nav-overlay">&#10095;</button>
+    <div id="book-container">
+        <div id="prevArea" class="nav-overlay">❮</div>
+        <div id="nextArea" class="nav-overlay">❯</div>
         
-        <!-- Halaman dimasukkan di sini oleh JS -->
+        <div class="book-base"></div>
+        <!-- Lembaran (Sheets) akan dimasukkan di sini oleh JS -->
 
-        <!-- Footer melayang dinaikkan lokasinya -->
         <div class="copyright-footer">
-            Deploy Code by <a href="https://muhardian.eu.org/deni" target="_blank">Muhardian@2026</a>
+            Deploy Code by <a href="https://muhardian.eu.org/deni" class="text-indigo-400">Muhardian @ 2026</a>
         </div>
     </div>
 
     <script>
-        const pdfUrl = 'https://muhardian.eu.org/deni/doa/doa.pdf';
-        const flipSoundUrl = 'https://muhardian.eu.org/deni/doa/kertas.mp3';
+        const CONFIG = {
+            pdfUrl: 'https://muhardian.eu.org/deni/doa/doa.pdf',
+            flipSoundUrl: 'https://muhardian.eu.org/deni/doa/kertas.mp3',
+            renderScale: 2
+        };
+
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        let pdfDoc = null;
-        let currentPage = 1;
-        let totalPages = 0;
-        const viewer = document.getElementById('viewer-container');
-        const flipSound = new Audio(flipSoundUrl);
+        let state = {
+            pdfDoc: null,
+            currentPage: 1, // Halaman fisik saat ini
+            totalPages: 0,
+            isMoving: false,
+            sheets: [] // Array elemen sheet
+        };
 
-        function playFeedback() {
-            flipSound.currentTime = 0;
-            flipSound.play().catch(() => {});
-            if (navigator.vibrate) navigator.vibrate(50);
-        }
-
-        async function renderPageToCanvas(pageNum) {
-            const page = await pdfDoc.getPage(pageNum);
-            const viewport = page.getViewport({ scale: 2 });
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-            await page.render({ canvasContext: context, viewport: viewport }).promise;
-            return canvas;
-        }
-
-        async function createPageElement(pageNum) {
-            const div = document.createElement('div');
-            div.className = 'calendar-page';
-            div.id = `page-${pageNum}`;
-            const canvas = await renderPageToCanvas(pageNum);
-            div.appendChild(canvas);
-            return div;
-        }
+        const container = document.getElementById('book-container');
+        const sound = new Audio(CONFIG.flipSoundUrl);
 
         async function init() {
             try {
-                const loadingTask = pdfjsLib.getDocument(pdfUrl);
-                pdfDoc = await loadingTask.promise;
-                totalPages = pdfDoc.numPages;
+                const loadingTask = pdfjsLib.getDocument(CONFIG.pdfUrl);
+                state.pdfDoc = await loadingTask.promise;
+                state.totalPages = state.pdfDoc.numPages;
 
-                const el1 = await createPageElement(1);
-                viewer.appendChild(el1);
+                // Buat lembaran (1 sheet = 2 halaman PDF)
+                // Lembaran 1: Depan (Hal 1), Belakang (Hal 2)
+                for (let i = 1; i <= state.totalPages; i += 2) {
+                    const sheet = await createSheet(i);
+                    container.appendChild(sheet);
+                    state.sheets.push(sheet);
+                }
+
+                updateBook();
                 
-                updateUI();
                 document.getElementById('loader').style.display = 'none';
-
-                loadRemaining();
-
-            } catch (e) {
-                console.error(e);
-                document.getElementById('loader').innerHTML = "Gagal memuat PDF.";
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loader').innerHTML = "Gagal memuat dokumen.";
             }
         }
 
-        async function loadRemaining() {
-            for (let i = 2; i <= totalPages; i++) {
-                const el = await createPageElement(i);
-                viewer.appendChild(el);
-                if (i === currentPage + 1) updateUI();
-            }
+        async function renderPage(pageNum) {
+            if (pageNum > state.totalPages) return null;
+            const page = await state.pdfDoc.getPage(pageNum);
+            const viewport = page.getViewport({ scale: CONFIG.renderScale });
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            await page.render({ canvasContext: ctx, viewport }).promise;
+            return canvas;
         }
 
-        function updateUI() {
-            const pages = document.querySelectorAll('.calendar-page');
-            pages.forEach((page, index) => {
-                const pNum = index + 1;
-                page.classList.remove('active', 'flipped', 'next');
+        async function createSheet(pageNum) {
+            const sheet = document.createElement('div');
+            sheet.className = 'sheet';
+            sheet.dataset.index = Math.floor((pageNum - 1) / 2);
 
-                if (pNum < currentPage) {
-                    page.classList.add('flipped');
-                } else if (pNum === currentPage) {
-                    page.classList.add('active');
-                } else if (pNum === currentPage + 1) {
-                    page.classList.add('next');
+            const front = document.createElement('div');
+            front.className = 'page-front';
+            const canvasFront = await renderPage(pageNum);
+            if (canvasFront) front.appendChild(canvasFront);
+
+            const back = document.createElement('div');
+            back.className = 'page-back';
+            const canvasBack = await renderPage(pageNum + 1);
+            if (canvasBack) back.appendChild(canvasBack);
+
+            sheet.appendChild(front);
+            sheet.appendChild(back);
+            
+            // Atur z-index awal agar tumpukan benar (halaman awal paling atas)
+            sheet.style.zIndex = 100 - sheet.dataset.index;
+            
+            return sheet;
+        }
+
+        function updateBook() {
+            state.sheets.forEach((sheet, index) => {
+                if (index < state.currentSheetIndex) {
+                    sheet.classList.add('flipped');
+                    sheet.style.zIndex = 10 + index; // Halaman lama di bawah kiri
+                } else {
+                    sheet.classList.remove('flipped');
+                    sheet.style.zIndex = 100 - index; // Halaman baru di atas kanan
                 }
             });
 
-            document.getElementById('pageInfo').innerText = `Halaman ${currentPage} / ${totalPages}`;
-            document.getElementById('prevBtn').disabled = currentPage === 1;
-            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+            const displayPage = (state.currentSheetIndex * 2) + 1;
+            document.getElementById('pageInfo').innerText = `Halaman ${displayPage} - ${Math.min(displayPage + 1, state.totalPages)}`;
         }
 
-        document.getElementById('nextBtn').onclick = (e) => {
-            e.stopPropagation();
-            if (currentPage < totalPages) {
-                currentPage++;
-                playFeedback();
-                updateUI();
-            }
-        };
+        state.currentSheetIndex = 0;
 
-        document.getElementById('prevBtn').onclick = (e) => {
-            e.stopPropagation();
-            if (currentPage > 1) {
-                currentPage--;
-                playFeedback();
-                updateUI();
-            }
-        };
+        function flip(direction) {
+            if (state.isMoving) return;
 
-        viewer.onclick = (e) => {
-            if (e.target.closest('.nav-overlay') || e.target.closest('.copyright-footer')) return;
-            const clickX = e.clientX;
-            const screenWidth = window.innerWidth;
-            if (clickX < screenWidth / 2) {
-                document.getElementById('prevBtn').click();
-            } else {
-                document.getElementById('nextBtn').click();
+            if (direction === 'next' && state.currentSheetIndex < state.sheets.length) {
+                state.isMoving = true;
+                sound.currentTime = 0;
+                sound.play().catch(() => {});
+                state.currentSheetIndex++;
+                updateBook();
+                setTimeout(() => state.isMoving = false, 1800);
+            } else if (direction === 'prev' && state.currentSheetIndex > 0) {
+                state.isMoving = true;
+                sound.currentTime = 0;
+                sound.play().catch(() => {});
+                state.currentSheetIndex--;
+                updateBook();
+                setTimeout(() => state.isMoving = false, 1800);
             }
-        };
+        }
 
-        let touchStartY = 0;
-        viewer.addEventListener('touchstart', e => touchStartY = e.touches[0].clientY);
-        viewer.addEventListener('touchend', e => {
-            const touchEndY = e.changedTouches[0].clientY;
-            if (touchStartY - touchEndY > 50) document.getElementById('nextBtn').click();
-            if (touchEndY - touchStartY > 50) document.getElementById('prevBtn').click();
+        document.getElementById('nextArea').onclick = () => flip('next');
+        document.getElementById('prevArea').onclick = () => flip('prev');
+
+        // Swipe & Keys
+        window.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight') flip('next');
+            if (e.key === 'ArrowLeft') flip('prev');
         });
 
         window.onload = init;
