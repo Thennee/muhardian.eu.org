@@ -3,13 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Doa Doa Pilihan - Muhardian Project</title>
-    <!-- Tailwind CSS for styling -->
+    <title>Doa Pilihan - Muhardian Project</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PDF.js for rendering PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <!-- PageFlip library for book effect -->
-    <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
     
     <style>
         body {
@@ -24,49 +20,61 @@
             font-family: sans-serif;
         }
 
-        #canvas-container {
+        #viewer-container {
             flex-grow: 1;
+            position: relative;
+            perspective: 1500px; /* Memberikan efek 3D */
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
             background-color: #121212;
         }
 
-        #book-container {
-            width: 100%;
-            height: 100%;
+        .calendar-page {
+            position: absolute;
+            width: 90%;
+            height: 85%;
+            background: #2d2d2d;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+            border-radius: 8px;
+            transform-origin: top center;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s;
             display: flex;
             justify-content: center;
             align-items: center;
+            z-index: 10;
+            backface-visibility: hidden;
         }
 
-        .flip-book {
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
-            background: #1a1a1a;
-            visibility: hidden; /* Sembunyikan sampai halaman 1 siap */
+        /* Animasi Flip ke Atas (Kalender) */
+        .calendar-page.flipped {
+            transform: rotateX(-120deg);
+            opacity: 0;
+            pointer-events: none;
         }
 
-        .page {
-            background-color: #2d2d2d;
-            overflow: hidden;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        /* Halaman yang sedang aktif */
+        .calendar-page.active {
+            z-index: 20;
+            transform: rotateX(0deg);
+            opacity: 1;
+        }
+
+        /* Halaman berikutnya (di bawah) */
+        .calendar-page.next {
+            z-index: 10;
+            transform: scale(0.95);
+            opacity: 0.5;
         }
 
         canvas {
-            width: 100% !important;
-            height: 100% !important;
+            max-width: 100%;
+            max-height: 100%;
             object-fit: contain;
+            border-radius: 4px;
         }
 
-        /* Loading Spinner */
         #loader {
             position: fixed;
             top: 50%;
@@ -86,14 +94,12 @@
             margin-bottom: 10px;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
         .controls {
             background: #262626;
-            padding: 12px 20px;
+            height: 70px;
+            padding: 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -101,62 +107,53 @@
             z-index: 60;
         }
 
+        .btn-nav {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            background: #4f46e5;
+            color: white;
+            transition: 0.2s;
+        }
+
+        .btn-nav:disabled {
+            background: #4b5563;
+            opacity: 0.5;
+        }
+
         .copyright-footer {
             background: #f9fafb;
             color: #4b5563;
             font-size: 10px;
             text-align: center;
-            padding: 6px 0;
-            border-top: 1px solid #e5e7eb;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             z-index: 60;
-        }
-
-        .copyright-footer a {
-            color: #4f46e5;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .btn-nav {
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s;
         }
     </style>
 </head>
 <body>
 
-    <!-- Loading State -->
     <div id="loader">
         <div class="spinner"></div>
-        <p id="loader-text" class="text-xs text-gray-400">Menyiapkan Halaman 1...</p>
+        <p class="text-xs text-gray-400">Memuat Kalender Doa...</p>
     </div>
 
-    <!-- Main Viewer Area -->
-    <div id="canvas-container">
-        <div id="book-container">
-            <div id="flipbook" class="flip-book">
-                <!-- Pages will be injected dynamically -->
-            </div>
-        </div>
+    <div id="viewer-container">
+        <!-- Pages injected here -->
     </div>
 
-    <!-- Navigasi -->
     <div class="controls">
-        <button id="prevBtn" class="btn-nav bg-gray-700 hover:bg-gray-600 text-white">
-            Kembali
-        </button>
+        <button id="prevBtn" class="btn-nav" disabled>Sebelumnya</button>
         <span id="pageInfo" class="text-xs font-mono text-gray-400">Halaman -- / --</span>
-        <button id="nextBtn" class="btn-nav bg-indigo-600 hover:bg-indigo-500 text-white">
-            Lanjut
-        </button>
+        <button id="nextBtn" class="btn-nav">Berikutnya</button>
     </div>
 
-    <!-- Footer Copyright -->
     <div class="copyright-footer">
-        Deploy Code by <a href="https://muhardian.eu.org/deni" target="_blank">Muhardian@2026</a>
+        Deploy Code by <a href="https://muhardian.eu.org/deni" target="_blank" class="ml-1 font-bold text-indigo-600">Muhardian@2026</a>
     </div>
 
     <script>
@@ -164,11 +161,10 @@
         const flipSoundUrl = 'https://muhardian.eu.org/deni/doa/kertas.mp3';
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        let pageFlip = null;
-        const flipbookEl = document.getElementById('flipbook');
-        const loader = document.getElementById('loader');
-        const loaderText = document.getElementById('loader-text');
-        const pageInfo = document.getElementById('pageInfo');
+        let pdfDoc = null;
+        let currentPage = 1;
+        let totalPages = 0;
+        const viewer = document.getElementById('viewer-container');
         const flipSound = new Audio(flipSoundUrl);
 
         function playFeedback() {
@@ -177,121 +173,103 @@
             if (navigator.vibrate) navigator.vibrate(50);
         }
 
-        async function renderPage(pdf, pageNum, vw) {
-            const page = await pdf.getPage(pageNum);
-            const unscaledViewport = page.getViewport({ scale: 1 });
-            // Gunakan vw dengan fallback jika window.innerWidth bermasalah
-            const currentVW = vw || window.innerWidth || 300;
-            const scale = (currentVW / unscaledViewport.width) * 2; 
-            const viewport = page.getViewport({ scale: scale });
-            
-            const pageWrapper = document.createElement('div');
-            pageWrapper.className = 'page';
-            
+        async function renderPageToCanvas(pageNum) {
+            const page = await pdfDoc.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 2 });
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
             canvas.height = viewport.height;
             canvas.width = viewport.width;
-
             await page.render({ canvasContext: context, viewport: viewport }).promise;
-            pageWrapper.appendChild(canvas);
-            return pageWrapper;
+            return canvas;
         }
 
-        async function initFlipBook() {
+        async function createPageElement(pageNum) {
+            const div = document.createElement('div');
+            div.className = 'calendar-page';
+            div.id = `page-${pageNum}`;
+            const canvas = await renderPageToCanvas(pageNum);
+            div.appendChild(canvas);
+            return div;
+        }
+
+        async function init() {
             try {
                 const loadingTask = pdfjsLib.getDocument(pdfUrl);
-                const pdf = await loadingTask.promise;
-                const totalPages = pdf.numPages;
+                pdfDoc = await loadingTask.promise;
+                totalPages = pdfDoc.numPages;
 
-                // Memastikan nilai dimensi valid dan tidak nol
-                const vw = Math.max(window.innerWidth, 200);
-                const vh = Math.max(window.innerHeight - (48 + 57 + 23), 300); 
-
-                // 1. Render hanya halaman pertama dahulu
-                const firstPage = await renderPage(pdf, 1, vw);
-                flipbookEl.appendChild(firstPage);
-
-                // 2. Inisialisasi PageFlip
-                // Menambahkan pengecekan dimensi sebelum inisialisasi
-                if (vw <= 0 || vh <= 0) {
-                    throw new Error("Invalid viewport dimensions detected.");
+                // Load 3 halaman pertama untuk awal yang cepat
+                for (let i = 1; i <= Math.min(totalPages, 3); i++) {
+                    const el = await createPageElement(i);
+                    viewer.appendChild(el);
                 }
 
-                pageFlip = new St.PageFlip(flipbookEl, {
-                    width: vw,
-                    height: vh,
-                    size: "stretch",
-                    minWidth: 100,
-                    maxWidth: 3000,
-                    minHeight: 100,
-                    maxHeight: 3000,
-                    drawShadow: true,
-                    flippingTime: 800,
-                    usePortrait: true,
-                    startPage: 0,
-                    showCover: false,
-                    mobileScrollSupport: false,
-                    clickEventForward: false,
-                    useMouseEvents: true,
-                    showPageCorners: true
-                });
+                updateUI();
+                document.getElementById('loader').style.display = 'none';
 
-                pageFlip.loadFromHTML(document.querySelectorAll('.page'));
-                
-                // Tampilkan buku dan sembunyikan loader setelah halaman 1 siap
-                flipbookEl.style.visibility = 'visible';
-                loader.style.display = 'none';
-                updatePageCounter(1, totalPages);
+                // Load sisanya di background
+                loadRemaining();
 
-                // 3. Render sisa halaman di latar belakang
-                renderRemainingPages(pdf, totalPages, vw);
-
-                pageFlip.on('flip', (e) => {
-                    updatePageCounter(e.data + 1, totalPages);
-                    playFeedback();
-                });
-
-                document.getElementById('prevBtn').onclick = () => pageFlip.flipPrev();
-                document.getElementById('nextBtn').onclick = () => pageFlip.flipNext();
-
-            } catch (error) {
-                console.error('PDF/FlipBook Error:', error);
-                loader.innerHTML = `<p class="text-red-500 p-4">Terjadi kesalahan: ${error.message || 'Gagal memuat PDF'}</p>`;
+            } catch (e) {
+                console.error(e);
+                document.getElementById('loader').innerHTML = "Gagal memuat PDF.";
             }
         }
 
-        async function renderRemainingPages(pdf, totalPages, vw) {
-            for (let i = 2; i <= totalPages; i++) {
-                try {
-                    const nextPage = await renderPage(pdf, i, vw);
-                    flipbookEl.appendChild(nextPage);
-                } catch (e) {
-                    console.warn(`Gagal merender halaman ${i}`, e);
+        async function loadRemaining() {
+            for (let i = 4; i <= totalPages; i++) {
+                const el = await createPageElement(i);
+                viewer.appendChild(el);
+            }
+        }
+
+        function updateUI() {
+            const pages = document.querySelectorAll('.calendar-page');
+            pages.forEach((page, index) => {
+                const pNum = index + 1;
+                page.classList.remove('active', 'flipped', 'next');
+
+                if (pNum < currentPage) {
+                    page.classList.add('flipped');
+                } else if (pNum === currentPage) {
+                    page.classList.add('active');
+                } else if (pNum === currentPage + 1) {
+                    page.classList.add('next');
                 }
-            }
-            // Update data PageFlip setelah semua halaman masuk ke DOM
-            if (pageFlip) {
-                pageFlip.updateFromHtml(document.querySelectorAll('.page'));
-            }
+            });
+
+            document.getElementById('pageInfo').innerText = `Halaman ${currentPage} / ${totalPages}`;
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
         }
 
-        function updatePageCounter(current, total) {
-            if (pageInfo) {
-                pageInfo.innerText = `Halaman ${current} / ${total}`;
+        document.getElementById('nextBtn').onclick = () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                playFeedback();
+                updateUI();
             }
-        }
-
-        window.onload = initFlipBook;
-
-        let timer;
-        window.onresize = () => {
-            clearTimeout(timer);
-            timer = setTimeout(() => {
-                // Hanya reload jika ukuran berubah signifikan untuk menghindari error loop
-                location.reload(); 
-            }, 500);
         };
+
+        document.getElementById('prevBtn').onclick = () => {
+            if (currentPage > 1) {
+                currentPage--;
+                playFeedback();
+                updateUI();
+            }
+        };
+
+        // Swipe support sederhana
+        let touchStartY = 0;
+        viewer.addEventListener('touchstart', e => touchStartY = e.touches[0].clientY);
+        viewer.addEventListener('touchend', e => {
+            const touchEndY = e.changedTouches[0].clientY;
+            if (touchStartY - touchEndY > 50) document.getElementById('nextBtn').click();
+            if (touchEndY - touchStartY > 50) document.getElementById('prevBtn').click();
+        });
+
+        window.onload = init;
     </script>
 </body>
 </html>
