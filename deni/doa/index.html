@@ -9,11 +9,11 @@
     
     <style>
         :root {
-            --primary-bg: #121212;
+            --primary-bg: #0f0f0f;
             --accent: #6366f1;
             --book-width: 450px;
             --book-height: 70vh;
-            --transition-speed: 1.8s;
+            --transition-speed: 0.8s;
         }
 
         body {
@@ -28,47 +28,80 @@
             font-family: 'Inter', sans-serif;
         }
 
-        #top-info {
-            height: 60px;
+        #main-wrapper {
+            flex-grow: 1;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 100;
-            background: rgba(18, 18, 18, 0.9);
-            backdrop-filter: blur(10px);
+            background: radial-gradient(circle, #1a1a1a 0%, #050505 100%);
+            position: relative;
+        }
+
+        /* Container untuk Header dan Footer yang menempel ke buku */
+        .book-label {
+            width: 85%;
+            max-width: var(--book-width);
+            background: rgba(30, 30, 30, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 0;
+            text-align: center;
+            z-index: 110;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        #page-header {
+            border-bottom: none;
+            border-radius: 12px 12px 0 0;
+        }
+
+        #page-footer {
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            font-size: 10px;
+            color: #666;
+            letter-spacing: 0.5px;
+        }
+
+        #pageInfo {
+            font-size: 0.85rem;
+            color: #a5b4fc;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         #book-container {
-            flex-grow: 1;
             position: relative;
-            perspective: 4000px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle, #252525 0%, #0a0a0a 100%);
-        }
-
-        /* Struktur Lembaran Buku */
-        .sheet {
-            position: absolute;
             width: 85%;
             max-width: var(--book-width);
             height: var(--book-height);
-            transform-style: preserve-3d;
-            transition: transform var(--transition-speed) cubic-bezier(0.645, 0.045, 0.355, 1);
-            transform-origin: left center;
+            perspective: 3000px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             z-index: 10;
         }
 
-        /* Bagian depan dan belakang lembaran */
+        .sheet {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: left center;
+            z-index: 10;
+            pointer-events: none;
+        }
+
         .page-front, .page-back {
             position: absolute;
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
             background: #2d2d2d;
-            border-radius: 4px 12px 12px 4px;
-            box-shadow: inset 5px 0 15px rgba(0,0,0,0.5), 5px 5px 25px rgba(0,0,0,0.5);
+            border-radius: 0 12px 12px 0;
+            box-shadow: inset 5px 0 15px rgba(0,0,0,0.5), 5px 5px 25px rgba(0,0,0,0.3);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -76,14 +109,12 @@
             border: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* Halaman belakang diputar 180 derajat */
         .page-back {
             transform: rotateY(180deg);
             background: #252525;
-            border-radius: 12px 4px 4px 12px;
+            border-radius: 12px 0 0 12px;
         }
 
-        /* Efek lengkungan jilidan di tengah */
         .sheet::before {
             content: '';
             position: absolute;
@@ -91,25 +122,22 @@
             top: 0;
             width: 5px;
             height: 100%;
-            background: linear-gradient(to right, rgba(0,0,0,0.5), transparent);
+            background: linear-gradient(to right, rgba(0,0,0,0.4), transparent);
             z-index: 5;
             pointer-events: none;
         }
 
-        /* State Halaman */
         .sheet.flipped {
             transform: rotateY(-180deg);
         }
 
-        /* Tumpukan Statis di Bawah */
         .book-base {
             position: absolute;
-            width: 85%;
-            max-width: var(--book-width);
-            height: var(--book-height);
+            width: 100%;
+            height: 100%;
             background: #1a1a1a;
-            border-radius: 4px 12px 12px 4px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            border-radius: 0 12px 12px 0;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
             z-index: 1;
             transform: translateZ(-20px);
         }
@@ -124,34 +152,30 @@
             position: absolute;
             top: 0;
             height: 100%;
-            width: 15%;
+            width: 40%;
             z-index: 200;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: rgba(255,255,255,0.1);
-            font-size: 2rem;
-            transition: color 0.3s;
+            color: rgba(255,255,255,0.03);
+            font-size: 3rem;
+            transition: all 0.3s;
+            user-select: none;
         }
-        .nav-overlay:hover { color: white; }
-        #prevArea { left: 0; }
-        #nextArea { right: 0; }
+        
+        .nav-overlay:hover {
+            color: rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.01);
+        }
 
-        .page-counter-pill {
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            padding: 8px 24px;
-            border-radius: 99px;
-            color: #a5b4fc;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
+        #prevArea { left: -10%; } 
+        #nextArea { right: -10%; }
 
         #loader {
             position: fixed;
             inset: 0;
-            background: #121212;
+            background: #0f0f0f;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -170,16 +194,8 @@
         }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        .copyright-footer {
-            position: absolute;
-            bottom: 20px;
-            background: rgba(0,0,0,0.6);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 10px;
-            color: #666;
-            z-index: 300;
-        }
+        .copyright-link { color: #888; text-decoration: none; transition: color 0.2s; }
+        .copyright-link:hover { color: var(--accent); }
     </style>
 </head>
 <body>
@@ -189,19 +205,22 @@
         <p class="text-xs uppercase tracking-widest text-gray-500">Membuka Lembaran Doa...</p>
     </div>
 
-    <div id="top-info">
-        <div id="pageInfo" class="page-counter-pill">Halaman 1</div>
-    </div>
+    <div id="main-wrapper">
+        <!-- Header Label -->
+        <div id="page-header" class="book-label">
+            <div id="pageInfo">Memuat Halaman...</div>
+        </div>
 
-    <div id="book-container">
-        <div id="prevArea" class="nav-overlay">❮</div>
-        <div id="nextArea" class="nav-overlay">❯</div>
-        
-        <div class="book-base"></div>
-        <!-- Lembaran (Sheets) akan dimasukkan di sini oleh JS -->
+        <!-- Book Container -->
+        <div id="book-container">
+            <div id="prevArea" class="nav-overlay">❮</div>
+            <div id="nextArea" class="nav-overlay">❯</div>
+            <div class="book-base"></div>
+        </div>
 
-        <div class="copyright-footer">
-            Deploy Code by <a href="https://muhardian.eu.org/deni" class="text-indigo-400">Muhardian @ 2026</a>
+        <!-- Footer Label (Sekarang menempel ke buku) -->
+        <div id="page-footer" class="book-label">
+            Deploy Code by <a href="https://muhardian.eu.org/deni" target="_blank" class="copyright-link">Muhardian @ 2026</a>
         </div>
     </div>
 
@@ -216,10 +235,10 @@
 
         let state = {
             pdfDoc: null,
-            currentPage: 1, // Halaman fisik saat ini
+            currentSheetIndex: 0,
             totalPages: 0,
             isMoving: false,
-            sheets: [] // Array elemen sheet
+            sheets: []
         };
 
         const container = document.getElementById('book-container');
@@ -231,8 +250,6 @@
                 state.pdfDoc = await loadingTask.promise;
                 state.totalPages = state.pdfDoc.numPages;
 
-                // Buat lembaran (1 sheet = 2 halaman PDF)
-                // Lembaran 1: Depan (Hal 1), Belakang (Hal 2)
                 for (let i = 1; i <= state.totalPages; i += 2) {
                     const sheet = await createSheet(i);
                     container.appendChild(sheet);
@@ -240,7 +257,6 @@
                 }
 
                 updateBook();
-                
                 document.getElementById('loader').style.display = 'none';
             } catch (err) {
                 console.error(err);
@@ -278,9 +294,6 @@
             sheet.appendChild(front);
             sheet.appendChild(back);
             
-            // Atur z-index awal agar tumpukan benar (halaman awal paling atas)
-            sheet.style.zIndex = 100 - sheet.dataset.index;
-            
             return sheet;
         }
 
@@ -288,45 +301,58 @@
             state.sheets.forEach((sheet, index) => {
                 if (index < state.currentSheetIndex) {
                     sheet.classList.add('flipped');
-                    sheet.style.zIndex = 10 + index; // Halaman lama di bawah kiri
+                    sheet.style.zIndex = 10 + index;
                 } else {
                     sheet.classList.remove('flipped');
-                    sheet.style.zIndex = 100 - index; // Halaman baru di atas kanan
+                    sheet.style.zIndex = 100 - index;
                 }
             });
 
             const displayPage = (state.currentSheetIndex * 2) + 1;
-            document.getElementById('pageInfo').innerText = `Halaman ${displayPage} - ${Math.min(displayPage + 1, state.totalPages)}`;
+            const secondPage = Math.min(displayPage + 1, state.totalPages);
+            
+            const infoText = (displayPage === secondPage) ? 
+                `Halaman ${displayPage}` : 
+                `Halaman ${displayPage} - ${secondPage}`;
+                
+            document.getElementById('pageInfo').innerText = infoText;
         }
-
-        state.currentSheetIndex = 0;
 
         function flip(direction) {
             if (state.isMoving) return;
 
             if (direction === 'next' && state.currentSheetIndex < state.sheets.length) {
                 state.isMoving = true;
-                sound.currentTime = 0;
-                sound.play().catch(() => {});
+                playSound();
                 state.currentSheetIndex++;
                 updateBook();
-                setTimeout(() => state.isMoving = false, 1800);
+                setTimeout(() => state.isMoving = false, 850);
             } else if (direction === 'prev' && state.currentSheetIndex > 0) {
                 state.isMoving = true;
-                sound.currentTime = 0;
-                sound.play().catch(() => {});
+                playSound();
                 state.currentSheetIndex--;
                 updateBook();
-                setTimeout(() => state.isMoving = false, 1800);
+                setTimeout(() => state.isMoving = false, 850);
             }
         }
 
-        document.getElementById('nextArea').onclick = () => flip('next');
-        document.getElementById('prevArea').onclick = () => flip('prev');
+        function playSound() {
+            sound.currentTime = 0;
+            sound.play().catch(() => {});
+        }
 
-        // Swipe & Keys
+        document.getElementById('nextArea').onclick = (e) => {
+            e.stopPropagation();
+            flip('next');
+        };
+        
+        document.getElementById('prevArea').onclick = (e) => {
+            e.stopPropagation();
+            flip('prev');
+        };
+
         window.addEventListener('keydown', e => {
-            if (e.key === 'ArrowRight') flip('next');
+            if (e.key === 'ArrowRight' || e.key === ' ') flip('next');
             if (e.key === 'ArrowLeft') flip('prev');
         });
 
