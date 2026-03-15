@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PDF Flip Book - Satu Halaman Penuh</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PDF.js for rendering PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- PageFlip library for book effect -->
+    <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
+    
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #e5e7eb;
+            overflow: hidden;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            font-family: sans-serif;
+        }
+
+        #canvas-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #121212;
+        }
+
+        #book-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .flip-book {
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+            background: #1a1a1a;
+        }
+
+        .page {
+            background-color: #2d2d2d;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
+        }
+
+        /* Loading Spinner */
+        #loader {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            text-align: center;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border-left-color: #6366f1;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .controls {
+            background: #262626;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #404040;
+            z-index: 60;
+        }
+
+        .copyright-footer {
+            background: #f9fafb;
+            color: #4b5563;
+            font-size: 10px;
+            text-align: center;
+            padding: 6px 0;
+            border-top: 1px solid #e5e7eb;
+            z-index: 60;
+        }
+
+        .copyright-footer a {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .btn-nav {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="py-3 text-center font-bold text-md border-b border-gray-800 bg-[#262626]">
+        Doa-Doa Pilihan
+    </div>
+
+    <!-- Loading State -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <p class="text-xs text-gray-400">Menyiapkan Halaman...</p>
+    </div>
+
+    <!-- Main Viewer Area -->
+    <div id="canvas-container">
+        <div id="book-container">
+            <div id="flipbook" class="flip-book">
+                <!-- Pages injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigasi -->
+    <div class="controls">
+        <button id="prevBtn" class="btn-nav bg-gray-700 hover:bg-gray-600 text-white">
+            Kembali
+        </button>
+        <span id="pageInfo" class="text-xs font-mono text-gray-400">Halaman -- / --</span>
+        <button id="nextBtn" class="btn-nav bg-indigo-600 hover:bg-indigo-500 text-white">
+            Lanjut
+        </button>
+    </div>
+
+    <!-- Footer Copyright -->
+    <div class="copyright-footer">
+        Deploy Code by <a href="https://muhardian.eu.org/deni" target="_blank">Muhardian@2026</a>
+    </div>
+
+    <script>
+        const pdfUrl = 'https://muhardian.eu.org/deni/doa/doa.pdf';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        let pageFlip = null;
+        const flipbookEl = document.getElementById('flipbook');
+        const loader = document.getElementById('loader');
+        const pageInfo = document.getElementById('pageInfo');
+
+        async function initFlipBook() {
+            try {
+                const loadingTask = pdfjsLib.getDocument(pdfUrl);
+                const pdf = await loadingTask.promise;
+                const totalPages = pdf.numPages;
+
+                const vw = window.innerWidth;
+                // Hitung tinggi yang tersedia (viewport minus header, controls, copyright)
+                const vh = window.innerHeight - (48 + 57 + 23); 
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const page = await pdf.getPage(i);
+                    
+                    // Render dengan kualitas tinggi
+                    const unscaledViewport = page.getViewport({ scale: 1 });
+                    const scale = (vw / unscaledViewport.width) * 2; 
+                    const viewport = page.getViewport({ scale: scale });
+                    
+                    const pageWrapper = document.createElement('div');
+                    pageWrapper.className = 'page';
+                    
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    await page.render({ canvasContext: context, viewport: viewport }).promise;
+                    
+                    pageWrapper.appendChild(canvas);
+                    flipbookEl.appendChild(pageWrapper);
+                }
+
+                // Pengaturan untuk memastikan HANYA 1 HALAMAN (Portrait)
+                pageFlip = new St.PageFlip(flipbookEl, {
+                    width: vw,
+                    height: vh,
+                    size: "stretch",
+                    minWidth: 200,
+                    maxWidth: 2000,
+                    minHeight: 200,
+                    maxHeight: 2000,
+                    drawShadow: true,
+                    flippingTime: 800,
+                    usePortrait: true,        // Kunci ke mode portrait (1 halaman)
+                    startPage: 0,
+                    showCover: false,         // Jangan anggap halaman pertama sebagai cover 2-halaman
+                    mobileScrollSupport: false,
+                    clickEventForward: false,
+                    useMouseEvents: true,
+                    showPageCorners: true
+                });
+
+                pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+
+                loader.style.display = 'none';
+                updatePageCounter();
+
+                pageFlip.on('flip', (e) => {
+                    updatePageCounter();
+                });
+
+                document.getElementById('prevBtn').onclick = () => pageFlip.flipPrev();
+                document.getElementById('nextBtn').onclick = () => pageFlip.flipNext();
+
+            } catch (error) {
+                console.error('PDF Error:', error);
+                loader.innerHTML = '<p class="text-red-500 p-4">Gagal memuat PDF. Pastikan URL benar atau CORS diizinkan.</p>';
+            }
+        }
+
+        function updatePageCounter() {
+            if (pageFlip) {
+                const current = pageFlip.getCurrentPageIndex() + 1;
+                const total = pageFlip.getPageCount();
+                pageInfo.innerText = `Halaman ${current} / ${total}`;
+            }
+        }
+
+        window.onload = initFlipBook;
+
+        let timer;
+        window.onresize = () => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                location.reload(); 
+            }, 300);
+        };
+    </script>
+</body>
+</html>
