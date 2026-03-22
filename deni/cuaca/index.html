@@ -1,261 +1,294 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Cloud, 
-  CloudRain, 
-  Sun, 
-  Wind, 
-  Droplets, 
-  Thermometer, 
-  MapPin, 
-  RefreshCw,
-  Clock,
-  CloudLightning,
-  CloudSnow,
-  Umbrella,
-  Zap
-} from 'lucide-react';
 
-const App = () => {
-  const [weather, setWeather] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [lastUpdated, setLastUpdated] = useState(new Date());
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App Bojong Gede - Neon Red</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- React & Babel CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Lucide Icons (UMD version) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-  // Koordinat Bojong Gede: -6.4912, 106.7944
-  const lat = -6.4912;
-  const lon = 106.7944;
-
-  const fetchWeather = async () => {
-    setLoading(true);
-    try {
-      // Menggunakan Open-Meteo dengan parameter tambahan untuk akurasi tinggi (Mirip Google/BMKG)
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m,uv_index&hourly=temperature_2m,precipitation_probability,weather_code&timezone=Asia%2FJakarta&forecast_days=1`;
-      
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Koneksi API terputus');
-      const data = await response.json();
-      
-      setWeather(data);
-      setLastUpdated(new Date());
-      setError(null);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchWeather();
-    const interval = setInterval(fetchWeather, 600000); 
-    return () => clearInterval(interval);
-  }, []);
-
-  const getWeatherIcon = (code, size = "w-16 h-16") => {
-    const className = `${size} text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.8)]`;
-    if (code === 0) return <Sun className={className} />;
-    if (code >= 1 && code <= 3) return <Cloud className={className} />;
-    if (code >= 51 && code <= 67) return <CloudRain className={className} />;
-    if (code >= 80 && code <= 82) return <CloudRain className={`${className} animate-bounce`} />;
-    if (code >= 95) return <CloudLightning className={`${className} text-red-600 drop-shadow-[0_0_25px_rgba(239,68,68,1)]`} />;
-    return <Cloud className={className} />;
-  };
-
-  const getWeatherDesc = (code) => {
-    const codes = {
-      0: 'Langit Cerah',
-      1: 'Cerah Berawan',
-      2: 'Sebagian Berawan',
-      3: 'Mendung',
-      45: 'Kabut',
-      51: 'Gerimis',
-      61: 'Hujan Ringan',
-      63: 'Hujan Sedang',
-      65: 'Hujan Lebat',
-      80: 'Hujan Ringan',
-      95: 'Badai Petir'
-    };
-    return codes[code] || 'Kondisi Bervariasi';
-  };
-
-  return (
-    <div className="min-h-screen bg-[#050101] text-red-50 font-sans selection:bg-red-600 flex flex-col items-center p-4 md:p-8">
-      {/* Efek Cahaya Latar */}
-      <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-red-900/10 blur-[150px] rounded-full"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-red-950/20 blur-[150px] rounded-full"></div>
-      </div>
-
-      {/* Header Bio Gede */}
-      <header className="w-full max-w-5xl flex flex-col md:flex-row justify-between items-center mb-10 z-10 gap-6">
-        <div className="text-center md:text-left">
-          <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
-            <div className="h-1 w-12 bg-red-600 rounded-full shadow-[0_0_10px_rgba(239,68,68,1)]"></div>
-            <span className="text-red-500 font-mono text-[10px] tracking-[0.4em] uppercase">Live Stations</span>
-          </div>
-          <h1 className="text-5xl font-black tracking-tighter text-white uppercase italic italic drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]">
-            BOJONG <span className="text-red-600">GEDE</span>
-          </h1>
-          <p className="text-red-400/50 flex items-center justify-center md:justify-start gap-2 text-xs mt-2 font-mono">
-            <MapPin size={12} className="text-red-600" /> 6.4912° S, 106.7944° E • JAWA BARAT
-          </p>
-        </div>
-        
-        <button 
-          onClick={fetchWeather}
-          className="group relative px-8 py-3 bg-transparent border border-red-900/50 rounded-full overflow-hidden transition-all hover:border-red-500 shadow-lg"
-        >
-          <div className="absolute inset-0 bg-red-600/5 group-hover:bg-red-600/20 transition-all"></div>
-          <div className="relative flex items-center gap-3">
-            <RefreshCw size={18} className={`text-red-500 ${loading ? 'animate-spin' : ''}`} />
-            <span className="text-xs font-bold tracking-[0.2em] uppercase text-red-200">Sync Data</span>
-          </div>
-        </button>
-      </header>
-
-      {loading && !weather ? (
-        <div className="flex flex-col items-center justify-center flex-1 space-y-4">
-          <div className="relative">
-            <div className="w-20 h-20 border-2 border-red-950 border-t-red-600 rounded-full animate-spin shadow-[0_0_20px_rgba(220,38,38,0.3)]"></div>
-            <Zap className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-red-500 animate-pulse" size={24} />
-          </div>
-          <p className="text-red-600 font-mono text-xs animate-pulse tracking-widest">MENGHUBUNGKAN KE SATELIT...</p>
-        </div>
-      ) : (
-        <main className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-4 gap-6 z-10">
-          
-          {/* Card Utama - Suhu Saat Ini */}
-          <section className="lg:col-span-3 bg-gradient-to-br from-[#120202] to-black border border-red-900/30 p-10 rounded-[40px] relative overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-            <div className="absolute top-0 right-0 p-8 opacity-5">
-              <Cloud className="w-64 h-64 text-red-500" />
-            </div>
-
-            <div className="relative grid md:grid-cols-2 gap-8 items-center">
-              <div className="text-center md:text-left order-2 md:order-1">
-                <span className="inline-block px-4 py-1 rounded-full bg-red-950/40 border border-red-800/30 text-red-400 text-[10px] font-bold uppercase tracking-widest mb-6">
-                  Kondisi Aktual
-                </span>
-                <h2 className="text-8xl font-black text-white leading-none mb-4 tracking-tighter">
-                  {Math.round(weather?.current.temperature_2m)}<span className="text-red-600">°</span>
-                </h2>
-                <div className="flex flex-col gap-1">
-                  <p className="text-3xl font-bold text-red-100">{getWeatherDesc(weather?.current.weather_code)}</p>
-                  <p className="text-red-500/70 font-medium tracking-wide">Terasa seperti {Math.round(weather?.current.apparent_temperature)}°C</p>
-                </div>
-              </div>
-
-              <div className="flex justify-center order-1 md:order-2 py-6">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-red-600/20 blur-[60px] rounded-full animate-pulse"></div>
-                  {getWeatherIcon(weather?.current.weather_code, "w-40 h-40")}
-                </div>
-              </div>
-            </div>
-
-            {/* Stats Bar */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 pt-10 border-t border-red-900/20">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-red-500/60 uppercase text-[9px] font-bold tracking-widest">
-                  <Droplets size={12} /> Kelembapan
-                </div>
-                <p className="text-xl font-bold text-red-50">{weather?.current.relative_humidity_2m}%</p>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-red-500/60 uppercase text-[9px] font-bold tracking-widest">
-                  <Wind size={12} /> Angin
-                </div>
-                <p className="text-xl font-bold text-red-50">{weather?.current.wind_speed_10m} <span className="text-xs opacity-50">km/h</span></p>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-red-500/60 uppercase text-[9px] font-bold tracking-widest">
-                  <Zap size={12} /> Indeks UV
-                </div>
-                <p className="text-xl font-bold text-red-50">{weather?.current.uv_index}</p>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-red-500/60 uppercase text-[9px] font-bold tracking-widest">
-                  <Umbrella size={12} /> Presipitasi
-                </div>
-                <p className="text-xl font-bold text-red-50">{weather?.current.precipitation} <span className="text-xs opacity-50">mm</span></p>
-              </div>
-            </div>
-          </section>
-
-          {/* Forecast Sidebar */}
-          <section className="bg-black/60 border border-red-900/20 p-8 rounded-[40px] backdrop-blur-xl flex flex-col">
-            <div className="flex items-center justify-between mb-8">
-              <h3 className="text-red-500 font-black text-xs uppercase tracking-[0.2em]">Prakiraan Jam</h3>
-              <Clock size={14} className="text-red-900" />
-            </div>
-            <div className="space-y-6 flex-1 overflow-y-auto pr-2 custom-scrollbar">
-              {weather?.hourly.time.slice(new Date().getHours(), new Date().getHours() + 6).map((time, index) => {
-                const hourIndex = new Date().getHours() + index;
-                return (
-                  <div key={index} className="flex items-center justify-between p-4 rounded-2xl bg-red-950/10 border border-red-900/5 hover:border-red-600/30 transition-all group">
-                    <div className="flex flex-col">
-                      <span className="text-xs font-mono text-red-500/60">
-                        {new Date(time).getHours().toString().padStart(2, '0')}:00
-                      </span>
-                      <span className="text-[10px] text-red-400/40 flex items-center gap-1">
-                        <Droplets size={10} /> {weather?.hourly.precipitation_probability[hourIndex]}%
-                      </span>
-                    </div>
-                    <div className="scale-75 group-hover:scale-90 transition-transform">
-                      {getWeatherIcon(weather?.hourly.weather_code[hourIndex], "w-10 h-10")}
-                    </div>
-                    <span className="font-black text-lg text-white">
-                      {Math.round(weather?.hourly.temperature_2m[hourIndex])}°
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-            
-            <div className="mt-8 pt-6 border-t border-red-900/20">
-              <div className="bg-red-600/10 p-4 rounded-2xl border border-red-600/20">
-                <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-1">Status Bojong Gede</p>
-                <p className="text-xs text-red-200/70 leading-relaxed">
-                   {weather?.current.weather_code > 50 ? 'Waspada potensi hujan di wilayah sekitar terminal dan stasiun.' : 'Cuaca mendukung untuk aktivitas luar ruangan di sekitaran Pemda.'}
-                </p>
-              </div>
-            </div>
-          </section>
-
-          {/* Footer Info & Attribution */}
-          <footer className="lg:col-span-4 flex flex-col gap-6 mt-10">
-            <div className="flex flex-col md:flex-row justify-between items-center px-4 opacity-30 text-[9px] font-mono uppercase tracking-[0.3em] text-red-500">
-               <span>Data Source: Open-Meteo High Res</span>
-               <span>Refreshed: {lastUpdated.toLocaleTimeString('id-ID')} WIB</span>
-               <span>&copy; 2024 NEON WEATHER SYSTEM</span>
-            </div>
-            
-            {/* Custom Link Footer */}
-            <div className="flex justify-center items-center pb-8 border-t border-red-900/10 pt-8">
-               <a 
-                href="https://muhardian.eu.org" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="group flex flex-col items-center gap-2"
-               >
-                 <span className="text-red-950 text-[8px] uppercase tracking-[0.5em] font-bold group-hover:text-red-800 transition-colors">Developed By</span>
-                 <div className="px-6 py-2 rounded-full border border-red-900/20 bg-black shadow-[0_0_10px_rgba(0,0,0,1)] group-hover:border-red-600 group-hover:shadow-[0_0_15px_rgba(239,68,68,0.3)] transition-all duration-500">
-                   <span className="text-red-600 font-black italic tracking-tighter text-sm group-hover:text-red-400 group-hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]">
-                     Muhardian @2026
-                   </span>
-                 </div>
-               </a>
-            </div>
-          </footer>
-        </main>
-      )}
-
-      <style dangerouslySetInnerHTML={{ __html: `
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #050101;
+        }
         .custom-scrollbar::-webkit-scrollbar { width: 2px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #450a0a; border-radius: 10px; }
-      `}} />
-    </div>
-  );
-};
+        
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        .animate-pulse-glow {
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
 
-export default App;
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        
+        /**
+         * Komponen Icon yang menggunakan API resmi Lucide createIcons
+         */
+        const Icon = ({ name, size = 24, className = "" }) => {
+            const iconRef = useRef(null);
+
+            useEffect(() => {
+                if (iconRef.current && window.lucide) {
+                    lucide.createIcons({
+                        icons: {
+                            [name]: lucide[name]
+                        },
+                        nameAttr: 'data-lucide',
+                        attrs: {
+                            class: className,
+                            width: size,
+                            height: size
+                        }
+                    });
+                }
+            }, [name, size, className]);
+
+            return <i ref={iconRef} data-lucide={name} className={className} style={{ width: size, height: size, display: 'inline-block' }}></i>;
+        };
+
+        const App = () => {
+            const [weather, setWeather] = useState(null);
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(null);
+            const [lastUpdated, setLastUpdated] = useState(new Date());
+
+            const lat = -6.4912;
+            const lon = 106.7944;
+
+            const fetchWeather = async () => {
+                setLoading(true);
+                try {
+                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m,uv_index&hourly=temperature_2m,precipitation_probability,weather_code&timezone=Asia%2FJakarta&forecast_days=1`;
+                    
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Koneksi API terputus. Periksa jaringan.');
+                    const data = await response.json();
+                    
+                    setWeather(data);
+                    setLastUpdated(new Date());
+                    setError(null);
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    // Memberikan sedikit jeda untuk simulasi transisi yang halus
+                    setTimeout(() => setLoading(false), 800);
+                }
+            };
+
+            // Sinkronisasi otomatis saat pertama kali halaman dibuka (Mounting)
+            useEffect(() => {
+                fetchWeather();
+                
+                // Interval sinkronisasi otomatis setiap 10 menit
+                const interval = setInterval(fetchWeather, 600000); 
+                return () => clearInterval(interval);
+            }, []);
+
+            const getWeatherIconName = (code) => {
+                if (code === 0) return 'Sun';
+                if (code >= 1 && code <= 3) return 'Cloud';
+                if (code >= 51 && code <= 67) return 'CloudRain';
+                if (code >= 80 && code <= 82) return 'CloudRain';
+                if (code >= 95) return 'CloudLightning';
+                return 'Cloud';
+            };
+
+            const getWeatherDesc = (code) => {
+                const codes = {
+                    0: 'Langit Cerah',
+                    1: 'Cerah Berawan',
+                    2: 'Sebagian Berawan',
+                    3: 'Mendung',
+                    45: 'Kabut',
+                    51: 'Gerimis',
+                    61: 'Hujan Ringan',
+                    63: 'Hujan Sedang',
+                    65: 'Hujan Lebat',
+                    80: 'Hujan Ringan',
+                    95: 'Badai Petir'
+                };
+                return codes[code] || 'Kondisi Bervariasi';
+            };
+
+            return (
+                <div className="min-h-screen text-red-50 flex flex-col items-center p-4 md:p-8 relative overflow-x-hidden">
+                    {/* Background Neon Elements */}
+                    <div className="fixed top-0 left-0 w-full h-full pointer-events-none -z-10">
+                        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-red-900/10 blur-[150px] rounded-full"></div>
+                        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-red-950/20 blur-[150px] rounded-full"></div>
+                    </div>
+
+                    <header className="w-full max-w-5xl flex flex-col md:flex-row justify-between items-center mb-10 z-10 gap-6">
+                        <div className="text-center md:text-left">
+                            <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+                                <div className="h-1 w-12 bg-red-600 rounded-full shadow-[0_0_10px_rgba(239,68,68,1)]"></div>
+                                <span className="text-red-500 font-mono text-[10px] tracking-[0.4em] uppercase">Live Stations</span>
+                            </div>
+                            <h1 className="text-5xl font-black tracking-tighter text-white uppercase italic drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]">
+                                BOJONG <span className="text-red-600">GEDE</span>
+                            </h1>
+                            <p className="text-red-400/50 flex items-center justify-center md:justify-start gap-2 text-xs mt-2 font-mono">
+                                <Icon name="MapPin" size={12} className="text-red-600" /> 6.4912° S, 106.7944° E • JAWA BARAT
+                            </p>
+                        </div>
+                        
+                        <button 
+                            onClick={fetchWeather}
+                            disabled={loading}
+                            className="group relative px-8 py-3 bg-transparent border border-red-900/50 rounded-full overflow-hidden transition-all hover:border-red-500 shadow-lg disabled:opacity-50"
+                        >
+                            <div className="absolute inset-0 bg-red-600/5 group-hover:bg-red-600/20 transition-all"></div>
+                            <div className="relative flex items-center gap-3">
+                                <Icon name="RefreshCw" size={18} className={`text-red-500 ${loading ? 'animate-spin' : ''}`} />
+                                <span className="text-xs font-bold tracking-[0.2em] uppercase text-red-200">
+                                    {loading ? 'Syncing...' : 'Sync Data'}
+                                </span>
+                            </div>
+                        </button>
+                    </header>
+
+                    {error ? (
+                        <div className="flex flex-col items-center justify-center flex-1 space-y-6 z-20 text-center">
+                            <Icon name="AlertTriangle" size={64} className="text-red-500 animate-pulse mb-4" />
+                            <h2 className="text-xl font-bold uppercase tracking-widest text-white">Sistem Terganggu</h2>
+                            <p className="text-red-200/60 font-mono text-sm max-w-xs">{error}</p>
+                            <button onClick={fetchWeather} className="mt-4 px-6 py-2 bg-red-600 rounded-full text-xs font-bold uppercase shadow-[0_0_15px_rgba(239,68,68,0.4)]">Coba Lagi</button>
+                        </div>
+                    ) : loading ? (
+                        <div className="flex flex-col items-center justify-center flex-1 space-y-4 z-20">
+                            <div className="relative">
+                                <div className="w-20 h-20 border-2 border-red-950 border-t-red-600 rounded-full animate-spin shadow-[0_0_20px_rgba(239,68,68,0.3)]"></div>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <Icon name="Zap" size={20} className="text-red-600 animate-pulse" />
+                                </div>
+                            </div>
+                            <p className="text-red-600 font-mono text-xs animate-pulse tracking-widest uppercase mt-4">Menghubungkan ke satelit...</p>
+                        </div>
+                    ) : weather && (
+                        <main className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-4 gap-6 z-10 animate-in fade-in duration-700">
+                            <section className="lg:col-span-3 bg-gradient-to-br from-[#120202] to-black border border-red-900/30 p-10 rounded-[40px] relative overflow-hidden shadow-2xl">
+                                <div className="absolute top-0 right-0 p-8 opacity-5">
+                                    <Icon name="Cloud" size={256} className="text-red-500" />
+                                </div>
+
+                                <div className="relative grid md:grid-cols-2 gap-8 items-center">
+                                    <div className="text-center md:text-left order-2 md:order-1">
+                                        <span className="inline-block px-4 py-1 rounded-full bg-red-950/40 border border-red-800/30 text-red-400 text-[10px] font-bold uppercase tracking-widest mb-6">Kondisi Aktual</span>
+                                        <h2 className="text-8xl font-black text-white leading-none mb-4 tracking-tighter">
+                                            {Math.round(weather.current.temperature_2m)}<span className="text-red-600">°</span>
+                                        </h2>
+                                        <div className="flex flex-col gap-1">
+                                            <p className="text-3xl font-bold text-red-100">{getWeatherDesc(weather.current.weather_code)}</p>
+                                            <p className="text-red-500/70 font-medium tracking-wide">Terasa seperti {Math.round(weather.current.apparent_temperature)}°C</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-center order-1 md:order-2 py-6">
+                                        <div className="relative">
+                                            <div className="absolute inset-0 bg-red-600/20 blur-[60px] rounded-full animate-pulse"></div>
+                                            <Icon name={getWeatherIconName(weather.current.weather_code)} size={160} className="text-red-500 drop-shadow-[0_0_20px_rgba(239,68,68,0.8)]" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 pt-10 border-t border-red-900/20">
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-2 text-red-500/60 uppercase text-[9px] font-bold tracking-widest"><Icon name="Droplets" size={12}/> Kelembapan</div>
+                                        <p className="text-xl font-bold text-red-50">{weather.current.relative_humidity_2m}%</p>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-2 text-red-500/60 uppercase text-[9px] font-bold tracking-widest"><Icon name="Wind" size={12}/> Angin</div>
+                                        <p className="text-xl font-bold text-red-50">{weather.current.wind_speed_10m} <span className="text-xs opacity-50">km/h</span></p>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-2 text-red-500/60 uppercase text-[9px] font-bold tracking-widest"><Icon name="Zap" size={12}/> Indeks UV</div>
+                                        <p className="text-xl font-bold text-red-50">{weather.current.uv_index}</p>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-2 text-red-500/60 uppercase text-[9px] font-bold tracking-widest"><Icon name="Umbrella" size={12}/> Presipitasi</div>
+                                        <p className="text-xl font-bold text-red-50">{weather.current.precipitation} <span className="text-xs opacity-50">mm</span></p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section className="bg-black/60 border border-red-900/20 p-8 rounded-[40px] backdrop-blur-xl flex flex-col shadow-2xl">
+                                <div className="flex items-center justify-between mb-8">
+                                    <h3 className="text-red-500 font-black text-xs uppercase tracking-[0.2em]">Prakiraan Jam</h3>
+                                    <Icon name="Clock" size={14} className="text-red-900" />
+                                </div>
+                                <div className="space-y-6 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                                    {weather.hourly.time.slice(new Date().getHours(), new Date().getHours() + 6).map((time, index) => {
+                                        const hourIndex = new Date().getHours() + index;
+                                        return (
+                                            <div key={index} className="flex items-center justify-between p-4 rounded-2xl bg-red-950/10 border border-red-900/5 hover:border-red-600/30 transition-all group">
+                                                <div className="flex flex-col">
+                                                    <span className="text-xs font-mono text-red-500/60">{new Date(time).getHours().toString().padStart(2, '0')}:00</span>
+                                                    <span className="text-[10px] text-red-400/40 flex items-center gap-1"><Icon name="Droplets" size={10}/> {weather.hourly.precipitation_probability[hourIndex]}%</span>
+                                                </div>
+                                                <Icon name={getWeatherIconName(weather.hourly.weather_code[hourIndex])} size={24} className="text-red-500" />
+                                                <span className="font-black text-lg text-white">{Math.round(weather.hourly.temperature_2m[hourIndex])}°</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                
+                                <div className="mt-8 pt-6 border-t border-red-900/20">
+                                    <div className="bg-red-600/10 p-4 rounded-2xl border border-red-600/20">
+                                        <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-1">Status Wilayah</p>
+                                        <p className="text-xs text-red-200/70 leading-relaxed italic">Data cuaca disinkronkan secara real-time untuk Bojong Gede.</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <footer className="lg:col-span-4 flex flex-col gap-8 mt-10">
+                                <div className="flex flex-col md:flex-row justify-between items-center px-4 opacity-30 text-[9px] font-mono uppercase tracking-[0.3em] text-red-500">
+                                    <span>Source: Open-Meteo High Res</span>
+                                    <span>Sync: {lastUpdated.toLocaleTimeString('id-ID')} WIB</span>
+                                    <span>&copy; 2026 NEON WEATHER SYSTEM</span>
+                                </div>
+                                
+                                <div className="flex justify-center items-center pb-12 border-t border-red-900/10 pt-10">
+                                    <a href="https://muhardian.eu.org" target="_blank" className="group flex flex-col items-center gap-2">
+                                        <span className="text-red-950 text-[8px] uppercase tracking-[0.5em] font-bold group-hover:text-red-700 transition-colors">Developed By</span>
+                                        <div className="px-8 py-3 rounded-full border border-red-900/20 bg-black shadow-2xl group-hover:border-red-600 transition-all duration-700">
+                                            <span className="text-red-600 font-black italic tracking-tighter text-base group-hover:text-red-400 group-hover:drop-shadow-[0_0_10px_rgba(239,68,68,1)]">
+                                                Muhardian @2026
+                                            </span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </footer>
+                        </main>
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
