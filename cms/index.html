@@ -3,425 +3,517 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emerald CMS - Professional & Elegant</title>
-    <!-- Tailwind CSS for Styling -->
+    <title>Muhardian Pro Content Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Quill Rich Text Editor -->
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.0/ace.js"></script>
     <style>
         :root {
-            --dark-green: #064e3b;
-            --emerald: #10b981;
-            --bg-dark: #022c22;
+            --neon-red: #ff003c;
+            --deep-black: #050505;
+            --charcoal: #0f0f0f;
         }
+
         body {
-            background-color: var(--bg-dark);
-            color: #ecfdf5;
             font-family: 'Inter', sans-serif;
+            background-color: var(--deep-black);
+            color: #eee;
+            scroll-behavior: smooth;
             overflow-x: hidden;
+            position: relative;
         }
-        .glass-morphism {
-            background: rgba(6, 78, 59, 0.4);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 1rem;
-        }
-        .card-hover:hover {
-            transform: translateY(-5px);
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
-        }
-        .emerald-gradient {
-            background: linear-gradient(135deg, #065f46 0%, #059669 100%);
-        }
-        #editor-container {
-            height: 250px;
-            background: white;
-            color: black;
-            border-radius: 0 0 0.5rem 0.5rem;
-        }
-        .ql-toolbar {
-            background: #f3f4f6;
-            border-radius: 0.5rem 0.5rem 0 0;
-        }
-        .modal {
-            display: none; 
+
+        /* Animated Gradient Background */
+        body::before {
+            content: "";
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 1000;
-            backdrop-filter: blur(8px);
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 0, 60, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255, 0, 60, 0.05) 0%, transparent 40%);
+            z-index: -2;
+            animation: moveGradient 15s ease infinite alternate;
         }
-        .loader {
-            border: 3px solid #064e3b;
-            border-top: 3px solid #10b981;
+
+        @keyframes moveGradient {
+            from { transform: scale(1) translate(0, 0); }
+            to { transform: scale(1.2) translate(5%, 5%); }
+        }
+
+        /* Mouse Follow Effect (Spotlight) */
+        #cursor-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 0, 60, 0.08) 0%, rgba(255, 0, 60, 0.03) 30%, transparent 70%);
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            transition: width 0.3s, height 0.3s;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .neon-text {
+            color: var(--neon-red);
+            text-shadow: 0 0 10px rgba(255, 0, 60, 0.5);
+        }
+
+        .neon-border {
+            border: 1px solid rgba(255, 0, 60, 0.2);
+            transition: all 0.3s ease;
+            background: rgba(15, 15, 15, 0.4);
+        }
+
+        .neon-border:hover {
+            border-color: var(--neon-red);
+            box-shadow: 0 0 25px rgba(255, 0, 60, 0.15);
+            background: rgba(15, 15, 15, 0.7);
+        }
+
+        .neon-button {
+            background: transparent;
+            border: 1px solid var(--neon-red);
+            color: var(--neon-red);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .neon-button:hover {
+            background: var(--neon-red);
+            color: white;
+            box-shadow: 0 0 30px var(--neon-red);
+            transform: translateY(-2px);
+        }
+
+        .glass {
+            background: rgba(5, 5, 5, 0.7);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        #editor {
+            height: 250px;
+            width: 100%;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+        }
+
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+        }
+
+        .card-anim {
+            animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+            opacity: 0;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neon-red); }
+
+        .read-more-modal {
+            background: var(--charcoal) !important;
+            color: #eee !important;
+            border: 1px solid var(--neon-red) !important;
+            text-align: left !important;
+            border-radius: 20px !important;
+        }
+
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen flex flex-col">
 
-    <!-- Header / Navbar -->
-    <nav class="sticky top-0 z-50 glass-morphism m-4 px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-2">
-            <div class="w-10 h-10 emerald-gradient rounded-lg flex items-center justify-center shadow-lg">
-                <i class="fas fa-leaf text-white"></i>
-            </div>
-            <h1 class="text-xl font-bold tracking-tight">EMERALD<span class="text-emerald-400">CMS</span></h1>
-        </div>
-        <div class="flex items-center gap-4">
-            <button id="logoutBtn" onclick="handleLogout()" class="hidden text-emerald-300 hover:text-white text-sm font-medium transition-colors">
-                Logout
-            </button>
-            <button onclick="toggleAdminModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-full text-sm font-semibold transition-all shadow-lg active:scale-95">
-                <i class="fas fa-user-shield mr-2"></i>Admin Panel
-            </button>
-        </div>
+    <!-- Cursor Glow Effect -->
+    <div id="cursor-glow"></div>
+
+    <nav class="p-6 flex justify-between items-center glass sticky top-0 z-50">
+        <h1 class="text-xl font-extrabold tracking-tighter neon-text">MUHARDIAN<span class="text-white">.PRO</span></h1>
+        <button onclick="showLoginPopup()" id="adminBtn" class="neon-button px-5 py-2 rounded text-xs">Admin Access</button>
     </nav>
 
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8">
-        <section class="text-center mb-16 fade-in">
-            <h2 class="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">Wawasan Hijau untuk <br><span class="text-emerald-400 italic">Masa Depan</span></h2>
-            <p class="text-emerald-200/70 max-w-2xl mx-auto text-lg">Kelola konten informasi lingkungan Anda dengan panel admin yang aman, cepat, dan terintegrasi Google Ecosystem.</p>
-        </section>
+    <main class="flex-grow container mx-auto px-6 py-12">
+        
+        <!-- Visitor View (Grid Konten) -->
+        <div id="visitorSection">
+            <header class="mb-16 text-center">
+                <span class="text-[10px] text-red-500 font-mono tracking-[0.6em] uppercase mb-4 block">Secure Database Interface</span>
+                <h2 class="text-4xl md:text-6xl font-black mb-6 tracking-tighter italic">MERAH <span class="neon-text">PUTIH</span></h2>
+                <div class="h-[2px] w-12 bg-red-600 mx-auto rounded-full"></div>
+            </header>
 
-        <!-- Container Artikel -->
-        <div id="article-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Loading State -->
-            <div id="skeleton-loader" class="contents">
-                <div class="animate-pulse glass-morphism p-6 h-80"></div>
-                <div class="animate-pulse glass-morphism p-6 h-80"></div>
-                <div class="animate-pulse glass-morphism p-6 h-80"></div>
+            <div id="loading" class="text-center py-20">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-red-600"></div>
+                <p class="mt-4 text-gray-500 font-mono text-xs uppercase tracking-widest">Synchronizing...</p>
+            </div>
+
+            <div id="contentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <!-- Data akan muncul di sini -->
             </div>
         </div>
+
+        <!-- Admin View -->
+        <div id="adminSection" class="hidden max-w-6xl mx-auto opacity-0 transition-all duration-700">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 border-b border-white/5 pb-6 gap-4">
+                <div>
+                    <h3 class="text-4xl font-black neon-text italic">ADMIN CONTROL</h3>
+                    <p class="text-gray-500 text-xs font-mono tracking-widest uppercase">LOGGED IN AS: ADMINISTRATOR</p>
+                </div>
+                <!-- Tombol Terminate Session diperbarui -->
+                <button onclick="logout()" class="neon-button px-6 py-3 rounded-xl flex items-center gap-3 group whitespace-nowrap">
+                    <span class="text-[10px] font-black">TERMINATE SESSION</span>
+                    <svg class="group-hover:-translate-x-1 transition-transform" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                <!-- Form Input -->
+                <div class="lg:col-span-1 space-y-8">
+                    <div class="glass p-8 rounded-2xl neon-border">
+                        <h4 class="text-xs font-black text-white mb-6 uppercase tracking-[0.2em] flex items-center gap-2">
+                            <span class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
+                            New Entry
+                        </h4>
+                        <div class="space-y-5">
+                            <div>
+                                <label class="text-[9px] text-gray-500 uppercase font-bold block mb-2 tracking-widest">Entry Title</label>
+                                <input type="text" id="postTitle" placeholder="Ketik judul..." class="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-sm focus:border-red-600 outline-none transition-all placeholder:text-gray-800">
+                            </div>
+                            <div>
+                                <label class="text-[9px] text-gray-500 uppercase font-bold block mb-2 tracking-widest">Entry Body</label>
+                                <textarea id="postBody" rows="5" placeholder="Ketik isi konten..." class="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-sm focus:border-red-600 outline-none transition-all placeholder:text-gray-800"></textarea>
+                            </div>
+                            <button onclick="addNewPost()" class="w-full neon-button py-4 rounded-lg text-xs mt-4">Queue Data</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- List Manager & Editor JSON -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Delete Manager -->
+                    <div class="glass p-6 rounded-2xl neon-border">
+                        <h4 class="text-[10px] font-black text-gray-500 mb-6 uppercase tracking-[0.2em]">Manage Current Entries</h4>
+                        <div id="adminEntryList" class="space-y-3 max-h-[300px] overflow-y-auto custom-scroll pr-2">
+                            <!-- Items will appear here -->
+                        </div>
+                    </div>
+
+                    <!-- JSON Editor -->
+                    <div class="rounded-2xl overflow-hidden neon-border">
+                        <div class="bg-[#1a1a1a] p-4 flex justify-between items-center border-b border-white/5">
+                            <span class="text-[9px] font-mono text-gray-500 uppercase tracking-widest">Raw_Data_Source.json</span>
+                            <div class="flex gap-2">
+                                <div class="w-2 h-2 rounded-full bg-white/5"></div>
+                                <div class="w-2 h-2 rounded-full bg-white/5"></div>
+                            </div>
+                        </div>
+                        <div id="editor"></div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end">
+                        <button onclick="handleUpdate()" class="neon-button px-12 py-5 rounded-xl flex items-center gap-4 group">
+                            <span class="text-xs font-black">COMMIT CHANGES TO SERVER</span>
+                            <svg class="group-hover:translate-x-1 transition-transform" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
-    <footer class="text-center py-10 text-emerald-300/40 text-sm border-t border-emerald-900/50 mt-20">
-        &copy; 2024 Emerald CMS. Dirancang secara profesional untuk pengelolaan data efisien.
+    <footer class="p-12 text-center border-t border-white/5 bg-black/80 backdrop-blur-md mt-20">
+        <div class="mb-4 flex justify-center gap-6">
+            <div class="h-px w-8 bg-white/10 self-center"></div>
+            <p class="text-gray-600 text-[9px] tracking-[0.5em] uppercase font-bold">Muhardian Pro Systems</p>
+            <div class="h-px w-8 bg-white/10 self-center"></div>
+        </div>
+        <p class="text-gray-800 text-[8px] font-mono uppercase tracking-widest">Terminal Build 2026.4.1</p>
     </footer>
 
-    <!-- Universal Admin Modal -->
-    <div id="adminModal" class="modal flex items-center justify-center p-4">
-        
-        <!-- Login Section -->
-        <div id="loginSection" class="glass-morphism w-full max-w-md p-8 bg-[#064e3b] shadow-2xl scale-in">
-            <div class="text-center mb-8">
-                <div class="w-16 h-16 emerald-gradient rounded-2xl flex items-center justify-center shadow-lg mx-auto mb-4">
-                    <i class="fas fa-lock text-2xl text-white"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-white">Autentikasi Admin</h3>
-                <p class="text-emerald-300/60 text-sm">Silakan login untuk mengakses editor</p>
-            </div>
-            
-            <form id="loginForm" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-emerald-400">Username</label>
-                    <input type="text" id="username" required class="w-full bg-emerald-900/50 border border-emerald-700 rounded-xl p-4 outline-none focus:border-emerald-400 transition-all text-white placeholder-emerald-800" placeholder="admin">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-emerald-400">Password</label>
-                    <input type="password" id="password" required class="w-full bg-emerald-900/50 border border-emerald-700 rounded-xl p-4 outline-none focus:border-emerald-400 transition-all text-white placeholder-emerald-800" placeholder="••••••••">
-                </div>
-                <div id="loginError" class="hidden text-red-400 text-sm text-center font-medium bg-red-900/20 py-3 rounded-lg border border-red-900/50">
-                    Kredensial yang Anda masukkan salah.
-                </div>
-                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-[#022c22] font-bold py-4 rounded-xl transition-all shadow-xl active:scale-95">
-                    Masuk ke Panel
-                </button>
-                <button type="button" onclick="toggleAdminModal()" class="w-full text-emerald-300 text-sm py-2 hover:text-white transition-colors">Batal</button>
-            </form>
-        </div>
-
-        <!-- Editor Section -->
-        <div id="editorSection" class="glass-morphism w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 bg-[#064e3b] shadow-2xl hidden">
-            <div class="flex justify-between items-center mb-8 border-b border-emerald-800 pb-6">
-                <div>
-                    <h3 class="text-2xl font-bold text-emerald-400">Panel Artikel</h3>
-                    <p class="text-emerald-300/50 text-sm">Terhubung sebagai: <span class="text-emerald-100 italic">Administrator</span></p>
-                </div>
-                <button onclick="toggleAdminModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-emerald-900/50 hover:bg-red-900/40 text-white transition-all">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <form id="cmsForm" class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-emerald-400">Judul Artikel</label>
-                        <input type="text" id="title" required class="w-full bg-emerald-900/50 border border-emerald-700 rounded-xl p-3 outline-none focus:border-emerald-400 transition-all text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-emerald-400">Tanggal</label>
-                        <input type="date" id="date" required class="w-full bg-emerald-900/50 border border-emerald-700 rounded-xl p-3 outline-none focus:border-emerald-400 transition-all text-white">
-                    </div>
-                </div>
-                
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-emerald-400">Banner (Google Drive)</label>
-                    <div class="relative group">
-                        <input type="file" id="image" accept="image/*" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                        <div class="w-full border-2 border-dashed border-emerald-700 rounded-xl p-10 text-center group-hover:border-emerald-400 group-hover:bg-emerald-900/20 transition-all">
-                            <i class="fas fa-cloud-upload-alt text-4xl text-emerald-500 mb-3"></i>
-                            <p class="text-sm text-emerald-300 font-medium">Klik untuk pilih gambar atau tarik file ke sini</p>
-                            <p class="text-[10px] text-emerald-600 mt-2 uppercase tracking-tighter">Format: JPG, PNG, WEBP</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-emerald-400">Isi Konten</label>
-                    <div id="editor-container"></div>
-                </div>
-
-                <div class="pt-6 border-t border-emerald-800">
-                    <button type="submit" id="submitBtn" class="w-full bg-emerald-500 hover:bg-emerald-400 text-[#022c22] font-bold py-4 rounded-xl transition-all flex justify-center items-center shadow-2xl active:scale-95">
-                        <span id="btnText">Simpan & Publish Artikel</span>
-                        <div id="btnLoader" class="loader ml-3 hidden"></div>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Scripts -->
     <script>
-        /**
-         * PENGATURAN HOSTING:
-         * Masukkan URL Web App dari Google Apps Script Anda di sini.
-         */
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyqM9zVwE21NMraa041lWms2A7Do4smoJpM2b7c6HdD25fujcKvEd7atlkbvdYxM-gUKw/exec';
+        const API_URL = "https://script.google.com/macros/s/AKfycby5MY97s2zr5pFXB8H8pvzD4LY3lMcy9GwY2_-YeKffk-hye2Mq-B81QQNIBAWKcH9i/exec";
         
-        let isLoggedIn = false;
+        let currentPassword = "";
+        let aceEditor;
+        let localData = [];
 
-        // Inisialisasi Quill Editor
-        var quill = new Quill('#editor-container', {
-            theme: 'snow',
-            placeholder: 'Mulai menulis konten yang menarik...',
-            modules: {
-                toolbar: [
-                    [{ 'header': [1, 2, 3, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    [{ 'color': [] }, { 'background': [] }],
-                    ['link', 'blockquote'],
-                    ['clean']
-                ]
-            }
+        // Mouse Spotlight Effect
+        const glow = document.getElementById('cursor-glow');
+        window.addEventListener('mousemove', (e) => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const modal = document.getElementById('adminModal');
-            modal.style.display = 'none';
-            loadArticles();
-        });
-
-        function toggleAdminModal() {
-            const modal = document.getElementById('adminModal');
-            const loginSection = document.getElementById('loginSection');
-            const editorSection = document.getElementById('editorSection');
-
-            if (modal.style.display === 'flex') {
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            } else {
-                modal.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-                
-                if (isLoggedIn) {
-                    loginSection.classList.add('hidden');
-                    editorSection.classList.remove('hidden');
-                } else {
-                    loginSection.classList.remove('hidden');
-                    editorSection.classList.add('hidden');
-                }
-            }
-        }
-
-        document.getElementById('loginForm').onsubmit = (e) => {
-            e.preventDefault();
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-            const errorMsg = document.getElementById('loginError');
-
-            if (user === 'admin' && pass === 'admin123') {
-                isLoggedIn = true;
-                errorMsg.classList.add('hidden');
-                document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('editorSection').classList.remove('hidden');
-                document.getElementById('logoutBtn').classList.remove('hidden');
-                document.getElementById('username').value = '';
-                document.getElementById('password').value = '';
-            } else {
-                errorMsg.classList.remove('hidden');
-                const loginBox = document.getElementById('loginSection');
-                loginBox.classList.add('animate-bounce');
-                setTimeout(() => loginBox.classList.remove('animate-bounce'), 500);
-            }
-        };
-
-        function handleLogout() {
-            isLoggedIn = false;
-            document.getElementById('logoutBtn').classList.add('hidden');
-            alert('Sesi admin berakhir.');
-            location.reload();
-        }
-
-        function setLoading(isLoading) {
-            const btnText = document.getElementById('btnText');
-            const btnLoader = document.getElementById('btnLoader');
-            const submitBtn = document.getElementById('submitBtn');
+        function initEditor() {
+            aceEditor = ace.edit("editor");
+            aceEditor.setTheme("ace/theme/tomorrow_night_eighties");
+            aceEditor.session.setMode("ace/mode/json");
+            aceEditor.setOptions({
+                showPrintMargin: false,
+                highlightActiveLine: true,
+                wrap: true,
+                useWorker: false
+            });
+            aceEditor.renderer.setScrollMargin(10, 10);
             
-            if (isLoading) {
-                btnText.textContent = "Sinkronisasi ke Cloud...";
-                btnLoader.classList.remove('hidden');
-                submitBtn.disabled = true;
-                submitBtn.classList.add('opacity-70');
-            } else {
-                btnText.textContent = "Simpan & Publish Artikel";
-                btnLoader.classList.add('hidden');
-                submitBtn.disabled = false;
-                submitBtn.classList.remove('opacity-70');
-            }
-        }
-
-        /**
-         * Mengambil data dari Google Sheets melalui Apps Script
-         * Menggunakan mekanisme fallback jika fetch biasa gagal
-         */
-        async function loadArticles() {
-            const grid = document.getElementById('article-grid');
-            
-            if (!WEB_APP_URL || WEB_APP_URL.includes('...YOUR_ID...')) {
-                renderEmptyState(grid, "Konfigurasi Belum Lengkap", "URL Web App belum diatur dengan benar di kode sumber.");
-                return;
-            }
-
-            try {
-                // Mencoba fetch standar dengan parameter no-cache untuk menghindari data lama
-                const response = await fetch(WEB_APP_URL + '?t=' + new Date().getTime(), { 
-                    method: 'GET',
-                    cache: 'no-store'
-                });
-                
-                if (!response.ok) throw new Error('Network response not ok');
-                
-                const articles = await response.json();
-                renderArticles(articles);
-
-            } catch (error) {
-                console.warn('Fetch standar gagal, mencoba metode alternatif...', error);
-                
-                // Jika fetch standar gagal karena CORS, instruksikan user
-                renderEmptyState(grid, "Masalah Koneksi (CORS)", 
-                    "Browser memblokir permintaan data. Pastikan di Google Apps Script Anda telah memilih 'Anyone' pada 'Who has access'. <br><br> <a href='" + WEB_APP_URL + "' target='_blank' class='underline text-emerald-400'>Klik di sini untuk memverifikasi URL</a>");
-            }
-        }
-
-        function renderArticles(articles) {
-            const grid = document.getElementById('article-grid');
-            if (!articles || articles.length === 0) {
-                renderEmptyState(grid, "Belum Ada Artikel", "Gunakan Admin Panel untuk mempublikasikan konten pertama Anda.");
-                return;
-            }
-
-            grid.innerHTML = '';
-            articles.reverse().forEach((item, index) => {
-                grid.innerHTML += `
-                    <article class="glass-morphism overflow-hidden card-hover flex flex-col fade-in" style="animation-delay: ${index * 0.1}s">
-                        <div class="h-52 emerald-gradient flex items-center justify-center relative overflow-hidden">
-                            <img src="https://lh3.googleusercontent.com/d/${item.imageId}" class="w-full h-full object-cover opacity-80" onerror="this.src='https://via.placeholder.com/400x300?text=Emerald+CMS'">
-                            <div class="absolute bottom-4 left-4">
-                                <span class="bg-black/50 backdrop-blur-md text-[10px] px-2 py-1 rounded text-emerald-300 uppercase font-bold tracking-widest italic">Berita</span>
-                            </div>
-                        </div>
-                        <div class="p-6">
-                            <div class="flex items-center gap-2 mb-3">
-                                <i class="far fa-calendar-alt text-emerald-500 text-xs"></i>
-                                <span class="text-[10px] text-emerald-400 font-mono uppercase tracking-widest">${new Date(item.date).toLocaleDateString('id-ID')}</span>
-                            </div>
-                            <h3 class="text-xl font-bold mt-1 mb-3 text-white leading-tight">${item.title}</h3>
-                            <div class="text-sm text-emerald-100/60 line-clamp-3 mb-5">${item.content.replace(/<[^>]*>?/gm, '')}</div>
-                            <button class="mt-auto flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase hover:gap-3 transition-all">
-                                Baca Detail <i class="fas fa-chevron-right text-[10px]"></i>
-                            </button>
-                        </div>
-                    </article>
-                `;
+            // Sync manual changes from editor back to localData
+            aceEditor.on("change", () => {
+                try {
+                    const content = aceEditor.getValue();
+                    if (content.trim()) {
+                        localData = JSON.parse(content);
+                        renderAdminEntryList();
+                    }
+                } catch(e) {}
             });
         }
 
-        function renderEmptyState(container, title, message) {
-            container.innerHTML = `
-                <div class="col-span-full py-20 text-center fade-in">
-                    <div class="w-20 h-20 bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-800">
-                        <i class="fas fa-satellite-dish text-emerald-700 text-3xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-emerald-100">${title}</h3>
-                    <p class="text-emerald-500 text-sm mt-2 max-w-md mx-auto leading-relaxed">${message}</p>
-                </div>
-            `;
+        async function fetchContent() {
+            document.getElementById('loading').classList.remove('hidden');
+            try {
+                const response = await fetch(API_URL);
+                const result = await response.json();
+                localData = result.data || [];
+                renderVisitorGrid();
+                renderAdminEntryList();
+                if (aceEditor) aceEditor.setValue(JSON.stringify(localData, null, 4), -1);
+            } catch (error) {
+                console.error("Fetch error:", error);
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+            }
         }
 
-        const toBase64 = file => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result.split(',')[1]);
-            reader.onerror = error => reject(error);
-        });
+        function renderVisitorGrid() {
+            const grid = document.getElementById('contentGrid');
+            grid.innerHTML = "";
+            
+            if (localData.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center text-gray-600 py-10 italic">Tidak ada transmisi data terdeteksi.</div>`;
+                return;
+            }
 
-        document.getElementById('cmsForm').onsubmit = async (e) => {
-            e.preventDefault();
-            setLoading(true);
+            localData.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = `glass p-10 rounded-3xl neon-border card-anim flex flex-col group`;
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-8">
+                        <div class="flex flex-col">
+                            <span class="text-[9px] font-mono text-red-600 uppercase tracking-[0.3em] font-black">${item.date || 'UNSET'}</span>
+                            <div class="h-[2px] w-4 bg-red-600 mt-1 transition-all group-hover:w-8"></div>
+                        </div>
+                        <span class="text-[8px] text-gray-700 font-mono italic">#${String(index + 1).padStart(3, '0')}</span>
+                    </div>
+                    <h3 class="text-2xl font-black mb-5 text-white tracking-tight leading-none group-hover:neon-text transition-all">${item.title}</h3>
+                    <div class="text-gray-400 text-sm leading-relaxed mb-6 line-clamp-3 font-medium">
+                        ${item.body}
+                    </div>
+                    <div class="mt-auto">
+                        <button onclick="readFullContent(${index})" class="group/btn inline-flex items-center gap-2 text-[9px] font-black text-red-600 hover:text-white uppercase tracking-[0.2em] transition-all">
+                            <span>Expand Entry</span>
+                            <svg class="group-hover/btn:translate-x-1 transition-transform" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderAdminEntryList() {
+            const listContainer = document.getElementById('adminEntryList');
+            if (!listContainer) return;
+            
+            listContainer.innerHTML = "";
+            localData.forEach((item, index) => {
+                const itemEl = document.createElement('div');
+                itemEl.className = "flex items-center justify-between bg-black/40 p-4 rounded-xl border border-white/5 hover:border-red-600/30 transition-all";
+                itemEl.innerHTML = `
+                    <div class="flex flex-col overflow-hidden mr-4">
+                        <span class="text-[11px] font-bold text-white truncate uppercase tracking-tight">${item.title}</span>
+                        <span class="text-[8px] font-mono text-gray-600 uppercase">${item.date}</span>
+                    </div>
+                    <button onclick="deleteEntry(${index})" class="p-2 hover:bg-red-600/10 rounded-lg text-gray-600 hover:text-red-500 transition-all">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                    </button>
+                `;
+                listContainer.appendChild(itemEl);
+            });
+        }
+
+        function deleteEntry(index) {
+            Swal.fire({
+                title: 'Hapus Konten?',
+                text: `Entry "${localData[index].title}" akan dihapus dari antrean lokal.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ff003c',
+                cancelButtonColor: '#1a1a1a',
+                confirmButtonText: 'Ya, Hapus!',
+                background: '#0a0a0a',
+                color: '#fff'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localData.splice(index, 1);
+                    aceEditor.setValue(JSON.stringify(localData, null, 4), -1);
+                    renderAdminEntryList();
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'info',
+                        title: 'Dihapus dari antrean. Ingat untuk Commit!',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        background: '#121212',
+                        color: '#fff'
+                    });
+                }
+            });
+        }
+
+        function readFullContent(index) {
+            const item = localData[index];
+            Swal.fire({
+                title: `<span class="neon-text text-2xl font-black italic tracking-tighter uppercase">${item.title}</span>`,
+                html: `
+                    <div class="text-left py-6">
+                        <div class="flex items-center justify-between mb-6 border-b border-white/5 pb-2">
+                             <p class="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold">${item.date}</p>
+                             <p class="text-[9px] font-mono text-red-600 uppercase">Status: Finalized</p>
+                        </div>
+                        <div class="text-sm leading-relaxed text-gray-300 overflow-y-auto max-h-[50vh] pr-4 custom-scroll">
+                            ${item.body.replace(/\n/g, '<br>')}
+                        </div>
+                    </div>
+                `,
+                showConfirmButton: false,
+                showCloseButton: true,
+                customClass: { popup: 'read-more-modal' },
+                background: '#0a0a0a',
+                color: '#eee'
+            });
+        }
+
+        function addNewPost() {
+            const title = document.getElementById('postTitle').value;
+            const body = document.getElementById('postBody').value;
+            const date = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+
+            if (!title || !body) {
+                return Swal.fire({ title: 'Validation Failed', text: 'Data tidak boleh kosong!', icon: 'warning', background: '#0a0a0a', color: '#fff' });
+            }
+
+            const newPost = { title, body, date };
+            localData.unshift(newPost);
+            aceEditor.setValue(JSON.stringify(localData, null, 4), -1);
+            renderAdminEntryList();
+            document.getElementById('postTitle').value = "";
+            document.getElementById('postBody').value = "";
+            
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Ditambahkan ke antrean.',
+                showConfirmButton: false,
+                timer: 2000,
+                background: '#121212',
+                color: '#fff'
+            });
+        }
+
+        async function showLoginPopup() {
+            const { value: password } = await Swal.fire({
+                title: 'TERMINAL LOGIN',
+                text: 'Authentication required for root access',
+                input: 'password',
+                inputPlaceholder: 'Enter Security Hash',
+                confirmButtonColor: '#ff003c',
+                confirmButtonText: 'Initialize',
+                background: '#050505',
+                color: '#fff',
+                customClass: { popup: 'neon-border' }
+            });
+            if (password) verifyLogin(password);
+        }
+
+        async function verifyLogin(password) {
+            Swal.fire({ title: 'Decrypting Sockets...', didOpen: () => Swal.showLoading(), background: '#050505', color: '#fff' });
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'login', password: password })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    currentPassword = password;
+                    const adminSec = document.getElementById('adminSection');
+                    document.getElementById('visitorSection').classList.add('hidden');
+                    adminSec.classList.remove('hidden');
+                    setTimeout(() => adminSec.classList.add('opacity-100'), 50);
+                    document.getElementById('adminBtn').classList.add('hidden');
+                    Swal.close();
+                } else {
+                    Swal.fire({ title: 'Access Denied', text: 'Hash mismatch!', icon: 'error', background: '#050505', color: '#fff' });
+                }
+            } catch (e) { Swal.fire('Critical Error', 'Database unreachable.', 'error'); }
+        }
+
+        async function handleUpdate() {
+            let updatedData;
+            try {
+                updatedData = JSON.parse(aceEditor.getValue());
+            } catch (e) {
+                return Swal.fire('JSON Error', 'Struktur data korup!', 'error');
+            }
+
+            Swal.fire({ title: 'Deploying To Server...', didOpen: () => Swal.showLoading(), background: '#050505', color: '#fff' });
 
             try {
-                const file = document.getElementById('image').files[0];
-                const base64Image = await toBase64(file);
-
-                const payload = {
-                    title: document.getElementById('title').value,
-                    date: document.getElementById('date').value,
-                    content: quill.root.innerHTML,
-                    image: base64Image,
-                    filename: file.name
-                };
-
-                // Menggunakan fetch dengan mode no-cors untuk bypass CORS pada POST
-                await fetch(WEB_APP_URL, {
+                const response = await fetch(API_URL, {
                     method: 'POST',
-                    mode: 'no-cors', 
-                    cache: 'no-cache',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ 
+                        action: 'update', 
+                        password: currentPassword, 
+                        newData: updatedData 
+                    })
                 });
+                const result = await response.json();
+                if (result.success) {
+                    localData = updatedData;
+                    renderVisitorGrid();
+                    renderAdminEntryList();
+                    Swal.fire({ title: 'Deployment Success', text: 'Data has been synchronized.', icon: 'success', background: '#050505', color: '#fff' });
+                }
+            } catch (e) { Swal.fire('Deploy Failed', 'Koneksi terputus.', 'error'); }
+        }
 
-                alert('Data telah dikirim ke Google Sheets! Halaman akan dimuat ulang dalam 3 detik.');
-                document.getElementById('cmsForm').reset();
-                quill.setContents([]);
-                toggleAdminModal();
-                
-                // Jeda sebentar agar Apps Script selesai memproses sebelum refresh data
-                setTimeout(loadArticles, 3500);
+        function logout() {
+            location.reload();
+        }
 
-            } catch (error) {
-                alert('Gagal mengirim data: ' + error.message);
-            } finally {
-                setLoading(false);
-            }
+        window.onload = () => {
+            initEditor();
+            fetchContent();
         };
     </script>
 </body>
