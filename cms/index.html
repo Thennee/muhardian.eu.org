@@ -145,7 +145,7 @@
     <div id="cursor-glow"></div>
 
     <nav class="p-6 flex justify-between items-center glass sticky top-0 z-50">
-        <h1 class="text-xl font-extrabold tracking-tighter neon-text">MUHARDIAN<span class="text-white">.PRO</span></h1>
+        <h1 class="text-xl font-extrabold tracking-tighter neon-text">MUHARDIAN<span class="text-white">.CMS</span></h1>
         <button onclick="showLoginPopup()" id="adminBtn" class="neon-button px-5 py-2 rounded text-xs">Admin Access</button>
     </nav>
 
@@ -176,7 +176,6 @@
                     <h3 class="text-4xl font-black neon-text italic">ADMIN CONTROL</h3>
                     <p class="text-gray-500 text-xs font-mono tracking-widest uppercase">LOGGED IN AS: ADMINISTRATOR</p>
                 </div>
-                <!-- Tombol Terminate Session diperbarui -->
                 <button onclick="logout()" class="neon-button px-6 py-3 rounded-xl flex items-center gap-3 group whitespace-nowrap">
                     <span class="text-[10px] font-black">TERMINATE SESSION</span>
                     <svg class="group-hover:-translate-x-1 transition-transform" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -207,7 +206,6 @@
 
                 <!-- List Manager & Editor JSON -->
                 <div class="lg:col-span-2 space-y-8">
-                    <!-- Delete Manager -->
                     <div class="glass p-6 rounded-2xl neon-border">
                         <h4 class="text-[10px] font-black text-gray-500 mb-6 uppercase tracking-[0.2em]">Manage Current Entries</h4>
                         <div id="adminEntryList" class="space-y-3 max-h-[300px] overflow-y-auto custom-scroll pr-2">
@@ -215,10 +213,9 @@
                         </div>
                     </div>
 
-                    <!-- JSON Editor -->
                     <div class="rounded-2xl overflow-hidden neon-border">
                         <div class="bg-[#1a1a1a] p-4 flex justify-between items-center border-b border-white/5">
-                            <span class="text-[9px] font-mono text-gray-500 uppercase tracking-widest">Raw_Data_Source.json</span>
+                            <span class="text-[9px] font-mono text-gray-500 uppercase tracking-widest">Row_Data_Source.json</span>
                             <div class="flex gap-2">
                                 <div class="w-2 h-2 rounded-full bg-white/5"></div>
                                 <div class="w-2 h-2 rounded-full bg-white/5"></div>
@@ -249,13 +246,12 @@
     </footer>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycby5MY97s2zr5pFXB8H8pvzD4LY3lMcy9GwY2_-YeKffk-hye2Mq-B81QQNIBAWKcH9i/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbyCtaeg8_G-5H9lYHG9b91aHeQoJqwQfY3Z0spYUIGjSbPVYrZso1drJqvmtxEsbCc/exec";
         
         let currentPassword = "";
         let aceEditor;
         let localData = [];
 
-        // Mouse Spotlight Effect
         const glow = document.getElementById('cursor-glow');
         window.addEventListener('mousemove', (e) => {
             glow.style.left = e.clientX + 'px';
@@ -274,13 +270,15 @@
             });
             aceEditor.renderer.setScrollMargin(10, 10);
             
-            // Sync manual changes from editor back to localData
             aceEditor.on("change", () => {
                 try {
                     const content = aceEditor.getValue();
                     if (content.trim()) {
-                        localData = JSON.parse(content);
-                        renderAdminEntryList();
+                        const parsed = JSON.parse(content);
+                        if (JSON.stringify(parsed) !== JSON.stringify(localData)) {
+                            localData = parsed;
+                            renderAdminEntryList();
+                        }
                     }
                 } catch(e) {}
             });
