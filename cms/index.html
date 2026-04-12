@@ -113,6 +113,20 @@
             overflow: hidden;
         }
 
+        /* Gaya Khusus Link di dalam konten */
+        .content-link {
+            color: #ff003c;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+        
+        .content-link:hover {
+            color: #fff;
+            text-shadow: 0 0 8px #ff003c;
+        }
+
         .card-anim {
             animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
             opacity: 0;
@@ -197,7 +211,7 @@
                             </div>
                             <div>
                                 <label class="text-[9px] text-gray-500 uppercase font-bold block mb-2 tracking-widest">Entry Body</label>
-                                <textarea id="postBody" rows="5" placeholder="Ketik isi konten..." class="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-sm focus:border-red-600 outline-none transition-all placeholder:text-gray-800"></textarea>
+                                <textarea id="postBody" rows="5" placeholder="Ketik isi konten... (Anda bisa memasukkan link website)" class="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-sm focus:border-red-600 outline-none transition-all placeholder:text-gray-800"></textarea>
                             </div>
                             <button onclick="addNewPost()" class="w-full neon-button py-4 rounded-lg text-xs mt-4">Queue Data</button>
                         </div>
@@ -258,6 +272,14 @@
             glow.style.top = e.clientY + 'px';
         });
 
+        // Fungsi untuk mengubah teks URL menjadi link HTML
+        function linkify(text) {
+            const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+            return text.replace(urlPattern, function(url) {
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="content-link">${url}</a>`;
+            });
+        }
+
         function initEditor() {
             aceEditor = ace.edit("editor");
             aceEditor.setTheme("ace/theme/tomorrow_night_eighties");
@@ -314,6 +336,9 @@
                 card.className = `glass p-10 rounded-3xl neon-border card-anim flex flex-col group`;
                 card.style.animationDelay = `${index * 0.1}s`;
                 
+                // Gunakan linkify untuk memproses bodi teks
+                const processedBody = linkify(item.body);
+
                 card.innerHTML = `
                     <div class="flex justify-between items-center mb-8">
                         <div class="flex flex-col">
@@ -324,7 +349,7 @@
                     </div>
                     <h3 class="text-2xl font-black mb-5 text-white tracking-tight leading-none group-hover:neon-text transition-all">${item.title}</h3>
                     <div class="text-gray-400 text-sm leading-relaxed mb-6 line-clamp-3 font-medium">
-                        ${item.body}
+                        ${processedBody}
                     </div>
                     <div class="mt-auto">
                         <button onclick="readFullContent(${index})" class="group/btn inline-flex items-center gap-2 text-[9px] font-black text-red-600 hover:text-white uppercase tracking-[0.2em] transition-all">
@@ -390,6 +415,8 @@
 
         function readFullContent(index) {
             const item = localData[index];
+            const processedBody = linkify(item.body);
+
             Swal.fire({
                 title: `<span class="neon-text text-2xl font-black italic tracking-tighter uppercase">${item.title}</span>`,
                 html: `
@@ -399,7 +426,7 @@
                              <p class="text-[9px] font-mono text-red-600 uppercase">Status: Finalized</p>
                         </div>
                         <div class="text-sm leading-relaxed text-gray-300 overflow-y-auto max-h-[50vh] pr-4 custom-scroll">
-                            ${item.body.replace(/\n/g, '<br>')}
+                            ${processedBody.replace(/\n/g, '<br>')}
                         </div>
                     </div>
                 `,
