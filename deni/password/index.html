@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Kata Sandi Kuat - Dark Red</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at center, #450a0a 0%, #1a0505 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #fecaca;
+        }
+
+        .glass-card {
+            background: rgba(30, 10, 10, 0.8);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .strength-meter {
+            height: 6px;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            width: 0%;
+        }
+
+        input[type="range"] {
+            accent-color: #dc2626;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #ef4444;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        .custom-checkbox:checked {
+            background-color: #dc2626;
+            border-color: #dc2626;
+        }
+
+        footer a:hover {
+            text-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+        }
+    </style>
+</head>
+<body>
+
+<div class="glass-card w-full max-w-md p-8">
+    <div class="text-center mb-8">
+        <h1 class="text-2xl font-bold text-red-500 tracking-tight">Password Generator</h1>
+        <p class="text-red-300/60 text-sm mt-2">Keamanan tingkat tinggi </p>
+    </div>
+
+    <!-- Password Display Area -->
+    <div class="relative mb-6">
+        <div class="bg-black/40 p-4 rounded-xl border border-red-900/50 flex items-center justify-between group transition-all hover:border-red-600/50">
+            <span id="password-display" class="text-xl font-mono font-bold text-red-400 truncate mr-2 select-all tracking-wider">P4ssw0rd!</span>
+            <button onclick="copyToClipboard()" class="p-2 hover:bg-red-900/30 rounded-lg transition-colors text-red-400 hover:text-red-300" title="Salin">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+            </button>
+        </div>
+        <!-- Success Message Toast -->
+        <div id="copy-toast" class="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-red-600 text-white text-xs py-1 px-3 rounded-full opacity-0 transition-opacity pointer-events-none shadow-lg">
+            Berhasil disalin!
+        </div>
+    </div>
+
+    <!-- Strength Meter -->
+    <div class="mb-6">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-[10px] font-bold text-red-400/70 uppercase tracking-widest">Keamanan</span>
+            <span id="strength-text" class="text-xs font-bold text-red-500 uppercase">Lemah</span>
+        </div>
+        <div class="w-full bg-red-950 rounded-full h-1.5 overflow-hidden">
+            <div id="strength-bar" class="strength-meter bg-red-600"></div>
+        </div>
+    </div>
+
+    <!-- Options -->
+    <div class="space-y-6">
+        <!-- Length Slider -->
+        <div>
+            <div class="flex justify-between mb-2">
+                <label class="text-sm font-medium text-red-200">Panjang Karakter</label>
+                <span id="length-value" class="text-red-500 font-bold">12</span>
+            </div>
+            <input type="range" id="length-slider" min="6" max="32" value="12" class="w-full h-1.5 bg-red-950 rounded-lg appearance-none cursor-pointer">
+        </div>
+
+        <!-- Checkboxes -->
+        <div class="grid grid-cols-2 gap-4">
+            <label class="flex items-center space-x-3 cursor-pointer group">
+                <input type="checkbox" id="uppercase" checked class="custom-checkbox w-5 h-5 bg-red-950 border-red-900 rounded focus:ring-red-500 focus:ring-offset-0 text-red-600">
+                <span class="text-sm text-red-200/80 group-hover:text-red-400 transition-colors">Huruf Besar</span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer group">
+                <input type="checkbox" id="lowercase" checked class="custom-checkbox w-5 h-5 bg-red-950 border-red-900 rounded focus:ring-red-500 focus:ring-offset-0 text-red-600">
+                <span class="text-sm text-red-200/80 group-hover:text-red-400 transition-colors">Huruf Kecil</span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer group">
+                <input type="checkbox" id="numbers" checked class="custom-checkbox w-5 h-5 bg-red-950 border-red-900 rounded focus:ring-red-500 focus:ring-offset-0 text-red-600">
+                <span class="text-sm text-red-200/80 group-hover:text-red-400 transition-colors">Angka</span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer group">
+                <input type="checkbox" id="symbols" checked class="custom-checkbox w-5 h-5 bg-red-950 border-red-900 rounded focus:ring-red-500 focus:ring-offset-0 text-red-600">
+                <span class="text-sm text-red-200/80 group-hover:text-red-400 transition-colors">Simbol</span>
+            </label>
+        </div>
+
+        <!-- Action Button -->
+        <button id="generate-btn" class="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-4 px-6 rounded-xl transition-all transform active:scale-95 shadow-lg shadow-red-900/20 flex items-center justify-center space-x-2 border border-red-500/30">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+            </svg>
+            <span>Generate Password</span>
+        </button>
+    </div>
+</div>
+
+<footer class="mt-8 text-center text-red-400/40 text-sm">
+    <p>Deploy by : <a href="https://muhardian.eu.org/deni/" target="_blank" class="text-red-500 hover:text-red-400 font-semibold transition-all">Muhardian</a> @ 2026</p>
+</footer>
+
+<script>
+    const passwordDisplay = document.getElementById('password-display');
+    const lengthSlider = document.getElementById('length-slider');
+    const lengthValue = document.getElementById('length-value');
+    const uppercaseEl = document.getElementById('uppercase');
+    const lowercaseEl = document.getElementById('lowercase');
+    const numbersEl = document.getElementById('numbers');
+    const symbolsEl = document.getElementById('symbols');
+    const generateBtn = document.getElementById('generate-btn');
+    const strengthBar = document.getElementById('strength-bar');
+    const strengthText = document.getElementById('strength-text');
+    const toast = document.getElementById('copy-toast');
+
+    const charSets = {
+        upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        lower: 'abcdefghijklmnopqrstuvwxyz',
+        numbers: '0123456789',
+        symbols: '!@#$%^&*()_+~`|}{[]:;?><,./-='
+    };
+
+    function generatePassword() {
+        let length = +lengthSlider.value;
+        let characters = '';
+        let password = '';
+
+        if (uppercaseEl.checked) characters += charSets.upper;
+        if (lowercaseEl.checked) characters += charSets.lower;
+        if (numbersEl.checked) characters += charSets.numbers;
+        if (symbolsEl.checked) characters += charSets.symbols;
+
+        if (characters === '') {
+            passwordDisplay.innerText = 'Pilih Opsi!';
+            updateStrength(0);
+            return;
+        }
+
+        for (let i = 0; i < length; i++) {
+            password += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+
+        passwordDisplay.innerText = password;
+        calculateStrength(password);
+    }
+
+    function calculateStrength(pwd) {
+        let score = 0;
+        if (pwd.length > 8) score++;
+        if (pwd.length > 14) score++;
+        if (/[A-Z]/.test(pwd)) score++;
+        if (/[0-9]/.test(pwd)) score++;
+        if (/[^A-Za-z0-9]/.test(pwd)) score++;
+        
+        updateStrength(score);
+    }
+
+    function updateStrength(score) {
+        let width = '0%';
+        let color = '#7f1d1d'; // default dark red
+        let label = 'Sangat Lemah';
+
+        if (score >= 5) {
+            width = '100%';
+            color = '#22c55e'; // Green for strong
+            label = 'Sangat Kuat';
+        } else if (score >= 4) {
+            width = '75%';
+            color = '#3b82f6'; // Blue
+            label = 'Kuat';
+        } else if (score >= 3) {
+            width = '50%';
+            color = '#f59e0b'; // Amber
+            label = 'Sedang';
+        } else if (score >= 1) {
+            width = '25%';
+            color = '#ef4444'; // Red
+            label = 'Lemah';
+        }
+
+        strengthBar.style.width = width;
+        strengthBar.style.backgroundColor = color;
+        strengthText.innerText = label;
+        strengthText.style.color = color;
+    }
+
+    function copyToClipboard() {
+        const text = passwordDisplay.innerText;
+        if (text === 'Pilih Opsi!' || text === '') return;
+        
+        const dummy = document.createElement("textarea");
+        document.body.appendChild(dummy);
+        dummy.value = text;
+        dummy.select();
+        document.execCommand("copy");
+        document.body.removeChild(dummy);
+
+        // Show toast notification
+        toast.style.opacity = '1';
+        setTimeout(() => {
+            toast.style.opacity = '0';
+        }, 2000);
+    }
+
+    // Event Listeners
+    lengthSlider.addEventListener('input', (e) => {
+        lengthValue.innerText = e.target.value;
+        generatePassword();
+    });
+
+    generateBtn.addEventListener('click', generatePassword);
+
+    // Initial generate
+    window.onload = generatePassword;
+</script>
+
+</body>
+</html>
