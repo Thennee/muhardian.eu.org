@@ -447,9 +447,9 @@
             const pass = document.getElementById('password').value;
             const errorMsg = document.getElementById('login-error');
 
-            if (user === "admin" && pass === "321321") {
+            if (user === "admin" && pass === "admin") {
                 errorMsg.classList.add('hidden');
-                window.location.href = "https://muhardian.eu.org";
+                window.location.href = "https://muhardian.eu.org/cms";
             } else {
                 errorMsg.classList.remove('hidden');
                 document.getElementById('password').value = "";
