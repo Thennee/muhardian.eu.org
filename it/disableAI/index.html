@@ -3,44 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Halaman Home</title>
+    <title>Remove Windows AI - Home</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Menggunakan font sistem yang bersih */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
         body {
-            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
         }
         
-        /* Animasi halus untuk teks */
         .fade-in {
-            animation: fadeIn 1s ease-in-out;
+            animation: fadeIn 0.8s ease-out forwards;
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .code-box {
+            transition: all 0.3s ease;
         }
     </style>
 </head>
-<body class="bg-gray-50 m-0 p-0">
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
 
-    <!-- Container Utama: H-screen memastikan tinggi penuh layar, flex untuk pengetengahan -->
-    <main class="flex items-center justify-center min-h-screen w-full px-4">
-        
-        <div class="text-center fade-in">
-      
+    <!-- Container Utama -->
+    <main class="flex-grow flex items-center justify-center px-6 py-12">
+        <div class="max-w-2xl w-full text-center fade-in">
             
-            <!-- Dekorasi garis bawah yang responsif -->
-            <div class="mt-4 h-1.5 w-16 md:w-24 bg-blue-600 mx-auto rounded-full"></div>
+            <!-- Badge / Label -->
+            <span class="inline-block px-4 py-1.5 mb-6 text-xs font-bold tracking-widest text-blue-600 uppercase bg-blue-100 rounded-full">
+                Windows Optimization, Tweak Windows, Remove Windows AI
+            </span>
+
+            <!-- Judul Utama -->
+            <h1 class="text-3xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">
+                Tweak Windows, Remove Windows AI
+            </h1>
             
-            <p class="mt-6 text-gray-500 text-sm md:text-base font-medium tracking-widest uppercase">
-                open with Terminal / PowerShell and paste : <br>
-                & ([scriptblock]::Create((irm "https://muhardian.eu.org/RemoveWindowsAi.ps1"))) <br>
-              
-            </p>
+            <!-- Dekorasi Garis -->
+            <div class="h-1.5 w-20 bg-blue-600 mx-auto rounded-full mb-8"></div>
+
+            <!-- Card Instruksi -->
+            <div class="glass-effect p-8 rounded-3xl shadow-xl shadow-blue-900/5 text-left border border-slate-200">
+                <p class="text-slate-600 mb-6 leading-relaxed">
+                    Pilih salah satu perintah di bawah ini dan jalankan melalui <strong>PowerShell (Admin)</strong> untuk mengoptimalkan Windows Anda.
+                </p>
+
+                <!-- Box Kode 1: Remove Windows AI -->
+                <div class="mb-6">
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">Remove Windows AI Script</label>
+                    <div class="relative group">
+                        <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-300"></div>
+                        <div class="relative flex flex-col sm:flex-row items-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-800 code-box">
+                            <code id="cmd1" class="text-blue-400 font-mono text-sm break-all flex-grow px-2">
+                                & ([scriptblock]::Create((irm "https://muhardian.eu.org/RemoveWindowsAi.ps1")))
+                            </code>
+                            <button onclick="copyCommand('cmd1', 'btn1')" id="btn1" class="shrink-0 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 border border-slate-700 active:scale-95 w-full sm:w-auto justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6a2 2 0 002-2V7a2 2 0 00-2-2h-6a2 2 0 00-2 2z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                                <span>Salin</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Box Kode 2: Chris Titus Tech -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">Windows Utility (Chris Titus)</label>
+                    <div class="relative group">
+                        <div class="absolute -inset-0.5 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-300"></div>
+                        <div class="relative flex flex-col sm:flex-row items-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-800 code-box">
+                            <code id="cmd2" class="text-emerald-400 font-mono text-sm break-all flex-grow px-2">
+                                irm christitus.com/win | iex
+                            </code>
+                            <button onclick="copyCommand('cmd2', 'btn2')" id="btn2" class="shrink-0 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 border border-slate-700 active:scale-95 w-full sm:w-auto justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6a2 2 0 002-2V7a2 2 0 00-2-2h-6a2 2 0 00-2 2z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                                <span>Salin</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Toast Notification -->
+                <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full text-sm font-medium opacity-0 transition-opacity pointer-events-none shadow-2xl z-50">
+                    Berhasil disalin ke clipboard!
+                </div>
+            </div>
+
+            <!-- Informasi Tambahan -->
+            <section class="mt-16 pt-16 border-t border-slate-200 text-left">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 tracking-tight">Informasi Penting</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                        <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center mb-4 font-bold">1</div>
+                        <h3 class="font-semibold text-slate-800 mb-2">PowerShell Admin</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">Klik kanan pada tombol Start, pilih Windows Terminal (Admin) atau PowerShell (Admin) sebelum menempelkan kode.</p>
+                    </div>
+                    <div class="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                        <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center mb-4 font-bold">2</div>
+                        <h3 class="font-semibold text-slate-800 mb-2">Chris Titus Tool</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">Utility ini menyediakan GUI untuk melakukan debloat, menginstal aplikasi, dan mengoptimalkan registry secara instan.</p>
+                    </div>
+                </div>
+            </section>
         </div>
-
     </main>
 
+    <footer class="py-8 text-center text-slate-400 text-xs border-t border-slate-100 bg-white/50 mt-auto">
+        <p>&copy; 2026 Muhardian. Terinspirasi oleh komunitas Open Source.</p>
+    </footer>
+
+    <script>
+        function copyCommand(elementId, buttonId) {
+            const command = document.getElementById(elementId).innerText.trim();
+            const btn = document.getElementById(buttonId);
+            const originalText = btn.querySelector('span').innerText;
+            
+            // Clipboard logic
+            const textArea = document.createElement("textarea");
+            textArea.value = command;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+
+            // UI Feedback per button
+            btn.querySelector('span').innerText = "Tersalin!";
+            btn.classList.replace('bg-slate-800', 'bg-blue-600');
+            
+            // Global Toast
+            const toast = document.getElementById('toast');
+            toast.classList.replace('opacity-0', 'opacity-100');
+            
+            setTimeout(() => {
+                btn.querySelector('span').innerText = originalText;
+                btn.classList.replace('bg-blue-600', 'bg-slate-800');
+                toast.classList.replace('opacity-100', 'opacity-0');
+            }, 2000);
+        }
+    </script>
 </body>
 </html>
