@@ -3,465 +3,476 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muhardian Pro Content Manager</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <title>Muhardian Pro | Content Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.0/ace.js"></script>
     <style>
         :root {
             --neon-red: #ff003c;
-            --deep-black: #050505;
-            --charcoal: #0f0f0f;
+            --deep-black: #080808;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--deep-black);
-            color: #eee;
-            scroll-behavior: smooth;
+            color: #f5f5f5;
             overflow-x: hidden;
-            position: relative;
         }
 
-        /* Animated Gradient Background */
-        body::before {
-            content: "";
+        .font-heading { font-family: 'Space+Grotesk', sans-serif; }
+
+        .bg-grid {
+            background-image: linear-gradient(rgba(255, 0, 60, 0.05) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 0, 60, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(255, 0, 60, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(255, 0, 60, 0.05) 0%, transparent 40%);
-            z-index: -2;
-            animation: moveGradient 15s ease infinite alternate;
+            inset: 0;
+            z-index: -3;
         }
 
-        @keyframes moveGradient {
-            from { transform: scale(1) translate(0, 0); }
-            to { transform: scale(1.2) translate(5%, 5%); }
-        }
-
-        /* Mouse Follow Effect (Spotlight) */
         #cursor-glow {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(255, 0, 60, 0.08) 0%, rgba(255, 0, 60, 0.03) 30%, transparent 70%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(255, 0, 60, 0.07) 0%, transparent 70%);
             border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%, -50%);
-            z-index: -1;
-            transition: width 0.3s, height 0.3s;
+            z-index: -2;
+            transition: width 0.3s ease;
+        }
+
+        .glass-nav {
+            background: rgba(8, 8, 8, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .neon-text {
             color: var(--neon-red);
-            text-shadow: 0 0 10px rgba(255, 0, 60, 0.5);
+            text-shadow: 0 0 15px rgba(255, 0, 60, 0.4);
         }
 
         .neon-border {
-            border: 1px solid rgba(255, 0, 60, 0.2);
-            transition: all 0.3s ease;
-            background: rgba(15, 15, 15, 0.4);
+            border: 1px solid rgba(255, 0, 60, 0.15);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: rgba(12, 12, 12, 0.6);
         }
 
         .neon-border:hover {
             border-color: var(--neon-red);
-            box-shadow: 0 0 25px rgba(255, 0, 60, 0.15);
-            background: rgba(15, 15, 15, 0.7);
+            box-shadow: 0 0 30px rgba(255, 0, 60, 0.1);
+            transform: translateY(-4px);
         }
 
-        .neon-button {
+        .btn-primary {
             background: transparent;
             border: 1px solid var(--neon-red);
             color: var(--neon-red);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 700;
+            letter-spacing: 2px;
+            transition: 0.3s;
         }
 
-        .neon-button:hover {
+        .btn-primary:hover {
             background: var(--neon-red);
             color: white;
-            box-shadow: 0 0 30px var(--neon-red);
-            transform: translateY(-2px);
-        }
-
-        .glass {
-            background: rgba(5, 5, 5, 0.7);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 0 0 40px rgba(255, 0, 60, 0.6);
         }
 
         #editor {
-            height: 250px;
+            height: 450px;
             width: 100%;
-            font-family: 'Fira Code', monospace;
-            font-size: 13px;
         }
 
-        .line-clamp-3 {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;  
-            overflow: hidden;
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--neon-red); }
 
-        .content-link {
-            color: #ff003c;
-            text-decoration: underline;
-            text-underline-offset: 4px;
-            transition: all 0.2s ease;
-            font-weight: 600;
-        }
-        
-        .content-link:hover {
-            color: #fff;
-            text-shadow: 0 0 8px #ff003c;
-        }
-
-        .card-anim {
-            animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-            opacity: 0;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #050505; }
-        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--neon-red); }
-
-        .read-more-modal {
-            background: var(--charcoal) !important;
-            color: #eee !important;
-            border: 1px solid var(--neon-red) !important;
-            text-align: left !important;
-            border-radius: 20px !important;
-        }
-
-        .custom-scroll::-webkit-scrollbar { width: 4px; }
-
-        .tab-btn {
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s;
-        }
-        .tab-btn.active {
-            border-color: var(--neon-red);
+        .tab-active {
             color: var(--neon-red);
+            border-bottom: 2px solid var(--neon-red);
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade { animation: fadeIn 0.5s ease forwards; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen">
 
-    <!-- Cursor Glow Effect -->
+    <div class="bg-grid"></div>
     <div id="cursor-glow"></div>
 
-    <nav class="p-6 flex justify-between items-center glass sticky top-0 z-50">
-        <h1 class="text-xl font-extrabold tracking-tighter neon-text">MUHARDIAN<span class="text-white">.CMS</span></h1>
-        <button onclick="showLoginPopup()" id="adminBtnNav" class="neon-button px-5 py-2 rounded text-xs">Admin Login</button>
+    <nav class="glass-nav sticky top-0 z-[100] px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-red-600 rounded flex items-center justify-center font-black text-white italic">M</div>
+                <h1 class="text-xl font-black tracking-tighter font-heading">MUHARDIAN<span class="neon-text">.CMS</span></h1>
+            </div>
+            <div id="navActions">
+                <button onclick="showLogin()" class="btn-primary px-6 py-2 rounded-lg text-[10px]">Akses Admin</button>
+            </div>
+        </div>
     </nav>
 
-    <main class="flex-grow container mx-auto px-6 py-12">
+    <main class="max-w-7xl mx-auto px-6 py-12">
         
-        <!-- Welcome Section (Public) -->
-        <div id="welcomeSection" class="text-center py-20">
-            <header class="mb-10">
-                <span class="text-[10px] text-red-500 font-mono tracking-[0.6em] uppercase mb-4 block">Protected Assets</span>
-                <h2 class="text-4xl md:text-7xl font-black mb-6 tracking-tighter italic">MERAH <span class="neon-text">PUTIH</span></h2>
-                <p class="text-gray-500 max-w-lg mx-auto text-sm leading-relaxed">Sistem manajemen konten terbatas. Silakan masuk menggunakan kredensial admin untuk mengakses database.</p>
-            </header>
-            <button onclick="showLoginPopup()" class="neon-button px-10 py-4 rounded-full text-xs">Initialize Access</button>
-        </div>
+        <!-- TAMPILAN PUBLIK -->
+        <section id="publicView" class="py-20 text-center animate-fade">
+            <span class="text-[10px] font-mono text-red-500 mb-4 block tracking-[0.5em] uppercase">Sistem Terenkripsi</span>
+            <h2 class="text-5xl md:text-8xl font-black mb-6 italic tracking-tighter">MERAH <span class="neon-text">PUTIH</span></h2>
+            <p class="text-gray-400 max-w-2xl mx-auto mb-12 text-lg">Manajemen aset digital dan basis data internal Muhardian Pro.</p>
+            <button onclick="showLogin()" class="btn-primary px-12 py-4 rounded-full text-xs">Masuk ke Konsol</button>
+        </section>
 
-        <!-- Admin View (Protected) -->
-        <div id="adminSection" class="hidden max-w-6xl mx-auto opacity-0 transition-all duration-700">
-            <!-- Header Admin -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 border-b border-white/5 pb-6 gap-4">
+        <!-- DASHBOARD ADMIN -->
+        <section id="adminView" class="hidden opacity-0 transition-opacity duration-500">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-12 border-b border-white/10 pb-8">
                 <div>
-                    <h3 class="text-4xl font-black neon-text italic">ADMIN DASHBOARD</h3>
-                    <p class="text-gray-500 text-xs font-mono tracking-widest uppercase">ENCRYPTED SESSION ACTIVE</p>
+                    <h2 class="text-4xl font-black font-heading mb-2">Control Panel</h2>
+                    <p class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Sesi Admin Aktif</p>
                 </div>
-                <button onclick="logout()" class="neon-button px-6 py-3 rounded-xl flex items-center gap-3 group">
-                    <span class="text-[10px] font-black">LOGOUT</span>
-                    <svg class="group-hover:-translate-x-1 transition-transform" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                </button>
+                <div class="flex gap-3">
+                    <button onclick="syncToCloud()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl text-[10px] font-bold transition-all flex items-center gap-2">
+                        SYNC KE CLOUD
+                    </button>
+                    <button onclick="logout()" class="px-6 py-3 border border-white/10 rounded-xl text-[10px] font-bold hover:bg-white/5 transition-all">LOGOUT</button>
+                </div>
             </div>
 
             <!-- Tab Menu -->
-            <div class="flex gap-8 mb-10 border-b border-white/5">
-                <button id="tabPost" onclick="switchTab('post')" class="tab-btn active pb-4 text-xs font-black tracking-widest uppercase">1. Create Entry</button>
-                <button id="tabView" onclick="switchTab('view')" class="tab-btn pb-4 text-xs font-black tracking-widest uppercase">2. View Database</button>
-                <button id="tabSource" onclick="switchTab('source')" class="tab-btn pb-4 text-xs font-black tracking-widest uppercase">3. Raw Source</button>
+            <div class="flex gap-10 mb-10 border-b border-white/5 overflow-x-auto whitespace-nowrap">
+                <button onclick="setTab('compose')" id="tab-compose" class="tab-active pb-4 text-xs font-black uppercase tracking-widest">1. Tulis Baru</button>
+                <button onclick="setTab('database')" id="tab-database" class="pb-4 text-xs font-black uppercase tracking-widest text-gray-500">2. Database</button>
+                <button onclick="setTab('raw')" id="tab-raw" class="pb-4 text-xs font-black uppercase tracking-widest text-gray-500">3. Editor JSON</button>
             </div>
 
-            <!-- Tab 1: Create Entry -->
-            <div id="panelPost" class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                <div class="lg:col-span-1">
-                    <div class="glass p-8 rounded-2xl neon-border">
-                        <h4 class="text-xs font-black text-white mb-6 uppercase tracking-[0.2em] flex items-center gap-2">
-                            <span class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
-                            New Post
-                        </h4>
-                        <div class="space-y-5">
+            <!-- Panel: Compose -->
+            <div id="panel-compose" class="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade">
+                <div class="lg:col-span-5">
+                    <div class="bg-[#0c0c0c] p-8 rounded-2xl neon-border">
+                        <div class="flex justify-between items-center mb-6">
+                            <h4 id="formTitle" class="text-xs font-black uppercase tracking-widest text-white">Buat Entri Baru</h4>
+                            <button id="cancelEditBtn" onclick="cancelEdit()" class="hidden text-[9px] text-gray-500 hover:text-white uppercase font-bold underline">Batal Edit</button>
+                        </div>
+                        <div class="space-y-6">
+                            <input type="hidden" id="editIndex" value="-1">
                             <div>
-                                <label class="text-[9px] text-gray-500 uppercase font-bold block mb-2 tracking-widest">Post Title</label>
-                                <input type="text" id="postTitle" placeholder="Ketik judul..." class="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-sm focus:border-red-600 outline-none transition-all placeholder:text-gray-800">
+                                <label class="text-[10px] text-gray-500 font-bold block mb-2 uppercase">Judul Postingan</label>
+                                <input id="titleInput" type="text" class="w-full bg-black border border-white/10 rounded-xl p-4 text-sm focus:border-red-600 outline-none">
                             </div>
                             <div>
-                                <label class="text-[9px] text-gray-500 uppercase font-bold block mb-2 tracking-widest">Post Body</label>
-                                <textarea id="postBody" rows="6" placeholder="Ketik isi konten... (Dukung link)" class="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-sm focus:border-red-600 outline-none transition-all placeholder:text-gray-800"></textarea>
+                                <label class="text-[10px] text-gray-500 font-bold block mb-2 uppercase">Konten / Isi</label>
+                                <textarea id="bodyInput" rows="10" class="w-full bg-black border border-white/10 rounded-xl p-4 text-sm focus:border-red-600 outline-none"></textarea>
                             </div>
-                            <button onclick="addNewPost()" class="w-full neon-button py-4 rounded-lg text-xs mt-4 italic">Commit to Queue</button>
+                            <button id="submitBtn" onclick="saveEntry()" class="w-full py-4 bg-white text-black font-black text-xs rounded-xl hover:bg-red-600 hover:text-white transition-all">SIMPAN KE ANTRIAN</button>
                         </div>
                     </div>
                 </div>
-                <div class="lg:col-span-2">
-                    <div class="glass p-8 rounded-2xl neon-border h-full">
-                        <h4 class="text-[10px] font-black text-gray-500 mb-6 uppercase tracking-[0.2em]">Live Queue Manager</h4>
-                        <div id="adminEntryList" class="space-y-3 max-h-[400px] overflow-y-auto custom-scroll pr-2">
-                            <!-- Items list -->
-                        </div>
-                        <div class="mt-8 pt-6 border-t border-white/5">
-                            <button onclick="handleUpdate()" class="w-full neon-button py-5 rounded-xl text-xs flex justify-center items-center gap-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6m12-4a9 9 0 0 1-15 6.7L3 16"/></svg>
-                                SYNC TO CLOUD DATABASE
-                            </button>
+                <div class="lg:col-span-7">
+                    <div class="bg-[#0c0c0c]/50 p-8 rounded-2xl border border-white/5 h-full">
+                        <h4 class="text-xs font-black mb-6 uppercase tracking-widest text-gray-500">Daftar Antrian Lokal</h4>
+                        <div id="queueList" class="space-y-4 max-h-[600px] overflow-y-auto pr-4 custom-scrollbar">
+                            <!-- Queue render -->
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab 2: View Database (Hanya untuk Admin) -->
-            <div id="panelView" class="hidden">
-                <div id="contentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                    <!-- Data grid view for admin -->
+            <!-- Panel: Database -->
+            <div id="panel-database" class="hidden animate-fade">
+                <div id="dbGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Cards render -->
                 </div>
             </div>
 
-            <!-- Tab 3: Raw Source -->
-            <div id="panelSource" class="hidden">
-                <div class="rounded-2xl overflow-hidden neon-border">
-                    <div class="bg-[#1a1a1a] p-4 flex justify-between items-center border-b border-white/5">
-                        <span class="text-[9px] font-mono text-gray-500 uppercase tracking-widest">JSON_RAW_DATA</span>
+            <!-- Panel: Raw -->
+            <div id="panel-raw" class="hidden animate-fade">
+                <div class="rounded-2xl overflow-hidden border border-white/10">
+                    <div class="bg-[#111] px-6 py-3 border-b border-white/5 flex justify-between items-center">
+                        <span class="text-[10px] font-mono text-gray-500">RAW_DATA_STRUCTURE</span>
+                        <button onclick="copyRaw()" class="text-[10px] text-red-500 font-bold uppercase">Salin JSON</button>
                     </div>
                     <div id="editor"></div>
                 </div>
             </div>
-        </div>
+        </section>
 
     </main>
 
-    <footer class="p-12 text-center border-t border-white/5 bg-black/80 backdrop-blur-md mt-20">
-        <p class="text-gray-600 text-[9px] tracking-[0.5em] uppercase font-bold">Muhardian Pro CMS</p>
+    <footer class="mt-20 border-t border-white/5 py-12 text-center">
+        <p class="text-[10px] text-gray-600 font-mono tracking-[0.5em] uppercase">Muhardian Pro Content Engine v2.0</p>
     </footer>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbyCtaeg8_G-5H9lYHG9b91aHeQoJqwQfY3Z0spYUIGjSbPVYrZso1drJqvmtxEsbCc/exec";
-        
-        let currentPassword = "";
-        let aceEditor;
         let localData = [];
+        let currentPass = "";
+        let aceEditor;
 
-        const glow = document.getElementById('cursor-glow');
-        window.addEventListener('mousemove', (e) => {
-            glow.style.left = e.clientX + 'px';
-            glow.style.top = e.clientY + 'px';
-        });
-
-        function linkify(text) {
-            const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-            return text.replace(urlPattern, function(url) {
-                return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="content-link">${url}</a>`;
-            });
-        }
-
+        // Init Editor Ace
         function initEditor() {
             aceEditor = ace.edit("editor");
             aceEditor.setTheme("ace/theme/tomorrow_night_eighties");
             aceEditor.session.setMode("ace/mode/json");
-            aceEditor.setOptions({ showPrintMargin: false, highlightActiveLine: true, wrap: true, useWorker: false });
+            aceEditor.setOptions({ fontSize: "14px", showPrintMargin: false, useWorker: false, wrap: true });
             aceEditor.on("change", () => {
                 try {
-                    const content = aceEditor.getValue();
-                    if (content.trim()) {
-                        const parsed = JSON.parse(content);
-                        if (JSON.stringify(parsed) !== JSON.stringify(localData)) {
-                            localData = parsed;
-                            renderAdminEntryList();
-                            renderVisitorGrid();
-                        }
+                    const parsed = JSON.parse(aceEditor.getValue());
+                    if (JSON.stringify(parsed) !== JSON.stringify(localData)) {
+                        localData = parsed;
+                        renderUI();
                     }
                 } catch(e) {}
             });
         }
 
-        async function fetchContent() {
-            try {
-                const response = await fetch(API_URL);
-                const result = await response.json();
-                localData = result.data || [];
-                renderVisitorGrid();
-                renderAdminEntryList();
-                if (aceEditor) aceEditor.setValue(JSON.stringify(localData, null, 4), -1);
-            } catch (error) { console.error("Fetch error:", error); }
-        }
+        // Cursor effect
+        const glow = document.getElementById('cursor-glow');
+        document.addEventListener('mousemove', (e) => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
 
-        function switchTab(tab) {
-            const panels = ['panelPost', 'panelView', 'panelSource'];
-            const tabs = ['tabPost', 'tabView', 'tabSource'];
-            
-            panels.forEach(p => document.getElementById(p).classList.add('hidden'));
-            tabs.forEach(t => document.getElementById(t).classList.remove('active'));
-
-            if(tab === 'post') {
-                document.getElementById('panelPost').classList.remove('hidden');
-                document.getElementById('tabPost').classList.add('active');
-            } else if(tab === 'view') {
-                document.getElementById('panelView').classList.remove('hidden');
-                document.getElementById('tabView').classList.add('active');
-                renderVisitorGrid();
-            } else {
-                document.getElementById('panelSource').classList.remove('hidden');
-                document.getElementById('tabSource').classList.add('active');
-            }
-        }
-
-        function renderVisitorGrid() {
-            const grid = document.getElementById('contentGrid');
-            grid.innerHTML = "";
-            if (localData.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center text-gray-600 py-10 italic">Database Kosong.</div>`;
-                return;
-            }
-            localData.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.className = `glass p-10 rounded-3xl neon-border card-anim flex flex-col group`;
-                card.innerHTML = `
-                    <div class="mb-6 flex justify-between">
-                        <span class="text-[9px] font-mono text-red-600 font-black">${item.date || 'UNSET'}</span>
-                        <span class="text-[8px] text-gray-700">ID: ${index+1}</span>
-                    </div>
-                    <h3 class="text-xl font-black mb-4 text-white uppercase">${item.title}</h3>
-                    <div class="text-gray-400 text-xs leading-relaxed mb-6 line-clamp-3">${linkify(item.body)}</div>
-                    <button onclick="readFullContent(${index})" class="text-[9px] font-black text-red-600 uppercase hover:text-white transition-all">Read More +</button>
-                `;
-                grid.appendChild(card);
+        // Tab Navigation
+        function setTab(tabId) {
+            ['compose', 'database', 'raw'].forEach(t => {
+                document.getElementById(`panel-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).className = "pb-4 text-xs font-black uppercase tracking-widest text-gray-500";
             });
+            document.getElementById(`panel-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`).className = "tab-active pb-4 text-xs font-black uppercase tracking-widest";
         }
 
-        function renderAdminEntryList() {
-            const listContainer = document.getElementById('adminEntryList');
-            if (!listContainer) return;
-            listContainer.innerHTML = "";
-            localData.forEach((item, index) => {
-                const itemEl = document.createElement('div');
-                itemEl.className = "flex items-center justify-between bg-black/40 p-4 rounded-xl border border-white/5 hover:border-red-600/30 transition-all";
-                itemEl.innerHTML = `
-                    <div class="flex flex-col overflow-hidden mr-4">
-                        <span class="text-[11px] font-bold text-white truncate uppercase">${item.title}</span>
-                        <span class="text-[8px] font-mono text-gray-600 uppercase">${item.date}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="deleteEntry(${index})" class="p-2 text-gray-600 hover:text-red-500"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
-                    </div>
-                `;
-                listContainer.appendChild(itemEl);
-            });
-        }
-
-        function deleteEntry(index) {
-            localData.splice(index, 1);
-            aceEditor.setValue(JSON.stringify(localData, null, 4), -1);
-            renderAdminEntryList();
-        }
-
-        function readFullContent(index) {
-            const item = localData[index];
-            Swal.fire({
-                title: `<span class="neon-text uppercase font-black">${item.title}</span>`,
-                html: `<div class="text-left text-sm text-gray-300 py-4 max-h-[50vh] overflow-y-auto pr-2 custom-scroll">${linkify(item.body).replace(/\n/g, '<br>')}</div>`,
-                showConfirmButton: false,
-                background: '#0a0a0a',
-                color: '#eee',
-                customClass: { popup: 'read-more-modal' }
-            });
-        }
-
-        function addNewPost() {
-            const title = document.getElementById('postTitle').value;
-            const body = document.getElementById('postBody').value;
-            const date = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
-            if (!title || !body) return;
-            localData.unshift({ title, body, date });
-            aceEditor.setValue(JSON.stringify(localData, null, 4), -1);
-            renderAdminEntryList();
-            document.getElementById('postTitle').value = "";
-            document.getElementById('postBody').value = "";
-            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Added to local queue', showConfirmButton: false, timer: 1500, background: '#111', color: '#fff' });
-        }
-
-        async function showLoginPopup() {
-            const { value: password } = await Swal.fire({
-                title: 'ADMIN ACCESS',
+        // Auth with better feedback
+        async function showLogin() {
+            const { value: pass } = await Swal.fire({
+                title: 'ADMIN LOGIN',
                 input: 'password',
-                inputPlaceholder: 'Security Hash Required',
+                inputPlaceholder: 'Masukkan password...',
+                background: '#080808',
+                color: '#fff',
                 confirmButtonColor: '#ff003c',
-                confirmButtonText: 'Authorize',
-                background: '#050505',
-                color: '#fff'
+                confirmButtonText: 'MASUK',
+                showLoaderOnConfirm: true,
+                preConfirm: async (password) => {
+                    try {
+                        const response = await fetch(API_URL, { 
+                            method: 'POST', 
+                            body: JSON.stringify({ action: 'login', password: password }) 
+                        });
+                        if (!response.ok) throw new Error('Respons jaringan tidak stabil');
+                        return await response.json();
+                    } catch (error) {
+                        Swal.showValidationMessage(`Koneksi Gagal: ${error}`);
+                    }
+                },
+                allowOutsideClick: () => !Swal.isLoading()
             });
-            if (password) verifyLogin(password);
+
+            if (pass && pass.success) {
+                currentPass = pass.password || ""; // Biasanya password dikembalikan atau disimpan
+                currentPass = pass.inputPassword || ""; // Placeholder jika server tidak mengembalikan pass
+                // Gunakan input awal jika success
+                loginSuccess(pass.password || ""); 
+            } else if (pass) {
+                Swal.fire('Akses Ditolak', 'Password salah atau sesi berakhir.', 'error');
+            }
+        }
+        
+        // Memisahkan logika login sukses untuk kejelasan
+        function loginSuccess(password) {
+            currentPass = password; // Simpan untuk sync nanti
+            document.getElementById('publicView').classList.add('hidden');
+            document.getElementById('adminView').classList.remove('hidden');
+            document.getElementById('adminView').classList.add('opacity-100');
+            document.getElementById('navActions').innerHTML = `<span class="text-[10px] text-red-500 font-bold uppercase tracking-widest">Koneksi Aman</span>`;
+            fetchData();
         }
 
-        async function verifyLogin(password) {
-            Swal.fire({ title: 'Verifying...', didOpen: () => Swal.showLoading(), background: '#050505' });
+        // Tambahan: showLogin versi lama diperbaiki agar menangani currentPass dengan benar
+        async function showLogin() {
+            const { value: pass } = await Swal.fire({
+                title: 'ADMIN LOGIN',
+                input: 'password',
+                background: '#080808',
+                color: '#fff',
+                confirmButtonColor: '#ff003c'
+            });
+            
+            if(!pass) return;
+
+            Swal.fire({ 
+                title: 'Verifikasi Skrip...', 
+                html: 'Membangunkan server Google (biasanya 5-10 detik)...',
+                didOpen: () => Swal.showLoading(), 
+                background: '#080808' 
+            });
+
             try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'login', password: password })
-                });
-                const result = await response.json();
-                if (result.success) {
-                    currentPassword = password;
-                    document.getElementById('welcomeSection').classList.add('hidden');
-                    document.getElementById('adminBtnNav').classList.add('hidden');
-                    const adminSec = document.getElementById('adminSection');
-                    adminSec.classList.remove('hidden');
-                    setTimeout(() => adminSec.classList.add('opacity-100'), 50);
+                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'login', password: pass }) });
+                const data = await res.json();
+                if(data.success) {
+                    currentPass = pass; // Simpan password asli untuk sync
                     Swal.close();
+                    document.getElementById('publicView').classList.add('hidden');
+                    document.getElementById('adminView').classList.remove('hidden');
+                    setTimeout(() => document.getElementById('adminView').classList.add('opacity-100'), 50);
+                    document.getElementById('navActions').innerHTML = `<span class="text-[10px] text-red-500 font-bold uppercase tracking-widest">Koneksi Aman</span>`;
+                    fetchData();
                 } else {
-                    Swal.fire('Failed', 'Incorrect Credentials', 'error');
+                    Swal.fire('Error', 'Password Salah', 'error');
                 }
-            } catch (e) { Swal.fire('Error', 'Connection failed', 'error'); }
+            } catch(e) { 
+                Swal.fire('Error', 'Gagal terhubung ke Google Apps Script. Pastikan skrip sudah dideploy.', 'error'); 
+            }
         }
 
-        async function handleUpdate() {
-            Swal.fire({ title: 'Deploying...', didOpen: () => Swal.showLoading(), background: '#050505' });
+        async function fetchData() {
             try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'update', password: currentPassword, newData: localData })
-                });
-                const result = await response.json();
-                if (result.success) {
-                    Swal.fire('Success', 'Cloud Database Updated', 'success');
+                const res = await fetch(API_URL);
+                const result = await res.json();
+                localData = result.data || [];
+                aceEditor.setValue(JSON.stringify(localData, null, 4), -1);
+                renderUI();
+            } catch(e) { console.error(e); }
+        }
+
+        function renderUI() {
+            const queue = document.getElementById('queueList');
+            const grid = document.getElementById('dbGrid');
+
+            queue.innerHTML = localData.map((item, i) => `
+                <div class="flex justify-between items-center bg-black/40 p-4 rounded-xl border border-white/5 hover:border-red-600/30 transition-all group">
+                    <div class="overflow-hidden">
+                        <p class="text-xs font-bold text-white truncate uppercase">${item.title}</p>
+                        <p class="text-[8px] font-mono text-gray-600 uppercase">${item.date || 'Lokal'}</p>
+                    </div>
+                    <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                        <button onclick="loadEdit(${i})" class="p-2 text-gray-400 hover:text-white">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                        <button onclick="deleteEntry(${i})" class="p-2 text-gray-400 hover:text-red-500">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            grid.innerHTML = localData.map((item, i) => `
+                <div class="bg-[#0c0c0c] p-8 rounded-2xl neon-border flex flex-col group h-full">
+                    <div class="flex justify-between mb-4">
+                        <span class="text-[9px] font-mono text-red-500 font-bold">${item.date || 'Menunggu Sync'}</span>
+                        <span class="text-[8px] text-gray-700">#${i+1}</span>
+                    </div>
+                    <h3 class="text-lg font-black text-white mb-4 uppercase tracking-tighter">${item.title}</h3>
+                    <div class="text-gray-400 text-xs leading-relaxed line-clamp-3 mb-6">${item.body}</div>
+                    <div class="mt-auto pt-4 border-t border-white/5 flex justify-between items-center">
+                        <button onclick="loadEdit(${i})" class="text-[9px] font-bold text-gray-500 hover:text-white uppercase transition-all">Edit Entri</button>
+                        <button onclick="deleteEntry(${i})" class="text-[9px] font-bold text-red-600 uppercase hover:text-white transition-all">Hapus</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function saveEntry() {
+            const title = document.getElementById('titleInput').value;
+            const body = document.getElementById('bodyInput').value;
+            const editIndex = parseInt(document.getElementById('editIndex').value);
+
+            if(!title || !body) return;
+
+            if(editIndex > -1) {
+                localData[editIndex].title = title;
+                localData[editIndex].body = body;
+                cancelEdit();
+            } else {
+                const dateStr = new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric'}).toUpperCase();
+                localData.unshift({ title, body, date: dateStr });
+            }
+
+            aceEditor.setValue(JSON.stringify(localData, null, 4), -1);
+            document.getElementById('titleInput').value = "";
+            document.getElementById('bodyInput').value = "";
+            renderUI();
+            
+            Swal.fire({ toast:true, position:'top-end', icon:'success', title:'Antrian Diperbarui', showConfirmButton:false, timer:1500, background:'#111', color:'#fff' });
+        }
+
+        function loadEdit(index) {
+            setTab('compose');
+            const item = localData[index];
+            document.getElementById('titleInput').value = item.title;
+            document.getElementById('bodyInput').value = item.body;
+            document.getElementById('editIndex').value = index;
+            
+            document.getElementById('formTitle').innerText = "Edit Entri Database";
+            document.getElementById('submitBtn').innerText = "PERBARUI ENTRI";
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+        }
+
+        function cancelEdit() {
+            document.getElementById('editIndex').value = "-1";
+            document.getElementById('titleInput').value = "";
+            document.getElementById('bodyInput').value = "";
+            document.getElementById('formTitle').innerText = "Buat Entri Baru";
+            document.getElementById('submitBtn').innerText = "SIMPAN KE ANTRIAN";
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+        }
+
+        function deleteEntry(i) {
+            Swal.fire({
+                title: 'Hapus Entri?',
+                text: "Tindakan ini tidak bisa dibatalkan dari antrian lokal.",
+                icon: 'warning',
+                background: '#080808',
+                color: '#fff',
+                showCancelButton: true,
+                confirmButtonColor: '#ff003c',
+                cancelButtonColor: '#333'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localData.splice(i, 1);
+                    aceEditor.setValue(JSON.stringify(localData, null, 4), -1);
+                    renderUI();
                 }
-            } catch (e) { Swal.fire('Error', 'Deploy failed', 'error'); }
+            });
+        }
+
+        async function syncToCloud() {
+            Swal.fire({ title: 'Sinkronisasi Master...', didOpen: () => Swal.showLoading(), background: '#080808' });
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'update', password: currentPass, newData: localData })
+                });
+                const result = await res.json();
+                if(result.success) Swal.fire('Berhasil', 'Database Cloud Terkini', 'success');
+            } catch(e) { Swal.fire('Error', 'Gagal Sync. Coba relogin jika password expired.', 'error'); }
+        }
+
+        function copyRaw() {
+            const val = aceEditor.getValue();
+            const el = document.createElement('textarea');
+            el.value = val;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            Swal.fire({ toast:true, position:'top-end', title:'JSON Disalin', showConfirmButton:false, timer:1000, background:'#111', color:'#fff' });
         }
 
         function logout() { location.reload(); }
 
-        window.onload = () => { initEditor(); fetchContent(); };
+        window.onload = () => { initEditor(); fetchData(); };
     </script>
 </body>
 </html>
