@@ -104,6 +104,12 @@
         }
 
         .animate-fade { animation: fadeIn 0.5s ease forwards; }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -208,6 +214,31 @@
 
     </main>
 
+    <!-- Modal Popup untuk Baca Lengkap -->
+    <div id="readMoreModal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-4">
+        <div class="modal-backdrop absolute inset-0" onclick="closeModal()"></div>
+        <div class="bg-[#0c0c0c] border border-white/10 w-full max-w-3xl rounded-3xl overflow-hidden relative z-10 animate-fade shadow-2xl">
+            <div class="p-8 md:p-12 max-h-[85vh] overflow-y-auto custom-scrollbar">
+                <div class="flex justify-between items-start mb-8">
+                    <div>
+                        <span id="modalDate" class="text-[10px] font-mono text-red-500 uppercase tracking-widest mb-2 block">01 JAN 2024</span>
+                        <h2 id="modalTitle" class="text-3xl md:text-4xl font-black font-heading text-white uppercase tracking-tighter italic">JUDUL POSTINGAN</h2>
+                    </div>
+                    <button onclick="closeModal()" class="text-gray-500 hover:text-white transition-all">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div id="modalBody" class="text-gray-300 leading-relaxed text-lg space-y-4 whitespace-pre-wrap">
+                    <!-- Isi konten akan muncul di sini -->
+                </div>
+                <div class="mt-12 pt-8 border-t border-white/5 flex gap-4">
+                    <button id="modalEditBtn" class="bg-white text-black px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all">Edit Data</button>
+                    <button onclick="closeModal()" class="border border-white/10 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/5 transition-all text-gray-400">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer class="mt-20 border-t border-white/5 py-12 text-center">
         <p class="text-[10px] text-gray-600 font-mono tracking-[0.5em] uppercase">Muhardian Pro Content Engine v2.0</p>
     </footer>
@@ -252,7 +283,7 @@
             document.getElementById(`tab-${tabId}`).className = "tab-active pb-4 text-xs font-black uppercase tracking-widest";
         }
 
-        // Auth with better feedback
+        // Auth
         async function showLogin() {
             const { value: pass } = await Swal.fire({
                 title: 'ADMIN LOGIN',
@@ -261,58 +292,14 @@
                 background: '#080808',
                 color: '#fff',
                 confirmButtonColor: '#ff003c',
-                confirmButtonText: 'MASUK',
-                showLoaderOnConfirm: true,
-                preConfirm: async (password) => {
-                    try {
-                        const response = await fetch(API_URL, { 
-                            method: 'POST', 
-                            body: JSON.stringify({ action: 'login', password: password }) 
-                        });
-                        if (!response.ok) throw new Error('Respons jaringan tidak stabil');
-                        return await response.json();
-                    } catch (error) {
-                        Swal.showValidationMessage(`Koneksi Gagal: ${error}`);
-                    }
-                },
-                allowOutsideClick: () => !Swal.isLoading()
-            });
-
-            if (pass && pass.success) {
-                currentPass = pass.password || ""; // Biasanya password dikembalikan atau disimpan
-                currentPass = pass.inputPassword || ""; // Placeholder jika server tidak mengembalikan pass
-                // Gunakan input awal jika success
-                loginSuccess(pass.password || ""); 
-            } else if (pass) {
-                Swal.fire('Akses Ditolak', 'Password salah atau sesi berakhir.', 'error');
-            }
-        }
-        
-        // Memisahkan logika login sukses untuk kejelasan
-        function loginSuccess(password) {
-            currentPass = password; // Simpan untuk sync nanti
-            document.getElementById('publicView').classList.add('hidden');
-            document.getElementById('adminView').classList.remove('hidden');
-            document.getElementById('adminView').classList.add('opacity-100');
-            document.getElementById('navActions').innerHTML = `<span class="text-[10px] text-red-500 font-bold uppercase tracking-widest">Koneksi Aman</span>`;
-            fetchData();
-        }
-
-        // Tambahan: showLogin versi lama diperbaiki agar menangani currentPass dengan benar
-        async function showLogin() {
-            const { value: pass } = await Swal.fire({
-                title: 'ADMIN LOGIN',
-                input: 'password',
-                background: '#080808',
-                color: '#fff',
-                confirmButtonColor: '#ff003c'
+                confirmButtonText: 'MASUK'
             });
             
             if(!pass) return;
 
             Swal.fire({ 
                 title: 'Verifikasi Skrip...', 
-                html: 'Membangunkan server Google (biasanya 5-10 detik)...',
+                html: 'Menghubungkan ke server Muhardian Pro...',
                 didOpen: () => Swal.showLoading(), 
                 background: '#080808' 
             });
@@ -321,7 +308,7 @@
                 const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'login', password: pass }) });
                 const data = await res.json();
                 if(data.success) {
-                    currentPass = pass; // Simpan password asli untuk sync
+                    currentPass = pass; 
                     Swal.close();
                     document.getElementById('publicView').classList.add('hidden');
                     document.getElementById('adminView').classList.remove('hidden');
@@ -332,7 +319,7 @@
                     Swal.fire('Error', 'Password Salah', 'error');
                 }
             } catch(e) { 
-                Swal.fire('Error', 'Gagal terhubung ke Google Apps Script. Pastikan skrip sudah dideploy.', 'error'); 
+                Swal.fire('Error', 'Gagal terhubung ke Database.', 'error'); 
             }
         }
 
@@ -357,11 +344,11 @@
                         <p class="text-[8px] font-mono text-gray-600 uppercase">${item.date || 'Lokal'}</p>
                     </div>
                     <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                        <button onclick="openReadMore(${i})" class="p-2 text-gray-400 hover:text-white" title="Lihat">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </button>
                         <button onclick="loadEdit(${i})" class="p-2 text-gray-400 hover:text-white">
                             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                        </button>
-                        <button onclick="deleteEntry(${i})" class="p-2 text-gray-400 hover:text-red-500">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
                         </button>
                     </div>
                 </div>
@@ -373,16 +360,46 @@
                         <span class="text-[9px] font-mono text-red-500 font-bold">${item.date || 'Menunggu Sync'}</span>
                         <span class="text-[8px] text-gray-700">#${i+1}</span>
                     </div>
-                    <h3 class="text-lg font-black text-white mb-4 uppercase tracking-tighter">${item.title}</h3>
+                    <h3 class="text-lg font-black text-white mb-4 uppercase tracking-tighter italic line-clamp-2">${item.title}</h3>
                     <div class="text-gray-400 text-xs leading-relaxed line-clamp-3 mb-6">${item.body}</div>
-                    <div class="mt-auto pt-4 border-t border-white/5 flex justify-between items-center">
-                        <button onclick="loadEdit(${i})" class="text-[9px] font-bold text-gray-500 hover:text-white uppercase transition-all">Edit Entri</button>
-                        <button onclick="deleteEntry(${i})" class="text-[9px] font-bold text-red-600 uppercase hover:text-white transition-all">Hapus</button>
+                    <div class="mt-auto pt-6 border-t border-white/5 flex flex-col gap-4">
+                        <button onclick="openReadMore(${i})" class="text-[10px] font-black text-red-600 hover:text-white uppercase tracking-widest text-left flex items-center gap-2 group/btn">
+                            Baca Selengkapnya
+                            <svg class="group-hover/btn:translate-x-1 transition-transform" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                        </button>
+                        <div class="flex justify-between items-center opacity-40 group-hover:opacity-100 transition-opacity">
+                            <button onclick="loadEdit(${i})" class="text-[9px] font-bold text-gray-500 hover:text-white uppercase">Edit</button>
+                            <button onclick="deleteEntry(${i})" class="text-[9px] font-bold text-gray-500 hover:text-red-500 uppercase">Hapus</button>
+                        </div>
                     </div>
                 </div>
             `).join('');
         }
 
+        // Modal Functions
+        function openReadMore(index) {
+            const item = localData[index];
+            document.getElementById('modalTitle').innerText = item.title;
+            document.getElementById('modalDate').innerText = item.date || 'Lokal Antrian';
+            document.getElementById('modalBody').innerText = item.body;
+            
+            // Set up Edit button in modal
+            const editBtn = document.getElementById('modalEditBtn');
+            editBtn.onclick = () => {
+                closeModal();
+                loadEdit(index);
+            };
+
+            document.getElementById('readMoreModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent scroll
+        }
+
+        function closeModal() {
+            document.getElementById('readMoreModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Logic Form
         function saveEntry() {
             const title = document.getElementById('titleInput').value;
             const body = document.getElementById('bodyInput').value;
@@ -404,7 +421,7 @@
             document.getElementById('bodyInput').value = "";
             renderUI();
             
-            Swal.fire({ toast:true, position:'top-end', icon:'success', title:'Antrian Diperbarui', showConfirmButton:false, timer:1500, background:'#111', color:'#fff' });
+            Swal.fire({ toast:true, position:'top-end', icon:'success', title:'Data Disimpan', showConfirmButton:false, timer:1500, background:'#111', color:'#fff' });
         }
 
         function loadEdit(index) {
@@ -417,6 +434,9 @@
             document.getElementById('formTitle').innerText = "Edit Entri Database";
             document.getElementById('submitBtn').innerText = "PERBARUI ENTRI";
             document.getElementById('cancelEditBtn').classList.remove('hidden');
+            
+            // Scroll to top of form
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function cancelEdit() {
@@ -431,7 +451,7 @@
         function deleteEntry(i) {
             Swal.fire({
                 title: 'Hapus Entri?',
-                text: "Tindakan ini tidak bisa dibatalkan dari antrian lokal.",
+                text: "Data ini akan hilang dari antrian lokal.",
                 icon: 'warning',
                 background: '#080808',
                 color: '#fff',
@@ -448,15 +468,15 @@
         }
 
         async function syncToCloud() {
-            Swal.fire({ title: 'Sinkronisasi Master...', didOpen: () => Swal.showLoading(), background: '#080808' });
+            Swal.fire({ title: 'Menyinkronkan Cloud...', didOpen: () => Swal.showLoading(), background: '#080808' });
             try {
                 const res = await fetch(API_URL, {
                     method: 'POST',
                     body: JSON.stringify({ action: 'update', password: currentPass, newData: localData })
                 });
                 const result = await res.json();
-                if(result.success) Swal.fire('Berhasil', 'Database Cloud Terkini', 'success');
-            } catch(e) { Swal.fire('Error', 'Gagal Sync. Coba relogin jika password expired.', 'error'); }
+                if(result.success) Swal.fire('Berhasil', 'Server Cloud Diperbarui', 'success');
+            } catch(e) { Swal.fire('Error', 'Gagal sinkronisasi data.', 'error'); }
         }
 
         function copyRaw() {
