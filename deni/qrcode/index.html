@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muhardian Scanner & Generator</title>
+    <!-- External Libraries -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bwip-js@3.0.4/dist/bwip-js-min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --neon-red: #ff003c;
+            --dark-bg: #0a0002;
+            --card-bg: #1a0205;
+            --fire-color: #ff3d00;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-h: 100vh;
+        }
+
+        .neon-border {
+            border: 2px solid var(--neon-red);
+            box-shadow: 0 0 10px var(--neon-red), inset 0 0 5px var(--neon-red);
+        }
+
+        .neon-text {
+            text-shadow: 0 0 5px var(--neon-red), 0 0 10px var(--neon-red);
+        }
+
+        .neon-button {
+            background: transparent;
+            border: 1px solid var(--neon-red);
+            color: var(--neon-red);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .neon-button:hover {
+            background: var(--neon-red);
+            color: white;
+            box-shadow: 0 0 20px var(--neon-red);
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 0, 60, 0.2);
+        }
+
+        /* Container Pro Persegi Sempurna */
+        .pro-export-card {
+            width: 300px;
+            height: 300px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(255, 0, 60, 0.4);
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        #gen-canvas {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
+        }
+
+        #reader {
+            width: 100% !important;
+            border: none !important;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #reader video {
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        /* Kesan Api pada Footer */
+        .fire-footer {
+            position: relative;
+            padding: 2rem 0;
+            margin-top: 4rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 61, 0, 0.3);
+            background: linear-gradient(to top, rgba(255, 61, 0, 0.1), transparent);
+        }
+
+        .fire-text {
+            color: #fff;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            display: inline-block;
+            transition: all 0.3s ease;
+            text-shadow: 
+                0px -2px 4px #fff, 
+                0px -4px 10px #ff0, 
+                0px -10px 20px #ff8000, 
+                0px -18px 40px #ff0000;
+            animation: flicker 1.5s infinite alternate;
+        }
+
+        .fire-text:hover {
+            transform: scale(1.05);
+            text-shadow: 
+                0px -4px 8px #fff, 
+                0px -8px 15px #ff0, 
+                0px -15px 25px #ff8000, 
+                0px -25px 50px #ff0000;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.9; transform: skewX(-1deg); }
+            20% { opacity: 1; transform: skewX(1deg); }
+            40% { opacity: 0.8; transform: skewX(-1deg); }
+            60% { opacity: 1; transform: skewX(1deg); }
+            80% { opacity: 0.9; transform: skewX(0deg); }
+            100% { opacity: 1; transform: skewX(-1deg); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div class="flex-grow p-4 md:p-8">
+        <div class="max-w-2xl mx-auto space-y-8">
+            <!-- Header -->
+            <header class="text-center">
+                <h1 class="text-4xl font-black neon-text italic uppercase">Muhardian Scan</h1>
+                <p class="text-gray-400 mt-2 italic">Square QR & Barcode Engine</p>
+            </header>
+
+            <!-- Main Navigation -->
+            <div class="flex gap-2 justify-center">
+                <button id="btn-tab-scan" onclick="switchTab('scan')" class="neon-button px-6 py-2 rounded-full flex-1">Scanner</button>
+                <button id="btn-tab-gen" onclick="switchTab('gen')" class="neon-button px-6 py-2 rounded-full flex-1 opacity-50">Generator</button>
+            </div>
+
+            <!-- Scanner Section -->
+            <section id="section-scan" class="space-y-4">
+                <div class="glass-card p-4 neon-border">
+                    <div id="reader"></div>
+                    <p class="text-center text-xs text-gray-500 mt-2">Halakan kamera ke QR atau Kod Bar</p>
+                </div>
+
+                <div id="result-container" class="glass-card p-6 space-y-3 hidden animate-fade-in">
+                    <h3 class="text-sm font-bold uppercase text-gray-500">Hasil Imbasan:</h3>
+                    <div id="result-text" class="text-xl font-mono break-all text-white p-3 bg-black/50 rounded border border-gray-800">
+                        -
+                    </div>
+                    <button onclick="copyResult()" class="w-full neon-button py-3 rounded-lg">Salin Teks</button>
+                </div>
+            </section>
+
+            <!-- Generator Section -->
+            <section id="section-gen" class="space-y-4 hidden text-center">
+                <div class="glass-card p-6 space-y-6 text-left">
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-400">Input Teks / URL</label>
+                        <input type="text" id="gen-input" placeholder="Masukkan teks atau nombor..." 
+                            class="w-full bg-black/50 border border-red-900 p-3 rounded text-white focus:outline-none focus:border-red-500">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-400">Jenis Kod</label>
+                        <select id="gen-type" class="w-full bg-black/50 border border-red-900 p-3 rounded text-white focus:outline-none">
+                            <option value="qrcode">Kod QR (Sentiasa Kotak)</option>
+                            <option value="code128">Kod Bar 128 (Mendatar)</option>
+                            <option value="ean13">EAN-13 (Standard)</option>
+                        </select>
+                    </div>
+
+                    <button onclick="generateCode()" class="w-full neon-button py-3 rounded-lg">Bina Kod Kotak</button>
+
+                    <div id="gen-error" class="p-3 bg-red-900/30 border border-red-600 text-red-400 text-sm rounded hidden text-center"></div>
+                </div>
+
+                <!-- Square Card Output -->
+                <div id="gen-output-wrapper" class="flex flex-col items-center space-y-6 hidden animate-fade-in">
+                    <div id="pro-card" class="pro-export-card">
+                        <canvas id="gen-canvas"></canvas>
+                        <p id="padding-info" class="text-gray-400 text-[10px] mt-2 font-mono uppercase tracking-widest hidden"></p>
+                    </div>
+                    
+                    <div class="flex gap-2 w-full max-w-[300px]">
+                        <button onclick="downloadCode()" class="flex-1 neon-button py-3 rounded-full text-sm">Muat Turun PNG</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Pautan Footer Api -->
+    <footer class="fire-footer">
+        <a href="https://muhardian.eu.org/deni" target="_blank" class="fire-text text-lg italic">
+            Muhardian Engine v1.7 &bull; Deni Edition
+        </a>
+        <p class="text-[10px] text-gray-600 mt-2 uppercase tracking-tighter">Powered by Flame & Neon</p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full bg-red-600 text-white font-bold opacity-0 transition-opacity pointer-events-none z-50">
+        Teks berjaya disalin!
+    </div>
+
+    <script>
+        let html5QrCode;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                startScanner();
+            }, 500);
+        });
+
+        function switchTab(tab) {
+            const btnScan = document.getElementById('btn-tab-scan');
+            const btnGen = document.getElementById('btn-tab-gen');
+            const scanSection = document.getElementById('section-scan');
+            const genSection = document.getElementById('section-gen');
+
+            if (tab === 'scan') {
+                scanSection.classList.remove('hidden');
+                genSection.classList.add('hidden');
+                btnScan.classList.remove('opacity-50');
+                btnGen.classList.add('opacity-50');
+                startScanner();
+            } else {
+                scanSection.classList.add('hidden');
+                genSection.classList.remove('hidden');
+                btnScan.classList.add('opacity-50');
+                btnGen.classList.remove('opacity-50');
+                stopScanner();
+            }
+        }
+
+        async function startScanner() {
+            const readerElement = document.getElementById('reader');
+            if (!readerElement) return;
+            if (html5QrCode && html5QrCode.isScanning) return;
+            
+            html5QrCode = new Html5Qrcode("reader");
+            try {
+                await html5QrCode.start(
+                    { facingMode: "environment" }, 
+                    { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 }, 
+                    onScanSuccess
+                );
+            } catch (err) {
+                console.warn("Kamera gagal:", err);
+            }
+        }
+
+        function stopScanner() {
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().catch(err => console.error(err));
+            }
+        }
+
+        function onScanSuccess(decodedText) {
+            const resultContainer = document.getElementById('result-container');
+            const resultText = document.getElementById('result-text');
+            resultContainer.classList.remove('hidden');
+            resultText.innerText = decodedText;
+            if (navigator.vibrate) navigator.vibrate(100);
+        }
+
+        function copyResult() {
+            const text = document.getElementById('result-text').innerText;
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            const toast = document.getElementById('toast');
+            toast.style.opacity = '1';
+            setTimeout(() => toast.style.opacity = '0', 2000);
+        }
+
+        function generateCode() {
+            let text = document.getElementById('gen-input').value.trim();
+            const type = document.getElementById('gen-type').value;
+            const wrapper = document.getElementById('gen-output-wrapper');
+            const errorDiv = document.getElementById('gen-error');
+            const paddingInfo = document.getElementById('padding-info');
+            
+            errorDiv.classList.add('hidden');
+            paddingInfo.classList.add('hidden');
+            if (!text) return;
+
+            if (type === 'ean13' && /^\d+$/.test(text) && text.length < 12) {
+                text = text.padStart(12, '0');
+                paddingInfo.innerText = `ID ditambah: ${text}`;
+                paddingInfo.classList.remove('hidden');
+            }
+
+            try {
+                const isQR = type === 'qrcode';
+                bwipjs.toCanvas('gen-canvas', {
+                    bcid: type,
+                    text: text,
+                    scale: 6,
+                    height: isQR ? 50 : 20,
+                    width: isQR ? 50 : undefined,
+                    includetext: true,
+                    textxalign: 'center',
+                    backgroundcolor: 'ffffff'
+                });
+                wrapper.classList.remove('hidden');
+            } catch (e) {
+                wrapper.classList.add('hidden');
+                errorDiv.innerText = "Ralat: " + e.message;
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function downloadCode() {
+            const canvas = document.getElementById('gen-canvas');
+            if (!canvas) return;
+
+            const finalCanvas = document.createElement('canvas');
+            const size = 1200;
+            finalCanvas.width = size;
+            finalCanvas.height = size;
+            const ctx = finalCanvas.getContext('2d');
+
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, size, size);
+
+            const img = new Image();
+            img.onload = function() {
+                const padding = size * 0.15;
+                const innerSize = size - (padding * 2);
+                
+                let renderWidth, renderHeight;
+                const ratio = img.width / img.height;
+
+                if (Math.abs(ratio - 1) < 0.01) { 
+                    renderWidth = innerSize;
+                    renderHeight = innerSize;
+                } else {
+                    if (ratio > 1) {
+                        renderWidth = innerSize;
+                        renderHeight = innerSize / ratio;
+                    } else {
+                        renderHeight = innerSize;
+                        renderWidth = innerSize * ratio;
+                    }
+                }
+
+                const x = (size - renderWidth) / 2;
+                const y = (size - renderHeight) / 2;
+
+                ctx.drawImage(img, x, y, renderWidth, renderHeight);
+
+                const link = document.createElement('a');
+                link.download = `muhardian-gen-${Date.now()}.png`;
+                link.href = finalCanvas.toDataURL("image/png");
+                link.click();
+            };
+            img.src = canvas.toDataURL();
+        }
+    </script>
+</body>
+</html>
