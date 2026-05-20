@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metode Asy-Syafi'i - Belajar Membaca Al-Qur'an Lengkap</title>
+    <!-- Tailwind CSS for high fidelity design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Amiri (Quranic Font) and Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti for celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .quran-font {
+            font-family: 'Amiri', serif;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #047857;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #065f46;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+<header class="bg-emerald-900 text-white shadow-lg sticky top-0 z-30 border-b border-amber-500/30">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+        <div class="flex items-center space-x-3">
+            <div class="bg-amber-500 text-emerald-950 p-2.5 rounded-xl shadow-md">
+                <i class="fa-solid fa-book-quran text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="text-lg md:text-xl font-bold tracking-tight flex items-center gap-1.5">
+                    Metode Asy-Syafi'i 
+                    <span class="text-xs bg-amber-500 text-emerald-950 px-2 py-0.5 rounded-full font-semibold">Penyempurnaan</span>
+                </h1>
+                <p class="text-xs text-emerald-200">Cara Praktis & Cepat Belajar Membaca Al-Qur'an (Pelajaran 1 - 15)</p>
+            </div>
+        </div>
+
+        <!-- Progress and stats bar -->
+        <div class="flex items-center gap-3 text-sm flex-wrap">
+            <button onclick="openAudioDiagnostic()" id="sound-status-badge" class="bg-emerald-800/80 hover:bg-emerald-700 px-3 py-1.5 rounded-lg border border-amber-500/40 text-amber-400 flex items-center gap-2 transition text-xs font-semibold">
+                <i class="fa-solid fa-circle-info"></i>
+                <span id="sound-status-text">Mendeteksi Suara...</span>
+            </button>
+            <div class="bg-emerald-800/80 px-3 py-1.5 rounded-lg border border-emerald-700 flex items-center gap-2">
+                <i class="fa-solid fa-fire text-amber-500"></i>
+                <span>Streak: <strong id="streak-counter">1</strong> Hari</span>
+            </div>
+            <div class="bg-emerald-800/80 px-3 py-1.5 rounded-lg border border-emerald-700 flex items-center gap-2">
+                <i class="fa-solid fa-circle-check text-green-400"></i>
+                <span>Progress: <strong id="progress-percent">0%</strong></span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Sound Help Diagnostic Modal -->
+<div id="audio-diagnostic-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+        <div class="flex justify-between items-start mb-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-amber-500/10 text-amber-600 flex items-center justify-center">
+                    <i class="fa-solid fa-volume-high text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800 text-base">Panduan & Diagnostik Suara</h3>
+                    <p class="text-[11px] text-slate-400">Pengecekan Audio Metode Asy-Syafi'i</p>
+                </div>
+            </div>
+            <button onclick="closeAudioDiagnostic()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <div class="space-y-3 my-4">
+            <div id="diag-status-box" class="p-3 rounded-xl border text-xs"></div>
+
+            <button onclick="testTtsVoice()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-circle-play"></i> Uji Suara Percobaan
+            </button>
+
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-2 text-xs text-slate-600">
+                <h4 class="font-bold text-slate-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-question text-emerald-600"></i> Suara Tetap Tidak Terdengar?
+                </h4>
+                <ol class="list-decimal pl-4 space-y-1.5 leading-relaxed text-[11px]">
+                    <li>Pastikan volume media perangkat Anda keras dan tidak dalam mode senyap (silent).</li>
+                    <li>Kami telah melengkapi sistem dengan <strong>Chime Sintetis Cadangan</strong>. Lonceng ganda lembut akan selalu menyala setiap mengetuk huruf.</li>
+                    <li>Bila menggunakan browser seluler, pastikan mesin Text-to-Speech (Google TTS / Siri) terpasang data suara bahasa Arab (ar-SA).</li>
+                </ol>
+            </div>
+        </div>
+
+        <button onclick="closeAudioDiagnostic()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition">
+            Tutup Jendela
+        </button>
+    </div>
+</div>
+
+<!-- Custom Confirmation Modal (Replaces window.confirm) -->
+<div id="custom-confirm-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
+        <div class="w-12 h-12 rounded-full bg-rose-500/10 text-rose-600 flex items-center justify-center mb-4">
+            <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+        </div>
+        <h3 class="font-bold text-slate-800 text-base">Konfirmasi Reset</h3>
+        <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+            Apakah Anda yakin ingin menghapus seluruh kemajuan belajar Anda? Proses ini akan mengembalikan progress, kuis, dan streak menjadi nol dan tidak dapat dibatalkan.
+        </p>
+        <div class="flex gap-2 mt-6">
+            <button onclick="closeConfirmModal(false)" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition">
+                Batal
+            </button>
+            <button onclick="closeConfirmModal(true)" class="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold transition">
+                Ya, Hapus Semua
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Main Container -->
+<main class="flex-grow max-w-7xl mx-auto w-full px-4 py-6 flex flex-col lg:flex-row gap-6">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="w-full lg:w-80 shrink-0">
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 sticky top-24">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h2 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-list-ol text-emerald-600"></i> Silabus Pelajaran
+                </h2>
+                <button onclick="triggerResetConfirm()" class="text-xs text-rose-500 hover:underline flex items-center gap-1">
+                    <i class="fa-solid fa-rotate"></i> Reset Progress
+                </button>
+            </div>
+
+            <!-- Chapter Navigation List (Pelajaran 1-15) -->
+            <nav class="space-y-2 max-h-[55vh] overflow-y-auto pr-1" id="chapter-list">
+                <!-- Chapters populated dynamically by JS -->
+            </nav>
+
+            <div class="mt-4 pt-4 border-t border-slate-100">
+                <div class="bg-gradient-to-br from-amber-50 to-orange-50 p-3 rounded-xl border border-amber-100 flex items-start gap-3">
+                    <i class="fa-solid fa-lightbulb text-amber-500 text-lg mt-0.5 animate-bounce"></i>
+                    <div>
+                        <h4 class="text-xs font-bold text-amber-900">Tips Metode Asy-Syafi'i</h4>
+                        <p class="text-[11px] text-amber-800 mt-1 leading-relaxed">
+                            Bacalah huruf dengan tegas, singkat, dan murni tanpa terseret. Pertahankan irama stabil 1 harakat sebelum mempercepat tempo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <section class="flex-grow flex flex-col gap-6">
+        
+        <!-- Active Chapter Title Banner -->
+        <div class="bg-gradient-to-r from-emerald-800 to-teal-800 text-white rounded-2xl p-6 shadow-md relative overflow-hidden">
+            <div class="absolute right-0 bottom-0 opacity-10 pointer-events-none transform translate-y-6 translate-x-6">
+                <i class="fa-solid fa-star-and-crescent text-9xl"></i>
+            </div>
+
+            <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="space-y-1">
+                    <span class="text-[10px] font-bold bg-amber-500 text-emerald-950 px-2.5 py-1 rounded-full uppercase tracking-wider" id="active-category">JILID 1 - DASAR</span>
+                    <h2 class="text-xl md:text-2xl font-bold" id="active-title">Pelajaran 1: Huruf Hijaiyah Tunggal (Fathah)</h2>
+                    <p class="text-xs md:text-sm text-emerald-100 leading-relaxed" id="active-desc">Memahami bentuk dan makhraj huruf awal dengan baris fathah (pendek - 1 harakat).</p>
+                </div>
+                <!-- Interactive Action Mode Switchers -->
+                <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                    <button id="btn-practice-tab" onclick="switchTab('practice')" class="flex-1 md:flex-none px-4 py-2 bg-amber-500 hover:bg-amber-400 text-emerald-950 font-semibold rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-sm">
+                        <i class="fa-solid fa-book-open"></i> Belajar Huruf
+                    </button>
+                    <button id="btn-draw-tab" onclick="switchTab('draw')" class="flex-1 md:flex-none px-4 py-2 bg-emerald-700 hover:bg-emerald-600 border border-emerald-600 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-sm">
+                        <i class="fa-solid fa-pen-nib"></i> Latihan Menulis
+                    </button>
+                    <button id="btn-quiz-tab" onclick="switchTab('quiz')" class="flex-1 md:flex-none px-4 py-2 bg-emerald-700 hover:bg-emerald-600 border border-emerald-600 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-sm">
+                        <i class="fa-solid fa-circle-question"></i> Uji Kuis
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 1: Practice / Belajar Huruf -->
+        <div id="tab-practice" class="block transition-all duration-300">
+            <div class="bg-emerald-50 text-emerald-800 border-l-4 border-emerald-600 rounded-r-xl p-4 mb-5 shadow-sm flex items-start gap-3">
+                <i class="fa-solid fa-circle-info text-lg mt-0.5 text-emerald-600 shrink-0"></i>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-emerald-900">Aturan & Petunjuk Membaca:</p>
+                    <p class="text-xs mt-0.5" id="active-instruction">Ketuk salah satu huruf hijaiyah di bawah untuk memperbesar makhraj serta mendengar panduan suaranya.</p>
+                </div>
+            </div>
+
+            <!-- Letter Grid Dynamic Container -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3" id="letters-grid">
+                <!-- Hijaiyah block dynamically generated here -->
+            </div>
+
+            <!-- Letter Focus/Detail Panel -->
+            <div id="letter-detail-panel" class="hidden mt-6 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-100 flex items-center justify-center font-bold text-3xl quran-font shadow-inner" id="detail-letter-arabic">
+                            اَ
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
+                                Huruf <span id="detail-letter-name">Alif</span>
+                                <span class="text-xs font-normal text-slate-500">(Lafal: <strong id="detail-letter-translit">A</strong>)</span>
+                            </h3>
+                            <p class="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
+                                <i class="fa-solid fa-bullhorn text-emerald-600"></i> Tempat Keluarnya Suara (Makhraj): <span id="detail-letter-makhraj" class="font-medium text-slate-700">Tenggorokan bagian bawah</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <button onclick="playVoiceActiveLetter()" class="flex-1 md:flex-none px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition shadow-sm">
+                            <i class="fa-solid fa-volume-high"></i> Putar Lafal
+                        </button>
+                        <button onclick="openWritingTabWithSelectedLetter()" class="flex-1 md:flex-none px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition">
+                            <i class="fa-solid fa-pen-fancy"></i> Tulis Huruf
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Canvas Menggambar/Tracing -->
+        <div id="tab-draw" class="hidden transition-all duration-300">
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-pen-nib text-amber-500 animate-pulse"></i> Papan Tulis Latihan Menulis
+                        </h3>
+                        <p class="text-xs text-slate-500">Tuliskan bentuk huruf di atas area kanvas gelap untuk melatih motorik halus menulis Arab.</p>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs text-slate-600 font-medium">Pilih Contoh:</label>
+                        <select id="tracing-letter-selector" onchange="changeTracingTemplate()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Drawing Workspace Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 flex flex-col justify-between">
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Pedoman Visual</h4>
+                            <div class="w-full aspect-square bg-white rounded-xl border border-slate-100 flex items-center justify-center relative shadow-inner overflow-hidden">
+                                <span id="tracing-ref-letter" class="quran-font text-8xl text-slate-300 select-none">اَ</span>
+                                <div class="absolute bottom-2 left-2 right-2 text-center text-[10px] text-slate-400 bg-white/80 backdrop-blur-sm rounded py-1">
+                                    Tulis dari kanan ke kiri, atas ke bawah
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-slate-200 space-y-2">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-500">Nama Huruf:</span>
+                                <strong id="tracing-ref-name" class="text-slate-700">Alif Fathah</strong>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-500">Bunyi Lafal:</span>
+                                <strong id="tracing-ref-translit" class="text-slate-700">A</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Canvas Panel -->
+                    <div class="md:col-span-2 flex flex-col items-center">
+                        <div class="relative w-full aspect-video md:aspect-[4/3] bg-slate-900 rounded-xl overflow-hidden shadow-inner cursor-crosshair border border-slate-700">
+                            <!-- Background guiding shape -->
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-20">
+                                <span id="canvas-bg-letter" class="quran-font text-9xl md:text-[12rem] text-slate-300 font-bold select-none">اَ</span>
+                            </div>
+                            <canvas id="writing-canvas" class="absolute inset-0 w-full h-full z-10"></canvas>
+                        </div>
+
+                        <!-- Brush controls -->
+                        <div class="flex flex-wrap items-center justify-between w-full mt-3 gap-3">
+                            <div class="flex items-center gap-1.5" id="color-selectors-container">
+                                <button onclick="setBrushColor('#eab308', this)" class="w-6 h-6 rounded-full bg-yellow-500 border-2 border-white ring-2 ring-emerald-500 transition" title="Kuning"></button>
+                                <button onclick="setBrushColor('#10b981', this)" class="w-6 h-6 rounded-full bg-emerald-500 border-2 border-white transition" title="Hijau"></button>
+                                <button onclick="setBrushColor('#3b82f6', this)" class="w-6 h-6 rounded-full bg-blue-500 border-2 border-white transition" title="Biru"></button>
+                                <button onclick="setBrushColor('#ef4444', this)" class="w-6 h-6 rounded-full bg-rose-500 border-2 border-white transition" title="Merah"></button>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-slate-500 font-medium">Ukuran:</span>
+                                <input type="range" id="brush-size" min="3" max="15" value="8" onchange="updateBrushSize(this.value)" class="w-24 accent-emerald-600">
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="clearCanvas()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition flex items-center gap-1">
+                                    <i class="fa-solid fa-trash-can"></i> Hapus Coretan
+                                </button>
+                                <button onclick="checkTracingComplete()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition flex items-center gap-1">
+                                    <i class="fa-solid fa-thumbs-up"></i> Selesai Tulis
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Quiz/Evaluasi Pembelajaran -->
+        <div id="tab-quiz" class="hidden transition-all duration-300">
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-graduation-cap text-emerald-600"></i> Kuis Evaluasi Interaktif
+                        </h3>
+                        <p class="text-xs text-slate-500 font-medium">Uji kebenaran bacaan, tanda baca, serta kaidah Asy-Syafi'i pada pelajaran ini.</p>
+                    </div>
+                    <div class="bg-emerald-50 text-emerald-800 border border-emerald-100 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5">
+                        <i class="fa-solid fa-star text-amber-500"></i>
+                        <span>Soal: <strong id="quiz-question-index">1</strong> / 5</span>
+                    </div>
+                </div>
+
+                <!-- Quiz Dashboard / Setup -->
+                <div id="quiz-setup-area" class="block py-6 text-center">
+                    <div class="max-w-md mx-auto space-y-4">
+                        <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700 mx-auto shadow-inner">
+                            <i class="fa-solid fa-play text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold text-base text-slate-800">Uji Pemahaman Pelajaran Anda</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Kuis berisikan 5 pertanyaan acak berbasis audio maupun teks visual yang berkaitan dengan makhraj dan lafal yang sedang dipelajari.
+                        </p>
+                        <button onclick="startQuizEngine()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs shadow-md transition">
+                            Mulai Kuis Pelajaran
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Quiz Container -->
+                <div id="quiz-live-area" class="hidden space-y-6">
+                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div id="quiz-progress-bar" class="bg-emerald-600 h-full transition-all duration-300" style="width: 20%"></div>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-100 p-6 rounded-2xl text-center space-y-4 relative shadow-sm">
+                        <span id="quiz-badge" class="absolute top-3 right-3 text-[10px] bg-slate-200 text-slate-600 font-bold px-2 py-0.5 rounded uppercase">EVALUASI</span>
+                        
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider" id="quiz-question-prompt">Lafal apakah huruf di bawah ini?</h4>
+                        
+                        <div class="inline-block px-8 py-5 rounded-2xl bg-white border border-slate-200/60 shadow-inner relative">
+                            <span id="quiz-arabic-word" class="quran-font text-5xl md:text-6xl text-slate-800 font-bold select-none">بَ - تَ</span>
+                            
+                            <button id="quiz-audio-btn" onclick="playQuizQuestionAudio()" class="absolute -bottom-3 -right-3 w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center text-xs shadow-md transition" title="Mainkan Suara">
+                                <i class="fa-solid fa-volume-high"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Option list -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="quiz-options-container">
+                        <!-- Generates choices dynamically -->
+                    </div>
+
+                    <div id="quiz-feedback" class="hidden p-3 rounded-xl text-center text-xs font-bold transition duration-300"></div>
+                </div>
+
+                <!-- Quiz Success Scoreboard -->
+                <div id="quiz-result-area" class="hidden py-6 text-center space-y-4">
+                    <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 mx-auto shadow-inner">
+                        <i class="fa-solid fa-award text-4xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg text-slate-800">Evaluasi Selesai!</h4>
+                        <p class="text-xs text-slate-500 mt-1">Kemampuan Anda pada bab ini telah dinilai.</p>
+                    </div>
+
+                    <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl max-w-sm mx-auto flex justify-around text-center shadow-sm">
+                        <div>
+                            <span class="text-[10px] uppercase text-slate-400 font-bold">Skor Akhir</span>
+                            <h5 class="text-xl font-black text-emerald-850" id="quiz-final-score">100 / 100</h5>
+                        </div>
+                        <div class="border-l border-emerald-200"></div>
+                        <div>
+                            <span class="text-[10px] uppercase text-slate-400 font-bold">Predikat</span>
+                            <h5 class="text-xs font-bold text-emerald-800 mt-2.5" id="quiz-final-status">SANGAT BAIK</h5>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-2 max-w-sm mx-auto pt-2">
+                        <button onclick="restartQuiz()" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition">
+                            Ulangi Tes
+                        </button>
+                        <button onclick="advanceToNextLevel()" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition shadow-md">
+                            Lanjut Pelajaran
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Custom Informative Footer for the active chapter -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-slate-800">Kaidah Hukum Bacaan Asy-Syafi'i</h4>
+                    <p class="text-[11px] text-slate-500 mt-0.5" id="active-rule-summary"></p>
+                </div>
+            </div>
+            <button onclick="markLessonComplete()" id="btn-complete-lesson" class="w-full sm:w-auto px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition shadow-md flex items-center justify-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-square-check"></i> Selesai & Lanjut Pelajaran
+            </button>
+        </div>
+        
+    </section>
+
+</main>
+
+<!-- Footer bar -->
+<footer class="bg-slate-900 text-slate-400 py-6 text-center border-t border-slate-800 mt-12 text-xs">
+    <div class="max-w-7xl mx-auto px-4 space-y-2">
+        <p class="font-semibold text-slate-300">Metode Asy-Syafi'i - Panduan Praktis Membaca Al-Qur'an Edisi Penyempurnaan</p>
+        <p>Aplikasi Media Pembelajaran Mandiri Interaktif untuk Pemula • Menggunakan Standar Rasm Usmani</p>
+        <div class="pt-2 border-t border-slate-800 flex justify-center gap-4 text-[11px]">
+            <a href="#" class="hover:text-emerald-400 transition">Beranda</a>
+            <span>•</span>
+            <a href="#" class="hover:text-emerald-400 transition">Tentang Metode</a>
+            <span>•</span>
+            <a href="#" class="hover:text-emerald-400 transition">Panduan Tajwid</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+const CHAPTER_DATA = [
+    {
+        id: "ch1",
+        category: "JILID 1 - DASAR",
+        title: "Pelajaran 1: Hijaiyah Fathah (ا - ذ)",
+        desc: "Latihan melafalkan huruf hijaiyah dengan tanda fathah (suara pendek 1 harakat).",
+        instruction: "Ketuk huruf di bawah ini. Pastikan melafalkannya dengan cepat, pendek, dan murni tanpa suara miring.",
+        rule: "Suara fathah berbunyi 'A' murni untuk huruf tipis (ا, ب, ت, ث) dan berbunyi 'O' tebal untuk huruf tebal (seperti: خ).",
+        letters: [
+            { arabic: "اَ", name: "Alif Fathah", translit: "A", makhraj: "Tenggorokan bagian bawah (Aqshal Halq)", voiceText: "أَ" },
+            { arabic: "بَ", name: "Ba Fathah", translit: "Ba", makhraj: "Pertemuan kedua bibir rapat", voiceText: "بَ" },
+            { arabic: "تَ", name: "Ta Fathah", translit: "Ta", makhraj: "Ujung lidah pada pangkal gigi seri atas", voiceText: "تَ" },
+            { arabic: "ثَ", name: "Tsa Fathah", translit: "Tsa", makhraj: "Ujung lidah menempel ujung gigi seri atas (lunak)", voiceText: "ثَ" },
+            { arabic: "جَ", name: "Jim Fathah", translit: "Ja", makhraj: "Tengah lidah ke langit-langit mulut", voiceText: "جَ" },
+            { arabic: "حَ", name: "Ha Fathah", translit: "Ha (Bersih)", makhraj: "Tenggorokan bagian tengah (Wasthul Halq)", voiceText: "حَ" },
+            { arabic: "خَ", name: "Kho Fathah", translit: "Kho (Tebal)", makhraj: "Tenggorokan bagian atas (Adnal Halq)", voiceText: "خَ" },
+            { arabic: "دَ", name: "Dal Fathah", translit: "Da", makhraj: "Ujung lidah pada pangkal gigi seri atas", voiceText: "دَ" },
+            { arabic: "ذَ", name: "Dzal Fathah", translit: "Dza", makhraj: "Ujung lidah pada ujung gigi seri atas", voiceText: "ذَ" }
+        ],
+        quiz: [
+            { type: "audio", phrase: "بَ - تَ", question: "Dengarkan suara berikut, mana yang benar?", correct: "Ba - Ta", options: ["Ba - Ta", "Ta - Ba", "Tsa - Ja", "Da - Ba"], voice: "بَ تَ" },
+            { type: "visual", phrase: "ثَ - جَ", question: "Bagaimanakah bunyi huruf di samping?", correct: "Tsa - Ja", options: ["Tsa - Ja", "Ta - Ja", "Sa - Ja", "Ja - Tsa"] },
+            { type: "visual", phrase: "خَ - حَ", question: "Perhatikan huruf berikut. Yang mana bunyi pelafalan yang benar?", correct: "Kho - Ha", options: ["Kho - Ha", "Ha - Kho", "Kho - Ka", "Ka - Ha"] },
+            { type: "visual", phrase: "دَ - ذَ", question: "Pilih bunyi huruf ini dengan benar:", correct: "Da - Dza", options: ["Da - Dza", "Dza - Da", "Da - Ra", "Dza - Ra"] },
+            { type: "visual", phrase: "اَ - بَ", question: "Manakah pelafalan untuk huruf di samping?", correct: "A - Ba", options: ["A - Ba", "Ba - A", "A - Ta", "Ta - A"] }
+        ]
+    },
+    {
+        id: "ch2",
+        category: "JILID 1 - DASAR",
+        title: "Pelajaran 2: Hijaiyah Fathah (ر - ض)",
+        desc: "Latihan melafalkan huruf hijaiyah berfathah dari huruf Ra sampai Dhad.",
+        instruction: "Ucapkan huruf dengan getaran Ra yang tebal, desisan Sin dan Syin yang bersih, serta ketebalan Shad dan Dhad.",
+        rule: "Huruf Shad (ص) dan Dhad (ض) dibaca tebal (mulut berbentuk bulat) namun tidak boleh terdengar monyong.",
+        letters: [
+            { arabic: "رَ", name: "Ro Fathah", translit: "Ro (Tebal)", makhraj: "Ujung lidah dekat punggungnya disentuhkan ke langit-langit", voiceText: "رَ" },
+            { arabic: "زَ", name: "Zai Fathah", translit: "Za", makhraj: "Ujung lidah sejajar di atas gigi seri bawah (mendesis tajam)", voiceText: "زَ" },
+            { arabic: "سَ", name: "Sin Fathah", translit: "Sa", makhraj: "Ujung lidah di atas gigi seri bawah (desis halus)", voiceText: "سَ" },
+            { arabic: "شَ", name: "Syin Fathah", translit: "Sya", makhraj: "Tengah lidah ke langit-langit (disertai hembusan udara)", voiceText: "شَ" },
+            { arabic: "صَ", name: "Shod Fathah", translit: "Sho (Tebal)", makhraj: "Ujung lidah menempel gigi seri bawah (lidah melengkung ke atas)", voiceText: "صَ" },
+            { arabic: "ضَ", name: "Dhod Fathah", translit: "Dho (Tebal)", makhraj: "Sisi lidah menempel gigi geraham atas", voiceText: "ضَ" }
+        ],
+        quiz: [
+            { type: "audio", phrase: "سَ - شَ", question: "Dengarkan suara berikut, mana yang benar?", correct: "Sa - Sya", options: ["Sa - Sya", "Sya - Sa", "Za - Sa", "Sa - Sho"], voice: "سَ شَ" },
+            { type: "visual", phrase: "صَ - ضَ", question: "Bagaimanakah lafal huruf di samping?", correct: "Sho - Dho", options: ["Sho - Dho", "So - Do", "Sa - Da", "Syo - Dyo"] },
+            { type: "visual", phrase: "رَ - زَ", question: "Manakah pelafalan untuk pasangan huruf di samping?", correct: "Ro - Za", options: ["Ro - Za", "Za - Ro", "Ro - Sa", "Za - Sa"] },
+            { type: "visual", phrase: "شَ - صَ", question: "Pilih bunyi huruf ini dengan benar:", correct: "Sya - Sho", options: ["Sya - Sho", "Sa - So", "Sya - Sa", "Sho - Sya"] },
+            { type: "audio", phrase: "ضَ - رَ", question: "Dengarkan audio, ketuk lafal yang sesuai:", correct: "Dho - Ro", options: ["Dho - Ro", "Do - Ro", "Ro - Dho", "Dza - Ro"], voice: "ضَ رَ" }
+        ]
+    },
+    {
+        id: "ch3",
+        category: "JILID 1 - DASAR",
+        title: "Pelajaran 3: Hijaiyah Fathah (ط - غ)",
+        desc: "Melafalkan huruf-huruf tebal dan kuat Thow, Zhow, 'Ain, dan Ghoin.",
+        instruction: "Perhatikan perbedaan tajam antara 'Ain (bersih dari tengah tenggorokan) dengan Ghoin (berkumur halus di tenggorokan atas).",
+        rule: "'Ain (ع) keluar dari tengah tenggorokan dengan penekanan sedang, sedangkan Ghoin (غ) keluar dari tenggorokan atas (seperti berkumur).",
+        letters: [
+            { arabic: "طَ", name: "Tho Fathah", translit: "Tho", makhraj: "Ujung lidah pada pangkal gigi seri atas (Sangat tebal)", voiceText: "طَ" },
+            { arabic: "ظَ", name: "Zho Fathah", translit: "Zho", makhraj: "Ujung lidah pada ujung gigi seri atas (Tebal)", voiceText: "ظَ" },
+            { arabic: "عَ", name: "‘Ain Fathah", translit: "‘A", makhraj: "Tenggorokan bagian tengah (Wasthul Halq)", voiceText: "عَ" },
+            { arabic: "غَ", name: "Ghoin Fathah", translit: "Gho", makhraj: "Tenggorokan bagian atas (Adnal Halq)", voiceText: "غَ" }
+        ],
+        quiz: [
+            { type: "audio", phrase: "عَ - غَ", question: "Dengarkan perbedaan lafal ini:", correct: "‘A - Gho", options: ["‘A - Gho", "A - Gho", "Gho - ‘A", "Ko - Go"], voice: "عَ غَ" },
+            { type: "visual", phrase: "طَ - ظَ", question: "Bagaimanakah pelafalan huruf di samping?", correct: "Tho - Zho", options: ["Tho - Zho", "To - Zo", "Ta - Za", "Zho - Tho"] },
+            { type: "visual", phrase: "غَ - عَ", question: "Manakah pelafalan untuk pasangan huruf di samping?", correct: "Gho - ‘A", options: ["Gho - ‘A", "Kho - A", "Gho - Ha", "Ha - Gho"] },
+            { type: "visual", phrase: "طَ - عَ", question: "Pilih bunyi huruf ini dengan benar:", correct: "Tho - ‘A", options: ["Tho - ‘A", "To - A", "Tho - A", "Ta - ‘A"] },
+            { type: "audio", phrase: "غَ - ظَ", question: "Dengarkan audio dan tentukan lafalnya:", correct: "Gho - Zho", options: ["Gho - Zho", "Ko - Zo", "Gho - Zo", "Kho - Zho"], voice: "غَ ظَ" }
+        ]
+    },
+    {
+        id: "ch4",
+        category: "JILID 1 - DASAR",
+        title: "Pelajaran 4: Hijaiyah Fathah (ف - ي)",
+        desc: "Menyelesaikan huruf hijaiyah tunggal fathah bagian akhir.",
+        instruction: "Ucapkan huruf-huruf tipis ini dengan membuka rongga mulut secara relaks dan alami.",
+        rule: "Huruf Kaf (ك) dibaca tipis dengan hembusan napas halus, berbeda dengan Qof (ق) yang bulat tebal di pangkal lidah.",
+        letters: [
+            { arabic: "فَ", name: "Fa Fathah", translit: "Fa", makhraj: "Ujung gigi seri atas menyentuh perut bibir bawah bagian dalam", voiceText: "فَ" },
+            { arabic: "قَ", name: "Qof Fathah", translit: "Qo (Tebal)", makhraj: "Pangkal lidah menyentuh langit-langit lunak", voiceText: "قَ" },
+            { arabic: "كَ", name: "Kaf Fathah", translit: "Ka (Berbisik)", makhraj: "Pangkal lidah sedikit ke depan langit-langit keras", voiceText: "كَ" },
+            { arabic: "لَ", name: "Lam Fathah", translit: "La", makhraj: "Ujung sisi lidah menyentuh langit-langit depan", voiceText: "لَ" },
+            { arabic: "مَ", name: "Mim Fathah", translit: "Ma", makhraj: "Pertemuan kedua bibir dalam keadaan rileks", voiceText: "مَ" },
+            { arabic: "نَ", name: "Nun Fathah", translit: "Na", makhraj: "Ujung lidah menyentuh gusi atas", voiceText: "نَ" },
+            { arabic: "وَ", name: "Wawu Fathah", translit: "Wa", makhraj: "Membulatkan kedua bibir ke depan", voiceText: "وَ" },
+            { arabic: "هَ", name: "Ha Besar Fathah", translit: "Ha (Dada)", makhraj: "Tenggorokan bagian bawah (dari pangkal dada)", voiceText: "هَ" },
+            { arabic: "يَ", name: "Ya Fathah", translit: "Ya", makhraj: "Tengah lidah menyentuh langit-langit mulut", voiceText: "يَ" }
+        ],
+        quiz: [
+            { type: "audio", phrase: "قَ - كَ", question: "Dengarkan kontras lafal tebal-tipis berikut:", correct: "Qo - Ka", options: ["Qo - Ka", "Ka - Qo", "Ko - Ka", "Qo - Ko"], voice: "قَ كَ" },
+            { type: "visual", phrase: "مَ - نَ", question: "Bagaimanakah pelafalan huruf di samping?", correct: "Ma - Na", options: ["Ma - Na", "Na - Ma", "Ma - Wa", "Wa - Na"] },
+            { type: "visual", phrase: "وَ - يَ", question: "Manakah pelafalan untuk pasangan huruf di samping?", correct: "Wa - Ya", options: ["Wa - Ya", "Ya - Wa", "Wa - Ha", "Ha - Ya"] },
+            { type: "visual", phrase: "هَ - حَ", question: "Perhatikan huruf Ha besar dan Ha kecil ini. Bunyi yang benar:", correct: "Ha - Ha", options: ["Ha - Ha", "Ha - Kho", "Ha - A", "A - Ha"] },
+            { type: "audio", phrase: "فَ - لَ", question: "Dengarkan audio dan tentukan lafalnya:", correct: "Fa - La", options: ["Fa - La", "La - Fa", "Pa - La", "Fa - Ra"], voice: "فَ لَ" }
+        ]
+    },
+    {
+        id: "ch5",
+        category: "JILID 1 - DASAR",
+        title: "Pelajaran 5: Mengenal Tanda Kasrah (i)",
+        desc: "Belajar melafalkan huruf hijaiyah berbaris kasrah (bunyi 'i' pendek).",
+        instruction: "Untuk menghasilkan bunyi 'i' yang fasih, tarik sudut bibir Anda ke samping seperti tersenyum tipis.",
+        rule: "Kasrah berbunyi 'i' murni, tidak boleh terdengar setengah miring seperti 'e' (contoh: 'bi' bukan 'be').",
+        letters: [
+            { arabic: "اِ", name: "Alif Kasrah", translit: "I", makhraj: "Tenggorokan bagian bawah", voiceText: "إِ" },
+            { arabic: "بِ", name: "Ba Kasrah", translit: "Bi", makhraj: "Pertemuan kedua bibir rapat", voiceText: "بِ" },
+            { arabic: "تِ", name: "Ta Kasrah", translit: "Ti", makhraj: "Ujung lidah menyentuh pangkal gigi seri atas", voiceText: "تِ" },
+            { arabic: "ثِ", name: "Tsa Kasrah", translit: "Tsi", makhraj: "Ujung lidah menyentuh ujung gigi seri atas", voiceText: "ثِ" },
+            { arabic: "جِ", name: "Jim Kasrah", translit: "Ji", makhraj: "Tengah lidah ke langit-langit", voiceText: "جِ" },
+            { arabic: "حِ", name: "Ha Kasrah", translit: "Hi (Bersih)", makhraj: "Tenggorokan tengah", voiceText: "حِ" }
+        ],
+        quiz: [
+            { type: "audio", phrase: "بِ - تِ", question: "Dengarkan suara berikut, mana yang benar?", correct: "Bi - Ti", options: ["Bi - Ti", "Ti - Bi", "Be - Te", "Bi - Tsi"], voice: "بِ تِ" },
+            { type: "visual", phrase: "اِ - جِ", question: "Bagaimanakah pelafalan huruf di samping?", correct: "I - Ji", options: ["I - Ji", "I - Je", "A - Ji", "Ji - I"] },
+            { type: "visual", phrase: "ثِ - حِ", question: "Manakah pelafalan untuk pasangan huruf di samping?", correct: "Tsi - Hi", options: ["Tsi - Hi", "Si - Hi", "Tsi - He", "Tse - He"] },
+            { type: "visual", phrase: "بِ - ثِ", question: "Pilih bunyi huruf ini dengan benar:", correct: "Bi - Tsi", options: ["Bi - Tsi", "Be - Tsi", "Bi - Si", "Ba - Tsa"] },
+            { type: "audio", phrase: "حِ - تِ", question: "Dengarkan audio dan tentukan lafalnya:", correct: "Hi - Ti", options: ["Hi - Ti", "He - Te", "Hi - Te", "Hi - Tsi"], voice: "حِ تِ" }
+        ]
+    },
+    {
+        id: "ch6",
+        category: "JILID 1 - DASAR",
+        title: "Pelajaran 6: Mengenal Tanda Dammah (u)",
+        desc: "Belajar melafalkan huruf hijaiyah berbaris dammah (bunyi 'u' pendek).",
+        instruction: "Untuk menghasilkan bunyi 'u' yang sempurna, monyongkan bibir Anda ke depan dengan lubang bulat kecil.",
+        rule: "Dammah berbunyi 'u' murni, tidak boleh terdengar seperti 'o' (contoh: 'bu' bukan 'bo').",
+        letters: [
+            { arabic: "اُ", name: "Alif Dammah", translit: "U", makhraj: "Membulatkan bibir ke depan", voiceText: "أُ" },
+            { arabic: "بُ", name: "Ba Dammah", translit: "Bu", makhraj: "Membulatkan bibir ke depan", voiceText: "بُ" },
+            { arabic: "تُ", name: "Ta Dammah", translit: "Tu", makhraj: "Ujung lidah ke pangkal gigi seri atas", voiceText: "تُ" },
+            { arabic: "ثُ", name: "Tsa Dammah", translit: "Tsu", makhraj: "Ujung lidah ke ujung gigi seri atas", voiceText: "ثُ" },
+            { arabic: "جُ", name: "Jim Dammah", translit: "Ju", makhraj: "Tengah lidah ke langit-langit", voiceText: "جُ" },
+            { arabic: "حُ", name: "Ha Dammah", translit: "Hu", makhraj: "Tenggorokan tengah", voiceText: "حُ" }
+        ],
+        quiz: [
+            { type: "audio", phrase: "بُ - تُ", question: "Dengarkan suara berikut, mana yang benar?", correct: "Bu - Tu", options: ["Bu - Tu", "Tu - Bu", "Bo - To", "Bu - Tsu"], voice: "بُ تُ" },
+            { type: "visual", phrase: "اُ - جُ", question: "Bagaimanakah pelafalan huruf di samping?", correct: "U - Ju", options: ["U - Ju", "O - Jo", "U - Jo", "Ju - U"] },
+            { type: "visual", phrase: "ثُ - حُ", question: "Manakah pelafalan untuk pasangan huruf di samping?", correct: "Tsu - Hu", options: ["Tsu - Hu", "Su - Hu", "Tsu - Ho", "Tso - Ho"] },
+            { type: "visual", phrase: "بُ - ثُ", question: "Pilih bunyi huruf ini dengan benar:", correct: "Bu - Tsu", options: ["Bu - Tsu", "Bo - Tso", "Bu - Su", "Bu - Tu"] },
+            { type: "audio", phrase: "حُ - تُ", question: "Dengarkan audio dan tentukan lafalnya:", correct: "Hu - Tu", options: ["Hu - Tu", "Ho - To", "Hu - To", "Hu - Tsu"], voice: "حُ تُ" }
+        ]
+    },
+    {
+        id: "ch7",
+        category: "JILID 1 - DASAR",
+        title: "Pelajaran 7: Latihan Harakat Campuran",
+        desc: "Menggabungkan tiga baris harakat dasar dalam kata pendek dengan bacaan terputus.",
+        instruction: "Sebutkan satu per satu harakat huruf di bawah ini secara cepat tanpa melambat atau mengayun suara.",
+        rule: "Pastikan Anda bisa merubah bentuk bibir dengan sigap: datar (A), melebar (I), lalu membulat monyong (U).",
+        letters: [
+            { arabic: "خَلَقَ", name: "Kho - La - Qo", translit: "Kho-la-qo", makhraj: "Latihan harakat fathah berurutan", voiceText: "خَلَقَ" },
+            { arabic: "حَمِدَ", name: "Ha - Mi - Da", translit: "Ha-mi-da", makhraj: "Fathah - Kasrah - Fathah", voiceText: "حَمِدَ" },
+            { arabic: "كُتِبَ", name: "Ku - Ti - Ba", translit: "Ku-ti-ba", makhraj: "Dammah - Kasrah - Fathah", voiceText: "كُتِبَ" },
+            { arabic: "رُزِقَ", name: "Ru - Zi - Qo", translit: "Ru-zi-qo", makhraj: "Dammah - Kasrah - Fathah", voiceText: "رُزِقَ" }
+        ],
+        quiz: [
+            { type: "audio", phrase: "خَلَقَ", question: "Dengarkan kata berikut, bagaimanakah bunyinya?", correct: "Kho-la-qo", options: ["Kho-la-qo", "Ko-la-ko", "Kho-li-qo", "Ku-ti-ba"], voice: "خَلَقَ" },
+            { type: "visual", phrase: "حَمِدَ", question: "Bagaimanakah pelafalan kata di samping?", correct: "Ha-mi-da", options: ["Ha-mi-da", "Ha-me-da", "Ha-ma-da", "Ham-da"] },
+            { type: "visual", phrase: "كُتِبَ", question: "Pilih transliterasi yang benar:", correct: "Ku-ti-ba", options: ["Ku-ti-ba", "Ko-te-ba", "Ka-ta-ba", "Ku-te-ba"] },
+            { type: "visual", phrase: "رُزِقَ", question: "Bagaimanakah bunyi kata di samping?", correct: "Ru-zi-qo", options: ["Ru-zi-qo", "Ru-zi-ka", "Ro-ze-ko", "Ru-ze-qo"] },
+            { type: "audio", phrase: "كُتِبَ", question: "Dengarkan audio, ketuk kata yang sesuai:", correct: "Ku-ti-ba", options: ["Ku-ti-ba", "Ru-zi-qo", "Ha-mi-da", "Kho-la-qo"], voice: "كُتِبَ" }
+        ]
+    },
+    {
+        id: "ch8",
+        category: "JILID 2 - SAMBUNG",
+        title: "Pelajaran 8: Bentuk Huruf Sambung Awal",
+        desc: "Belajar mengenali bentuk kepala huruf hijaiyah saat mulai menyambung di depan kata.",
+        instruction: "Perhatikan bahwa badan bagian bawah huruf (seperti Ba, Ta, Tsa, Jim) dihilangkan saat berada di awal kata.",
+        rule: "Hanya kepala huruf yang dipertahankan untuk disambung, titik huruf tetap berada pada posisinya.",
+        letters: [
+            { arabic: "بَـ", name: "Ba Awal", translit: "Ba...", makhraj: "Hanya menyisakan lekukan awal dengan titik di bawah", voiceText: "بَ" },
+            { arabic: "تَـ", name: "Ta Awal", translit: "Ta...", makhraj: "Menyisakan lekukan awal dengan dua titik di atas", voiceText: "تَ" },
+            { arabic: "جَـ", name: "Jim Awal", translit: "Ja...", makhraj: "Ekor lengkung bawah dipotong untuk menyambung", voiceText: "جَ" },
+            { arabic: "سَـ", name: "Sin Awal", translit: "Sa...", makhraj: "Gigi sin dipertahankan untuk disambung ke depan", voiceText: "سَ" }
+        ],
+        quiz: [
+            { type: "visual", phrase: "بَـ", question: "Huruf apakah ini bila berdiri sendiri?", correct: "Ba", options: ["Ba", "Ta", "Tsa", "Nun"] },
+            { type: "visual", phrase: "تَـ", question: "Huruf apakah ini?", correct: "Ta", options: ["Ta", "Ba", "Ya", "Tsa"] },
+            { type: "visual", phrase: "جَـ", question: "Bentuk di samping merupakan awalan dari huruf:", correct: "Jim", options: ["Jim", "Ha", "Kho", "Ain"] },
+            { type: "visual", phrase: "سَـ", question: "Huruf apakah di samping ini?", correct: "Sin", options: ["Sin", "Syin", "Shad", "Sa"] },
+            { type: "audio", phrase: "جَـ", question: "Dengarkan suara huruf ini:", correct: "Ja", options: ["Ja", "Ha", "Kho", "Sa"], voice: "جَ" }
+        ]
+    },
+    {
+        id: "ch9",
+        category: "JILID 2 - SAMBUNG",
+        title: "Pelajaran 9: Bentuk Sambung Tengah & Akhir",
+        desc: "Memahami struktur penyambungan penuh di tengah dan di akhir kata.",
+        instruction: "Amati garis sambung penghubung (di kanan dan kiri huruf) yang membuat bentuk huruf sedikit berubah.",
+        rule: "Huruf tertentu seperti Alif, Dal, Dzal, Ro, Zai, dan Wawu tidak dapat menyambung huruf sesudahnya.",
+        letters: [
+            { arabic: "ـبـ", name: "Ba Tengah", translit: "...ba...", makhraj: "Garis penyambung di kanan dan kiri huruf", voiceText: "بَ" },
+            { arabic: "ـجـ", name: "Jim Tengah", translit: "...ja...", makhraj: "Garis meluncur di kanan-kiri menyatu kepala jim", voiceText: "جَ" },
+            { arabic: "ـت", name: "Ta Akhir", translit: "...ta", makhraj: "Kembali ke bentuk asli tertutup dengan garis ekor kanan", voiceText: "تَ" },
+            { arabic: "ـج", name: "Jim Akhir", translit: "...ja", makhraj: "Ekor bulat jim dikembalikan di akhir kata", voiceText: "جَ" }
+        ],
+        quiz: [
+            { type: "visual", phrase: "ـبـ", question: "Di manakah posisi huruf Ba di samping?", correct: "Tengah", options: ["Tengah", "Awal", "Akhir", "Tunggal"] },
+            { type: "visual", phrase: "ـج", question: "Huruf Jim di samping berada di posisi:", correct: "Akhir", options: ["Akhir", "Awal", "Tengah", "Tunggal"] },
+            { type: "visual", phrase: "ـت", question: "Huruf apakah yang berada di akhir kata ini?", correct: "Ta", options: ["Ta", "Ba", "Tsa", "Ya"] },
+            { type: "visual", phrase: "ـجـ", question: "Huruf tengah di samping adalah:", correct: "Jim", options: ["Jim", "Ha", "Kho", "Ain"] },
+            { type: "audio", phrase: "ـت", question: "Dengarkan suara huruf akhir berikut:", correct: "Ta", options: ["Ta", "Ba", "Tsa", "Ja"], voice: "تَ" }
+        ]
+    },
+    {
+        id: "ch10",
+        category: "JILID 3 - MAD ASLI",
+        title: "Pelajaran 10: Mad Thabi'i Alif (Panjang)",
+        desc: "Belajar membaca huruf berfathah diikuti Alif (panjang 2 harakat).",
+        instruction: "Ayung atau panjangkan bacaan tepat 2 ketukan (seperti membunyikan dua huruf). Jangan berlebih.",
+        rule: "Jika ada huruf berbaris Fathah bertemu dengan Alif Mati (Mati tanpa baris), maka wajib dibaca panjang 2 harakat.",
+        letters: [
+            { arabic: "بَا", name: "Ba Mad Alif", translit: "Baa (Panjang)", makhraj: "Fathah diikuti Alif = 2 Harakat", voiceText: "بَا" },
+            { arabic: "تَا", name: "Ta Mad Alif", translit: "Taa (Panjang)", makhraj: "Fathah diikuti Alif = 2 Harakat", voiceText: "تَا" },
+            { arabic: "جَا", name: "Jim Mad Alif", translit: "Jaa (Panjang)", makhraj: "Fathah diikuti Alif = 2 Harakat", voiceText: "جَا" },
+            { arabic: "دَا", name: "Dal Mad Alif", translit: "Daa (Panjang)", makhraj: "Fathah diikuti Alif = 2 Harakat", voiceText: "دَا" }
+        ],
+        quiz: [
+            { type: "audio", phrase: "بَا", question: "Berapakah harakah panjang bacaan ini?", correct: "2 Harakat", options: ["2 Harakat", "1 Harakat", "4 Harakat", "6 Harakat"], voice: "بَا" },
+            { type: "visual", phrase: "تَا", question: "Transliterasi lafal di samping yang benar:", correct: "Taa (Panjang)", options: ["Taa (Panjang)", "Ta (Pendek)", "Tia (Miring)", "Tah (Mendesah)"] },
+            { type: "visual", phrase: "جَا - دَا", question: "Bagaimanakah lafal kata di samping?", correct: "Jaa - Daa", options: ["Jaa - Daa", "Ja - Da", "Jaa - Da", "Ja - Daa"] },
+            { type: "visual", phrase: "بَا - تَا", question: "Pilih cara membaca yang benar:", correct: "Panjang - Panjang", options: ["Panjang - Panjang", "Pendek - Pendek", "Panjang - Pendek", "Pendek - Panjang"] },
+            { type: "audio", phrase: "دَا", question: "Dengarkan audio, ketuk tulisan yang tepat:", correct: "Daa", options: ["Daa", "Da", "De", "Do"], voice: "دَا" }
+        ]
+    },
+    {
+        id: "ch11",
+        category: "JILID 3 - MAD ASLI",
+        title: "Pelajaran 11: Mad Thabi'i Ya & Wawu",
+        desc: "Membaca kasrah diikuti Ya sukun dan dammah diikuti Wawu sukun.",
+        instruction: "Ayung dan tarik bibir saat membaca Mad Ya, monyongkan bibir saat membaca Mad Wawu sepanjang 2 harakat.",
+        rule: "Mad Asli terjadi pula saat Kasrah bertemu Ya sukun (Mati) ATAU Dammah bertemu Wawu sukun (Mati).",
+        letters: [
+            { arabic: "بِيْ", name: "Ba Mad Ya", translit: "Bii (Panjang)", makhraj: "Kasrah diikuti Ya sukun", voiceText: "بِي" },
+            { arabic: "تِيْ", name: "Ta Mad Ya", translit: "Tii (Panjang)", makhraj: "Kasrah diikuti Ya sukun", voiceText: "تِي" },
+            { arabic: "بُوْ", name: "Ba Mad Wawu", translit: "Buu (Panjang)", makhraj: "Dammah diikuti Wawu sukun", voiceText: "بُو" },
+            { arabic: "تُوْ", name: "Ta Mad Wawu", translit: "Tuu (Panjang)", makhraj: "Dammah diikuti Wawu sukun", voiceText: "تُو" }
+        ],
+        quiz: [
+            { type: "audio", phrase: "بِيْ", question: "Dengarkan lafal ini, hukum mad apakah ini?", correct: "Mad Ya", options: ["Mad Ya", "Mad Alif", "Mad Wawu", "Bukan Mad"], voice: "بِي" },
+            { type: "visual", phrase: "بُوْ", question: "Bagaimanakah lafal huruf di samping?", correct: "Buu (Panjang)", options: ["Buu (Panjang)", "Bu (Pendek)", "Bo (Miring)", "Bou (Diftong)"] },
+            { type: "visual", phrase: "تِيْ - تُوْ", question: "Bagaimanakah cara membaca pasangan di samping?", correct: "Tii - Tuu", options: ["Tii - Tuu", "Ti - Tu", "Tee - Too", "Tii - Tu"] },
+            { type: "visual", phrase: "تِيْ", question: "Mengapa dibaca panjang?", correct: "Kasrah bertemu Ya mati", options: ["Kasrah bertemu Ya mati", "Dammah bertemu Wawu mati", "Fathah bertemu Alif", "Karena ada harakat berdiri"] },
+            { type: "audio", phrase: "تُوْ", question: "Dengarkan audio, ketuk lafal yang sesuai:", correct: "Tuu", options: ["Tuu", "Tu", "To", "Tii"], voice: "تُو" }
+        ]
+    },
+    {
+        id: "ch12",
+        category: "JILID 4 - TANWIN",
+        title: "Pelajaran 12: Tanwin Fathatain (an)",
+        desc: "Belajar melafalkan baris ganda di atas (Fathatain) berbunyi suara 'an'.",
+        instruction: "Bunyikan huruf seperti menambahkan akhiran huruf 'N' mati di akhir pelafalan.",
+        rule: "Fathatain (baris dua di atas) biasanya ditulis bersamaan dengan Alif penolong di belakangnya.",
+        letters: [
+            { arabic: "اً", name: "Alif Fathatain", translit: "An", makhraj: "Bunyi 'A' diikuti akhiran N", voiceText: "أً" },
+            { arabic: "بًا", name: "Ba Fathatain", translit: "Ban", makhraj: "Bunyi 'Ba' diikuti akhiran N", voiceText: "بً" },
+            { arabic: "تًا", name: "Ta Fathatain", translit: "Tan", makhraj: "Bunyi 'Ta' diikuti akhiran N", voiceText: "تً" },
+            { arabic: "ثًّا", name: "Tsa Fathatain", translit: "Tsan", makhraj: "Bunyi 'Tsa' diikuti akhiran N", voiceText: "ثً" }
+        ],
+        quiz: [
+            { type: "audio", phrase: "بًا - تًا", question: "Dengarkan suara berikut, mana yang benar?", correct: "Ban - Tan", options: ["Ban - Tan", "Ba - Ta", "Ban - Ta", "Baa - Taa"], voice: "بً تً" },
+            { type: "visual", phrase: "اً", question: "Bagaimanakah bunyi harakat ganda di samping?", correct: "An", options: ["An", "In", "Un", "A"] },
+            { type: "visual", phrase: "ثًّا", question: "Manakah pelafalan untuk huruf di samping?", correct: "Tsan", options: ["Tsan", "San", "Tsa", "Tsin"] },
+            { type: "visual", phrase: "بًا", question: "Apakah fungsi huruf Alif di akhir kata 'Ban' tersebut?", correct: "Hanya Alif bantu penulisan", options: ["Hanya Alif bantu penulisan", "Dibaca panjang", "Untuk tanda sukun", "Dibaca memantul"] },
+            { type: "audio", phrase: "تًا", question: "Dengarkan audio, ketuk lafal yang sesuai:", correct: "Tan", options: ["Tan", "Tun", "Tin", "Ta"], voice: "تً" }
+        ]
+    },
+    {
+        id: "ch13",
+        category: "JILID 4 - TANWIN",
+        title: "Pelajaran 13: Tanwin Kasratain & Dammatain",
+        desc: "Membaca baris ganda di bawah (Kasratain: in) dan di depan (Dammatain: un).",
+        instruction: "Suarakan akhiran 'N' dengan jelas dan bersih tanpa mendengung berlebihan.",
+        rule: "Kasratain berbunyi 'in' dan Dammatain berbunyi 'un'. Kedua tanda ini tidak memerlukan Alif bantu tambahan.",
+        letters: [
+            { arabic: "بٍ", name: "Ba Kasratain", translit: "Bin", makhraj: "Kasrah ganda berakhiran N", voiceText: "بٍ" },
+            { arabic: "تٍ", name: "Ta Kasratain", translit: "Tin", makhraj: "Kasrah ganda berakhiran N", voiceText: "تٍ" },
+            { arabic: "بٌ", name: "Ba Dammatain", translit: "Bun", makhraj: "Dammah ganda berakhiran N", voiceText: "بٌ" },
+            { arabic: "تٌ", name: "Ta Dammatain", translit: "Tun", makhraj: "Dammah ganda berakhiran N", voiceText: "تٌ" }
+        ],
+        quiz: [
+            { type: "audio", phrase: "بٍ - بٌ", question: "Dengarkan perbedaan kasratain dan dammatain berikut:", correct: "Bin - Bun", options: ["Bin - Bun", "Bun - Bin", "Bi - Bu", "Bin - Tun"], voice: "بٍ بٌ" },
+            { type: "visual", phrase: "تٍ", question: "Bagaimanakah pelafalan tanda baca di samping?", correct: "Tin", options: ["Tin", "Tun", "Tan", "Ti"] },
+            { type: "visual", phrase: "تٌ", question: "Bagaimanakah pelafalan tanda baca di samping?", correct: "Tun", options: ["Tun", "Tin", "Tan", "Tu"] },
+            { type: "visual", phrase: "بٍ - تٌ", question: "Pilih bunyi pasangan huruf di samping:", correct: "Bin - Tun", options: ["Bin - Tun", "Bin - Tin", "Bun - Tun", "Bin - Tu"] },
+            { type: "audio", phrase: "تٍ", question: "Dengarkan audio, ketuk lafal yang sesuai:", correct: "Tin", options: ["Tin", "Tun", "Tan", "Ti"], voice: "تٍ" }
+        ]
+    },
+    {
+        id: "ch14",
+        category: "JILID 5 - SUKUN",
+        title: "Pelajaran 14: Tanda Sukun & Qalqalah",
+        desc: "Membaca huruf mati (sukun) serta memantulkan bunyi huruf Qalqalah.",
+        instruction: "Tahan aliran suara untuk huruf sukun biasa. Pantulkan dengan tegas jika bertemu huruf Qalqalah (Ba, Jim, Dal).",
+        rule: "Huruf Qalqalah (ب, ج, د, ط, ق) saat sukun/mati wajib dibaca memantul (seperti membalikkan suara).",
+        letters: [
+            { arabic: "اَبْ", name: "Alif Ba Sukun", translit: "Ab (Memantul)", makhraj: "Ba Sukun = Qalqalah (Memantul)", voiceText: "أَبْ" },
+            { arabic: "اَتْ", name: "Alif Ta Sukun", translit: "At (Berdesis)", makhraj: "Ta Sukun = Memiliki sifat Hams (Desis halus)", voiceText: "أَتْ" },
+            { arabic: "اَجْ", name: "Alif Jim Sukun", translit: "Aj (Memantul)", makhraj: "Jim Sukun = Qalqalah (Memantul)", voiceText: "أَجْ" },
+            { arabic: "اَدْ", name: "Alif Dal Sukun", translit: "Ad (Memantul)", makhraj: "Dal Sukun = Qalqalah (Memantul)", voiceText: "أَدْ" }
+        ],
+        quiz: [
+            { type: "audio", phrase: "اَبْ", question: "Dengarkan audio, apakah suara memantul terdengar?", correct: "Ya, memantul (Qalqalah)", options: ["Ya, memantul (Qalqalah)", "Tidak, ditahan biasa", "Panjang 2 harakat", "Suara mendengung"], voice: "أَبْ" },
+            { type: "visual", phrase: "اَتْ", question: "Mengapa huruf Ta di samping dibaca 'At' dengan desisan udara halus?", correct: "Sifat Hams pada huruf Ta", options: ["Sifat Hams pada huruf Ta", "Karena memantul", "Karena merupakan huruf Mad", "Kesalahan harakat"] },
+            { type: "visual", phrase: "اَجْ", question: "Manakah pelafalan untuk pasangan huruf di samping?", correct: "Aj (Memantul)", options: ["Aj (Memantul)", "At", "An", "Aji"] },
+            { type: "visual", phrase: "اَدْ", question: "Manakah di bawah ini yang merupakan kelompok huruf Qalqalah?", correct: "Ba, Jim, Dal, Tho, Qof", options: ["Ba, Jim, Dal, Tho, Qof", "Alif, Ba, Ta, Tsa", "Lam, Mim, Nun, Wawu", "Fa, Qof, Kaf, Lam"] },
+            { type: "audio", phrase: "اَجْ", question: "Dengarkan audio, ketuk lafal yang sesuai:", correct: "Aj", options: ["Aj", "Ab", "Ad", "At"], voice: "أَجْ" }
+        ]
+    },
+    {
+        id: "ch15",
+        category: "JILID 5 - TASYDID",
+        title: "Pelajaran 15: Tanda Tasydid / Syaddah",
+        desc: "Membaca huruf ganda dengan penekanan dan penahanan suara.",
+        instruction: "Tekan suara Anda pada huruf bertasydid seolah huruf tersebut berjumlah dua (dilebur).",
+        rule: "Tasydid (ّ) melambangkan peleburan huruf mati pertama dengan huruf berharakat kedua (contoh: 'Ab-ba').",
+        letters: [
+            { arabic: "اَبَّ", name: "Alif Ba Tasydid", translit: "Ab-ba (Ditekan)", makhraj: "Menahan sejenak lalu melepas baris fathah", voiceText: "أَبَّ" },
+            { arabic: "اَتَّ", name: "Alif Ta Tasydid", translit: "At-ta", makhraj: "Ditekan kuat pada makhraj Ta", voiceText: "أَتَّ" },
+            { arabic: "اَجَّ", name: "Alif Jim Tasydid", translit: "Aj-ja", makhraj: "Ditekan kuat pada tengah lidah", voiceText: "أَجَّ" },
+            { arabic: "كَرَّ", name: "Kaf Ro Tasydid", translit: "Kar-ro", makhraj: "Ditekan dengan getaran Ra yang tebal", voiceText: "كَرَّ" }
+        ],
+        quiz: [
+            { type: "audio", phrase: "اَبَّ", question: "Dengarkan suara berikut, bagaimanakah cara membacanya?", correct: "Ditekan ganda (Tasydid)", options: ["Ditekan ganda (Tasydid)", "Memantul (Qalqalah)", "Dibaca panjang", "Dibaca mendengung saja"], voice: "أَبَّ" },
+            { type: "visual", phrase: "كَرَّ", question: "Bagaimanakah pelafalan kata di samping?", correct: "Kar-ro", options: ["Kar-ro", "Ka-ro", "Kaa-ro", "Kar-a"] },
+            { type: "visual", phrase: "اَتَّ", question: "Manakah pelafalan untuk huruf di samping?", correct: "At-ta", options: ["At-ta", "Ata", "At-an", "At-ti"] },
+            { type: "visual", phrase: "اَجَّ", question: "Bentuk harakat seperti 'W' kecil di atas huruf dinamakan:", correct: "Tasydid / Syaddah", options: ["Tasydid / Syaddah", "Sukun / Mati", "Tanwin", "Fathah"] },
+            { type: "audio", phrase: "اَتَّ", question: "Dengarkan audio, ketuk lafal yang sesuai:", correct: "At-ta", options: ["At-ta", "Ab-ba", "Aj-ja", "Kar-ro"], voice: "أَتَّ" }
+        ]
+    }
+];
+
+let activeChapterIndex = 0;
+let activeLetterIdx = 0;
+let completedChapters = JSON.parse(localStorage.getItem('asy_syafii_completed_v2')) || [];
+let brushColor = "#eab308"; // Gold default brush
+let brushSize = 8;
+let isDrawing = false;
+let canvas, ctx;
+let lastX = 0;
+let lastY = 0;
+let nextConfirmAction = null; // Storing callback for custom confirmation
+
+const ttsSynth = window.speechSynthesis;
+let arabicVoice = null;
+let audioContext = null;
+
+// Audio Synthesizer Double Chime Fallback
+function playChime() {
+    try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        
+        if (!audioContext) {
+            audioContext = new AudioContextClass();
+        }
+        
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+        
+        const playTone = (freq, delay, duration) => {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, audioContext.currentTime + delay);
+            
+            gain.gain.setValueAtTime(0, audioContext.currentTime + delay);
+            gain.gain.linearRampToValueAtTime(0.12, audioContext.currentTime + delay + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + delay + duration);
+            
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            
+            osc.start(audioContext.currentTime + delay);
+            osc.stop(audioContext.currentTime + delay + duration);
+        };
+        
+        // F5 then A5 dual chime
+        playTone(698.46, 0, 0.25);
+        playTone(880.00, 0.08, 0.35);
+    } catch (e) {
+        console.warn("Chime playback error:", e);
+    }
+}
+
+// Loading Arabic TTS Voices
+function loadVoices() {
+    if (!ttsSynth) {
+        updateVoiceStatusUI(false, "Tidak Didukung");
+        return;
+    }
+    const voices = ttsSynth.getVoices();
+    arabicVoice = voices.find(v => v.lang.includes('ar-SA') || v.lang.includes('ar'));
+    
+    if (arabicVoice) {
+        updateVoiceStatusUI(true, "Suara Arab Aktif");
+    } else {
+        const fallbackVoice = voices.find(v => v.lang.startsWith('ar'));
+        if (fallbackVoice) {
+            arabicVoice = fallbackVoice;
+            updateVoiceStatusUI(true, "Suara Arab Aktif");
+        } else {
+            updateVoiceStatusUI(false, "Lonceng Aktif");
+        }
+    }
+}
+
+function updateVoiceStatusUI(ready, label) {
+    const badge = document.getElementById('sound-status-badge');
+    const text = document.getElementById('sound-status-text');
+    if (!badge || !text) return;
+    
+    if (ready) {
+        badge.className = "bg-emerald-800/80 hover:bg-emerald-700 px-3 py-1.5 rounded-lg border border-emerald-500 text-green-400 flex items-center gap-2 transition text-xs font-semibold shadow";
+        text.innerHTML = `<i class="fa-solid fa-volume-high text-green-400 animate-pulse"></i> ${label}`;
+    } else {
+        badge.className = "bg-emerald-800/80 hover:bg-emerald-700 px-3 py-1.5 rounded-lg border border-amber-500/40 text-amber-400 flex items-center gap-2 transition text-xs font-semibold shadow";
+        text.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> ${label}`;
+    }
+}
+
+if (ttsSynth) {
+    if (ttsSynth.onvoiceschanged !== undefined) {
+        ttsSynth.onvoiceschanged = loadVoices;
+    }
+    loadVoices();
+}
+
+window.onload = function() {
+    initApp();
+    setupCanvas();
+    updateProgressUI();
+    setTimeout(loadVoices, 1000);
+};
+
+function initApp() {
+    renderChapters();
+    loadChapter(activeChapterIndex);
+    updateStreak();
+}
+
+// Rendering Chapter List in sidebar navigation (Lessons 1-15)
+function renderChapters() {
+    const sidebar = document.getElementById('chapter-list');
+    if (!sidebar) return;
+    sidebar.innerHTML = '';
+    
+    CHAPTER_DATA.forEach((ch, idx) => {
+        const isCompleted = completedChapters.includes(ch.id);
+        const isActive = idx === activeChapterIndex;
+        
+        const btn = document.createElement('button');
+        btn.className = `w-full text-left p-3 rounded-xl transition flex justify-between items-center border ${
+            isActive 
+            ? 'bg-emerald-50 border-emerald-300 text-emerald-950 shadow-sm font-medium' 
+            : 'bg-white hover:bg-slate-50 border-slate-100 text-slate-700'
+        }`;
+        btn.onclick = () => loadChapter(idx);
+        
+        btn.innerHTML = `
+            <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
+                    isActive ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'
+                }">
+                    ${idx + 1}
+                </div>
+                <div class="overflow-hidden">
+                    <h4 class="text-xs font-bold leading-tight truncate ${isActive ? 'text-emerald-950' : 'text-slate-800'}">${ch.title}</h4>
+                    <span class="text-[9px] text-slate-400 font-medium block mt-0.5">${ch.category}</span>
+                </div>
+            </div>
+            <div class="shrink-0 pl-1">
+                ${isCompleted ? 
+                    '<i class="fa-solid fa-circle-check text-green-500 text-sm"></i>' : 
+                    '<i class="fa-regular fa-circle text-slate-300 text-sm"></i>'
+                }
+            </div>
+        `;
+        sidebar.appendChild(btn);
+    });
+}
+
+// Loading specific Active Lesson / Chapter
+function loadChapter(index) {
+    activeChapterIndex = index;
+    const ch = CHAPTER_DATA[index];
+    
+    // Fill up Active Info banner
+    document.getElementById('active-category').innerText = ch.category;
+    document.getElementById('active-title').innerText = ch.title;
+    document.getElementById('active-desc').innerText = ch.desc;
+    document.getElementById('active-instruction').innerText = ch.instruction;
+    document.getElementById('active-rule-summary').innerText = ch.rule;
+    
+    // Switch Default back to Tab 1
+    switchTab('practice');
+    
+    // Load dynamic letters and tracing lists
+    renderLettersGrid(ch.letters);
+    populateTracingSelector(ch.letters);
+    
+    // Sidebar highlight refresh
+    renderChapters();
+    
+    // Select the first letter item
+    if(ch.letters && ch.letters.length > 0) {
+        selectLetterDetail(0);
+    }
+
+    // Reset Quiz module state
+    document.getElementById('quiz-setup-area').classList.remove('hidden');
+    document.getElementById('quiz-live-area').classList.add('hidden');
+    document.getElementById('quiz-result-area').classList.add('hidden');
+}
+
+function renderLettersGrid(letters) {
+    const grid = document.getElementById('letters-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    
+    letters.forEach((item, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `p-4 rounded-2xl bg-white border border-slate-200 hover:border-emerald-500 hover:shadow-md transition text-center space-y-1.5 group ${
+            activeLetterIdx === idx ? 'ring-2 ring-emerald-500 border-emerald-500' : ''
+        }`;
+        btn.onclick = () => selectLetterDetail(idx);
+        btn.innerHTML = `
+            <div class="quran-font text-4xl text-slate-800 group-hover:scale-110 transition duration-200 select-none">${item.arabic}</div>
+            <div class="text-[11px] font-bold text-slate-500">${item.translit}</div>
+        `;
+        grid.appendChild(btn);
+    });
+}
+
+// Letter Selection detail focus
+function selectLetterDetail(idx) {
+    activeLetterIdx = idx;
+    const letters = CHAPTER_DATA[activeChapterIndex].letters;
+    if(!letters || !letters[idx]) return;
+
+    const item = letters[idx];
+    document.getElementById('detail-letter-arabic').innerText = item.arabic;
+    document.getElementById('detail-letter-name').innerText = item.name;
+    document.getElementById('detail-letter-translit').innerText = item.translit;
+    document.getElementById('detail-letter-makhraj').innerText = item.makhraj;
+
+    // Apply Active Ring in UI
+    const gridButtons = document.querySelectorAll('#letters-grid button');
+    gridButtons.forEach((btn, i) => {
+        if(i === idx) {
+            btn.classList.add('ring-2', 'ring-emerald-500', 'border-emerald-500');
+        } else {
+            btn.classList.remove('ring-2', 'ring-emerald-500', 'border-emerald-500');
+        }
+    });
+
+    document.getElementById('letter-detail-panel').classList.remove('hidden');
+    speakArabic(item.voiceText || item.arabic);
+}
+
+function playVoiceActiveLetter() {
+    const letters = CHAPTER_DATA[activeChapterIndex].letters;
+    if(letters && letters[activeLetterIdx]) {
+        const item = letters[activeLetterIdx];
+        speakArabic(item.voiceText || item.arabic);
+    }
+}
+
+function speakArabic(text) {
+    // Tactile Chime Feedback triggers instantly
+    playChime();
+
+    if (!ttsSynth) return;
+    
+    try {
+        if (ttsSynth.paused) {
+            ttsSynth.resume();
+        }
+        ttsSynth.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ar-SA';
+        
+        if (arabicVoice) {
+            utterance.voice = arabicVoice;
+        } else {
+            const voices = ttsSynth.getVoices();
+            const activeAr = voices.find(v => v.lang.includes('ar-SA') || v.lang.includes('ar'));
+            if (activeAr) utterance.voice = activeAr;
+        }
+        
+        utterance.rate = 0.65; // Relaxed speed for clear pronunciation
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        
+        ttsSynth.speak(utterance);
+    } catch (e) {
+        console.warn("Speech synthesis error:", e);
+    }
+}
+
+function openAudioDiagnostic() {
+    const modal = document.getElementById('audio-diagnostic-modal');
+    const statusBox = document.getElementById('diag-status-box');
+    if (!modal || !statusBox) return;
+    
+    modal.classList.remove('hidden');
+    
+    const isSupported = !!ttsSynth;
+    const hasVoice = !!arabicVoice;
+    
+    if (!isSupported) {
+        statusBox.className = "p-3 rounded-xl border border-red-200 bg-red-50 text-red-800 text-xs flex items-start gap-2";
+        statusBox.innerHTML = `
+            <i class="fa-solid fa-circle-xmark text-red-600 mt-0.5 shrink-0"></i>
+            <div>
+                <strong>Browser Tidak Kompatibel:</strong> Sistem pembaca suara tidak didukung browser ini. Disarankan menggunakan Google Chrome atau Safari.
+            </div>
+        `;
+    } else if (!hasVoice) {
+        statusBox.className = "p-3 rounded-xl border border-amber-200 bg-amber-50/70 text-amber-850 text-xs flex items-start gap-2";
+        statusBox.innerHTML = `
+            <i class="fa-solid fa-triangle-exclamation text-amber-600 mt-0.5 shrink-0"></i>
+            <div>
+                <strong>Suara Asli Belum Terpasang:</strong> Paket suara bahasa Arab (ar-SA) belum aktif. Lonceng sintetis cadangan diaktifkan otomatis sebagai pemandu lafal.
+            </div>
+        `;
+    } else {
+        statusBox.className = "p-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs flex items-start gap-2";
+        statusBox.innerHTML = `
+            <i class="fa-solid fa-circle-check text-emerald-600 mt-0.5 shrink-0"></i>
+            <div>
+                <strong>Berjalan Normal:</strong> Suara asli Arab (ar-SA) terdeteksi aktif (${arabicVoice.name}).
+            </div>
+        `;
+    }
+}
+
+function closeAudioDiagnostic() {
+    const modal = document.getElementById('audio-diagnostic-modal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function testTtsVoice() {
+    speakArabic("أَهْلًا وَسَهْلًا بِكُمْ");
+}
+
+function switchTab(tab) {
+    const practiceTab = document.getElementById('tab-practice');
+    const drawTab = document.getElementById('tab-draw');
+    const quizTab = document.getElementById('tab-quiz');
+    
+    const btnPractice = document.getElementById('btn-practice-tab');
+    const btnDraw = document.getElementById('btn-draw-tab');
+    const btnQuiz = document.getElementById('btn-quiz-tab');
+    
+    practiceTab.classList.add('hidden');
+    drawTab.classList.add('hidden');
+    quizTab.classList.add('hidden');
+    
+    [btnPractice, btnDraw, btnQuiz].forEach(btn => {
+        if(btn) {
+            btn.className = "flex-1 md:flex-none px-4 py-2 bg-emerald-700 hover:bg-emerald-600 border border-emerald-600 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-sm";
+        }
+    });
+
+    if(tab === 'practice') {
+        practiceTab.classList.remove('hidden');
+        btnPractice.className = "flex-1 md:flex-none px-4 py-2 bg-amber-500 hover:bg-amber-400 text-emerald-950 font-semibold rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-sm";
+    } else if (tab === 'draw') {
+        drawTab.classList.remove('hidden');
+        btnDraw.className = "flex-1 md:flex-none px-4 py-2 bg-amber-500 hover:bg-amber-400 text-emerald-950 font-semibold rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-sm";
+        resizeCanvas();
+    } else if (tab === 'quiz') {
+        quizTab.classList.remove('hidden');
+        btnQuiz.className = "flex-1 md:flex-none px-4 py-2 bg-amber-500 hover:bg-amber-400 text-emerald-950 font-semibold rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-sm";
+    }
+}
+
+function setupCanvas() {
+    canvas = document.getElementById('writing-canvas');
+    if(!canvas) return;
+    ctx = canvas.getContext('2d');
+    
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+
+    // Responsive Touch Screen controls
+    canvas.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent('mousedown', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        canvas.dispatchEvent(mouseEvent);
+        e.preventDefault();
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent('mousemove', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        canvas.dispatchEvent(mouseEvent);
+        e.preventDefault();
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', () => {
+        const mouseEvent = new MouseEvent('mouseup', {});
+        canvas.dispatchEvent(mouseEvent);
+    }, { passive: false });
+
+    window.addEventListener('resize', resizeCanvas);
+}
+
+function resizeCanvas() {
+    if(!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+    clearCanvas();
+}
+
+function startDrawing(e) {
+    isDrawing = true;
+    const rect = canvas.getBoundingClientRect();
+    lastX = e.clientX - rect.left;
+    lastY = e.clientY - rect.top;
+}
+
+function draw(e) {
+    if (!isDrawing) return;
+    const rect = canvas.getBoundingClientRect();
+    const currentX = e.clientX - rect.left;
+    const currentY = e.clientY - rect.top;
+
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(currentX, currentY);
+    
+    ctx.strokeStyle = brushColor;
+    ctx.lineWidth = brushSize;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    lastX = currentX;
+    lastY = currentY;
+}
+
+function stopDrawing() {
+    isDrawing = false;
+}
+
+function clearCanvas() {
+    if(!ctx || !canvas) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function setBrushColor(color, element) {
+    brushColor = color;
+    const buttons = document.querySelectorAll('#color-selectors-container button');
+    buttons.forEach(btn => {
+        btn.classList.remove('ring-2', 'ring-emerald-500');
+    });
+    if(element) {
+        element.classList.add('ring-2', 'ring-emerald-500');
+    }
+}
+
+function updateBrushSize(val) {
+    brushSize = parseInt(val);
+}
+
+function populateTracingSelector(letters) {
+    const sel = document.getElementById('tracing-letter-selector');
+    if(!sel) return;
+    sel.innerHTML = '';
+    
+    letters.forEach((item, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.innerText = `${item.arabic} (${item.translit})`;
+        sel.appendChild(opt);
+    });
+    
+    changeTracingTemplate();
+}
+
+function changeTracingTemplate() {
+    const sel = document.getElementById('tracing-letter-selector');
+    const idx = parseInt(sel.value || 0);
+    const item = CHAPTER_DATA[activeChapterIndex].letters[idx];
+    
+    document.getElementById('tracing-ref-letter').innerText = item.arabic;
+    document.getElementById('tracing-ref-name').innerText = item.name;
+    document.getElementById('tracing-ref-translit').innerText = item.translit;
+    
+    document.getElementById('canvas-bg-letter').innerText = item.arabic;
+    clearCanvas();
+}
+
+function openWritingTabWithSelectedLetter() {
+    switchTab('draw');
+    const sel = document.getElementById('tracing-letter-selector');
+    if(sel) {
+        sel.value = activeLetterIdx;
+        changeTracingTemplate();
+    }
+}
+
+function checkTracingComplete() {
+    confetti({
+        particleCount: 50,
+        spread: 50,
+        origin: { y: 0.8 }
+    });
+}
+
+let currentQuizIndex = 0;
+let correctQuizCount = 0;
+let quizQuestions = [];
+
+function startQuizEngine() {
+    const ch = CHAPTER_DATA[activeChapterIndex];
+    if (!ch.quiz || ch.quiz.length === 0) return;
+    
+    quizQuestions = [...ch.quiz].slice(0, 5);
+    currentQuizIndex = 0;
+    correctQuizCount = 0;
+    
+    document.getElementById('quiz-setup-area').classList.add('hidden');
+    document.getElementById('quiz-live-area').classList.remove('hidden');
+    document.getElementById('quiz-result-area').classList.add('hidden');
+    
+    renderQuizQuestion();
+}
+
+function renderQuizQuestion() {
+    const question = quizQuestions[currentQuizIndex];
+    
+    document.getElementById('quiz-question-index').innerText = currentQuizIndex + 1;
+    const progressPerc = ((currentQuizIndex + 1) / 5) * 100;
+    document.getElementById('quiz-progress-bar').style.width = `${progressPerc}%`;
+    
+    const badge = document.getElementById('quiz-badge');
+    const prompt = document.getElementById('quiz-question-prompt');
+    
+    if(question.type === 'audio') {
+        badge.innerText = "DENGARKAN & TEBAK";
+        prompt.innerText = "Dengarkan audio dan pilih huruf/kata yang sesuai:";
+        document.getElementById('quiz-audio-btn').style.display = 'flex';
+    } else {
+        badge.innerText = "BACA & ARTISAN";
+        prompt.innerText = "Bagaimanakah cara membaca atau bunyi huruf/kata berikut?";
+        document.getElementById('quiz-audio-btn').style.display = 'none';
+    }
+    
+    document.getElementById('quiz-arabic-word').innerText = question.phrase;
+    
+    const optContainer = document.getElementById('quiz-options-container');
+    optContainer.innerHTML = '';
+    
+    question.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = "w-full py-3 px-4 bg-slate-50 hover:bg-emerald-50 border-2 border-slate-200/80 hover:border-emerald-500 rounded-xl text-xs font-semibold text-slate-700 hover:text-emerald-950 text-left transition flex justify-between items-center group";
+        btn.onclick = () => selectQuizAnswer(opt, btn);
+        btn.innerHTML = `
+            <span>${opt}</span>
+            <i class="fa-regular fa-circle text-slate-300 group-hover:text-emerald-500"></i>
+        `;
+        optContainer.appendChild(btn);
+    });
+
+    const feedback = document.getElementById('quiz-feedback');
+    feedback.className = "hidden p-3 rounded-xl text-center text-xs font-bold transition";
+    
+    if(question.type === 'audio' && question.voice) {
+        setTimeout(() => speakArabic(question.voice), 500);
+    }
+}
+
+function playQuizQuestionAudio() {
+    const question = quizQuestions[currentQuizIndex];
+    if (question.voice) {
+        speakArabic(question.voice);
+    } else {
+        speakArabic(question.phrase);
+    }
+}
+
+function selectQuizAnswer(selected, selectedButton) {
+    const question = quizQuestions[currentQuizIndex];
+    const optButtons = document.querySelectorAll('#quiz-options-container button');
+    const feedback = document.getElementById('quiz-feedback');
+    
+    optButtons.forEach(btn => {
+        btn.disabled = true;
+    });
+
+    const isCorrect = (selected === question.correct);
+    if(isCorrect) {
+        correctQuizCount++;
+        feedback.innerText = "Benar! Pertahankan kemampuan Anda.";
+        feedback.className = "block bg-green-50 text-green-700 border border-green-200 p-2 rounded-xl text-center text-xs font-bold";
+        selectedButton.className = "w-full py-3 px-4 bg-green-50 border-2 border-green-500 rounded-xl text-xs font-semibold text-green-950 text-left transition flex justify-between items-center";
+        selectedButton.querySelector('i').className = "fa-solid fa-circle-check text-green-500";
+    } else {
+        feedback.innerText = `Belum tepat. Jawaban benar: ${question.correct}`;
+        feedback.className = "block bg-rose-50 text-rose-700 border border-rose-200 p-2 rounded-xl text-center text-xs font-bold";
+        selectedButton.className = "w-full py-3 px-4 bg-rose-50 border-2 border-rose-500 rounded-xl text-xs font-semibold text-rose-950 text-left transition flex justify-between items-center";
+        selectedButton.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-500";
+    }
+
+    setTimeout(() => {
+        currentQuizIndex++;
+        if (currentQuizIndex < 5) {
+            renderQuizQuestion();
+        } else {
+            showQuizResults();
+        }
+    }, 1800);
+}
+
+function showQuizResults() {
+    document.getElementById('quiz-live-area').classList.add('hidden');
+    document.getElementById('quiz-result-area').classList.remove('hidden');
+    
+    const finalScore = (correctQuizCount / 5) * 100;
+    document.getElementById('quiz-final-score').innerText = `${finalScore} / 100`;
+    
+    let status = "SANGAT BAIK";
+    if (finalScore < 100 && finalScore >= 80) {
+        status = "BAGUS";
+    } else if (finalScore < 80 && finalScore >= 60) {
+        status = "CUKUP - PERLU ULANG";
+    } else if (finalScore < 60) {
+        status = "KURANG - SILAKAN BELAJAR LAGI";
+    }
+    
+    document.getElementById('quiz-final-status').innerText = status;
+    
+    if(finalScore >= 80) {
+        confetti({
+            particleCount: 150,
+            spread: 80,
+            origin: { y: 0.6 }
+        });
+        
+        const ch = CHAPTER_DATA[activeChapterIndex];
+        if(!completedChapters.includes(ch.id)) {
+            completedChapters.push(ch.id);
+            localStorage.setItem('asy_syafii_completed_v2', JSON.stringify(completedChapters));
+            updateProgressUI();
+            renderChapters();
+        }
+    }
+}
+
+function restartQuiz() {
+    startQuizEngine();
+}
+
+function advanceToNextLevel() {
+    if(activeChapterIndex + 1 < CHAPTER_DATA.length) {
+        loadChapter(activeChapterIndex + 1);
+    } else {
+        loadChapter(0);
+    }
+}
+
+function markLessonComplete() {
+    const ch = CHAPTER_DATA[activeChapterIndex];
+    if(!completedChapters.includes(ch.id)) {
+        completedChapters.push(ch.id);
+        localStorage.setItem('asy_syafii_completed_v2', JSON.stringify(completedChapters));
+        updateProgressUI();
+        renderChapters();
+    }
+    
+    confetti({
+        particleCount: 100,
+        spread: 60,
+        origin: { y: 0.8 }
+    });
+
+    setTimeout(() => {
+        advanceToNextLevel();
+    }, 1200);
+}
+
+function updateProgressUI() {
+    const total = CHAPTER_DATA.length;
+    const completed = completedChapters.length;
+    const percent = Math.round((completed / total) * 100);
+    
+    const progressEl = document.getElementById('progress-percent');
+    if (progressEl) {
+        progressEl.innerText = `${percent}%`;
+    }
+}
+
+function updateStreak() {
+    let streak = parseInt(localStorage.getItem('asy_syafii_streak_v2') || 1);
+    const lastActive = localStorage.getItem('asy_syafii_last_active_v2');
+    const todayStr = new Date().toDateString();
+    
+    if(lastActive && lastActive !== todayStr) {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        if (lastActive === yesterday.toDateString()) {
+            streak++;
+        } else {
+            streak = 1;
+        }
+    }
+    
+    localStorage.setItem('asy_syafii_streak_v2', streak);
+    localStorage.setItem('asy_syafii_last_active_v2', todayStr);
+    
+    const streakEl = document.getElementById('streak-counter');
+    if (streakEl) {
+        streakEl.innerText = streak;
+    }
+}
+
+// Custom confirmation popups
+function triggerResetConfirm() {
+    document.getElementById('custom-confirm-modal').classList.remove('hidden');
+}
+
+function closeConfirmModal(confirmed) {
+    document.getElementById('custom-confirm-modal').classList.add('hidden');
+    if(confirmed) {
+        completedChapters = [];
+        localStorage.removeItem('asy_syafii_completed_v2');
+        updateProgressUI();
+        loadChapter(0);
+    }
+}
+</script>
+</body>
+</html>
