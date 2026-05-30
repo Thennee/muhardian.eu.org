@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Timer & Hitung Mundur - Muhardian apps</title>
+    <!-- Tailwind CSS untuk styling cepat dan responsif -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons untuk ikon yang cantik -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Gaya kustom untuk tema Silver-Hijau yang premium */
+        body {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Gradasi Silver metalik lembut */
+        .silver-gradient {
+            background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 50%, #e2e8f0 100%);
+            box-shadow: 0 10px 30px -5px rgba(100, 116, 139, 0.3),
+                        inset 0 1px 0px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Tema warna hijau emerald/neon */
+        .brand-green {
+            color: #10b981;
+        }
+        .bg-brand-green {
+            background-color: #10b981;
+        }
+        .bg-brand-green-dark {
+            background-color: #059669;
+        }
+        .border-brand-green {
+            border-color: #10b981;
+        }
+
+        /* Efek glassmorphism halus untuk panel */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Animasi denyut nadi halus untuk indikator aktif */
+        @keyframes pulse-green {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        .pulse-active {
+            animation: pulse-green 2s infinite ease-in-out;
+        }
+
+        /* Kustomisasi scrollbar untuk daftar putaran (laps) */
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 2px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(16, 185, 129, 0.3);
+            border-radius: 2px;
+        }
+
+        /* Memastikan aplikasi pas di satu layar HP tanpa scroll body */
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-3 sm:p-6">
+
+    <!-- Container Utama: Meniru bentuk aplikasi HP -->
+    <div class="w-full max-w-md h-full max-h-[850px] silver-gradient rounded-[36px] flex flex-col overflow-hidden border-4 border-slate-300 relative">
+        
+        <!-- Bagian Atas / Header Status -->
+        <div class="px-6 pt-6 pb-2 flex justify-between items-center border-b border-slate-200/50">
+            <div class="flex items-center gap-2">
+                <div class="w-3 h-3 rounded-full bg-brand-green pulse-active"></div>
+                <span class="text-xs font-bold text-slate-500 tracking-wider uppercase">Muhardian WebApp</span>
+            </div>
+            <div class="text-xs font-semibold text-slate-400" id="live-clock">00:00</div>
+        </div>
+
+        <!-- Judul & Pilihan Mode -->
+        <div class="px-6 pt-4">
+            <h1 class="text-xl font-black text-slate-700 tracking-tight flex items-center gap-2">
+                <i data-lucide="clock" class="brand-green w-6 h-6"></i>
+                Demi<span class="brand-green">Masa</span>
+            </h1>
+            
+            <!-- Tab Switcher (Stopwatch / Hitung Mundur) -->
+            <div class="mt-4 bg-slate-200/70 p-1 rounded-2xl flex">
+                <button id="tab-stopwatch" onclick="switchMode('stopwatch')" class="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 bg-white text-slate-800 shadow-sm">
+                    <i data-lucide="timer" class="w-4 h-4"></i> Stopwatch
+                </button>
+                <button id="tab-countdown" onclick="switchMode('countdown')" class="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 text-slate-500 hover:text-slate-800">
+                    <i data-lucide="hourglass" class="w-4 h-4"></i> Mundur
+                </button>
+            </div>
+        </div>
+
+        <!-- PANEL STOPWATCH -->
+        <div id="panel-stopwatch" class="flex-1 flex flex-col justify-between p-6 transition-all duration-300 overflow-hidden">
+            <!-- Tampilan Utama Angka -->
+            <div class="flex-1 flex flex-col justify-center items-center my-4">
+                <div class="w-64 h-64 rounded-full glass-panel border-4 border-white shadow-inner flex flex-col justify-center items-center relative">
+                    <!-- Progress Ring Dekoratif (Hijau) -->
+                    <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="46" stroke="rgba(16, 185, 129, 0.1)" stroke-width="3" fill="transparent" />
+                        <circle id="stopwatch-progress" cx="50" cy="50" r="46" stroke="#10b981" stroke-width="3" fill="transparent" stroke-dasharray="289" stroke-dashoffset="289" class="transition-all duration-100" />
+                    </svg>
+                    
+                    <span class="text-xs font-bold text-slate-400 tracking-widest uppercase mb-1">Stopwatch</span>
+                    <span id="sw-display" class="text-4xl font-mono font-bold text-slate-800 tracking-tight">00:00,00</span>
+                    <span id="sw-ms" class="text-xs font-semibold text-brand-green mt-1">MILI DETIK</span>
+                </div>
+            </div>
+
+            <!-- List Lap (Putaran) -->
+            <div class="h-28 overflow-y-auto mb-4 custom-scroll px-2" id="lap-container">
+                <div class="text-center text-xs text-slate-400 py-4" id="no-lap-text">Belum ada putaran waktu</div>
+                <ul id="lap-list" class="space-y-1.5"></ul>
+            </div>
+
+            <!-- Tombol Kontrol Stopwatch -->
+            <div class="grid grid-cols-3 gap-3 items-center">
+                <button onclick="lapStopwatch()" id="btn-sw-lap" class="bg-slate-200 hover:bg-slate-300 active:scale-95 text-slate-600 font-bold py-3.5 rounded-2xl transition-all flex justify-center items-center gap-1.5 text-sm" disabled>
+                    <i data-lucide="flag" class="w-4 h-4"></i> Lap
+                </button>
+                <button onclick="toggleStopwatch()" id="btn-sw-start" class="bg-brand-green hover:bg-brand-green-dark active:scale-95 text-white font-extrabold py-4 rounded-2xl shadow-lg shadow-emerald-500/20 transition-all flex justify-center items-center gap-2 text-base">
+                    <i data-lucide="play" id="icon-sw-start" class="w-5 h-5 fill-white"></i> <span id="text-sw-start">Mulai</span>
+                </button>
+                <button onclick="resetStopwatch()" id="btn-sw-reset" class="bg-slate-200 hover:bg-red-50 active:scale-95 text-slate-600 hover:text-red-500 font-bold py-3.5 rounded-2xl transition-all flex justify-center items-center gap-1.5 text-sm">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- PANEL HITUNG MUNDUR -->
+        <div id="panel-countdown" class="flex-1 hidden flex-col justify-between p-6 transition-all duration-300 overflow-hidden">
+            <!-- Tampilan Utama Hitung Mundur -->
+            <div class="flex-1 flex flex-col justify-center items-center my-4">
+                
+                <!-- Form Input Waktu (Tampil saat berhenti/reset) -->
+                <div id="cd-setup" class="w-full max-w-[280px] space-y-4">
+                    <div class="text-center">
+                        <span class="text-xs font-bold text-slate-400 tracking-widest uppercase">Atur Durasi</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-2 bg-slate-200/50 p-3 rounded-2xl border border-white">
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-bold text-slate-400 mb-1">JAM</span>
+                            <input type="number" id="input-hours" min="0" max="23" value="0" class="w-full text-center bg-white text-slate-800 font-bold text-xl py-2 rounded-xl focus:ring-2 focus:ring-emerald-400 outline-none border border-slate-300/50">
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-bold text-slate-400 mb-1">MENIT</span>
+                            <input type="number" id="input-minutes" min="0" max="59" value="5" class="w-full text-center bg-white text-slate-800 font-bold text-xl py-2 rounded-xl focus:ring-2 focus:ring-emerald-400 outline-none border border-slate-300/50">
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-bold text-slate-400 mb-1">DETIK</span>
+                            <input type="number" id="input-seconds" min="0" max="59" value="0" class="w-full text-center bg-white text-slate-800 font-bold text-xl py-2 rounded-xl focus:ring-2 focus:ring-emerald-400 outline-none border border-slate-300/50">
+                        </div>
+                    </div>
+
+                    <!-- Preset Cepat -->
+                    <div class="grid grid-cols-4 gap-1.5">
+                        <button onclick="setCDPreset(1)" class="bg-white hover:bg-brand-green/10 text-slate-600 hover:text-brand-green text-xs font-bold py-1.5 rounded-lg border border-slate-200 transition-all">1m</button>
+                        <button onclick="setCDPreset(3)" class="bg-white hover:bg-brand-green/10 text-slate-600 hover:text-brand-green text-xs font-bold py-1.5 rounded-lg border border-slate-200 transition-all">3m</button>
+                        <button onclick="setCDPreset(5)" class="bg-white hover:bg-brand-green/10 text-slate-600 hover:text-brand-green text-xs font-bold py-1.5 rounded-lg border border-slate-200 transition-all">5m</button>
+                        <button onclick="setCDPreset(10)" class="bg-white hover:bg-brand-green/10 text-slate-600 hover:text-brand-green text-xs font-bold py-1.5 rounded-lg border border-slate-200 transition-all">10m</button>
+                    </div>
+                </div>
+
+                <!-- Lingkaran Hitung Mundur (Tampil saat berjalan/jeda) -->
+                <div id="cd-running" class="w-64 h-64 rounded-full glass-panel border-4 border-white shadow-inner flex flex-col justify-center items-center relative hidden">
+                    <!-- Progress Ring Aktif -->
+                    <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="46" stroke="rgba(16, 185, 129, 0.1)" stroke-width="3" fill="transparent" />
+                        <circle id="countdown-progress" cx="50" cy="50" r="46" stroke="#10b981" stroke-width="3" fill="transparent" stroke-dasharray="289" stroke-dashoffset="0" class="transition-all duration-300" />
+                    </svg>
+                    
+                    <span id="cd-status-text" class="text-xs font-bold text-slate-400 tracking-widest uppercase mb-1">Mundur</span>
+                    <span id="cd-display" class="text-4xl font-mono font-bold text-slate-800 tracking-tight">00:05:00</span>
+                    <span id="cd-percent" class="text-xs font-bold text-brand-green mt-1">100%</span>
+                </div>
+
+            </div>
+
+            <!-- Tombol Kontrol Hitung Mundur -->
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="cancelCountdown()" id="btn-cd-cancel" class="bg-slate-200 hover:bg-red-50 active:scale-95 text-slate-500 hover:text-red-500 font-bold py-4 rounded-2xl transition-all flex justify-center items-center gap-2 text-base" disabled>
+                    <i data-lucide="x" class="w-5 h-5"></i> Batal
+                </button>
+                <button onclick="toggleCountdown()" id="btn-cd-start" class="bg-brand-green hover:bg-brand-green-dark active:scale-95 text-white font-extrabold py-4 rounded-2xl shadow-lg shadow-emerald-500/20 transition-all flex justify-center items-center gap-2 text-base">
+                    <i data-lucide="play" id="icon-cd-start" class="w-5 h-5 fill-white"></i> <span id="text-cd-start">Mulai</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Notifikasi Kustom / Toast Alert (Pengganti Alert Browser) -->
+        <div id="custom-alert" class="absolute bottom-24 left-6 right-6 glass-panel border-l-4 border-l-brand-green p-4 rounded-xl shadow-xl translate-y-32 opacity-0 pointer-events-none transition-all duration-300 z-50">
+            <div class="flex items-start gap-3">
+                <div class="p-1 bg-emerald-100 rounded-lg text-emerald-600">
+                    <i data-lucide="bell" class="w-5 h-5 pulse-active"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-bold text-slate-800 text-sm" id="alert-title">Waktu Selesai!</h4>
+                    <p class="text-slate-500 text-xs mt-0.5" id="alert-message">Zikir hitung mundur telah mencapai nol.</p>
+                </div>
+                <button onclick="dismissAlert()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Audio Beep Sintetis (Menggunakan Web Audio API untuk keandalan tanpa file eksternal) -->
+        <div class="hidden"></div>
+    </div>
+
+    <script>
+        // Inisialisasi ikon Lucide
+        lucide.createIcons();
+
+        // Variabel Jam Digital Atas HP
+        function updateLiveClock() {
+            const now = new Date();
+            const hrs = String(now.getHours()).padStart(2, '0');
+            const mins = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('live-clock').innerText = `${hrs}:${mins}`;
+        }
+        setInterval(updateLiveClock, 1000);
+        updateLiveClock();
+
+        // VARIABEL STATE APLIKASI
+        let currentMode = 'stopwatch'; // 'stopwatch' atau 'countdown'
+
+        // STATE STOPWATCH (Berbasis Timestamp Sistem)
+        let swInterval = null;
+        let swStartTime = 0;
+        let swElapsedTime = 0;
+        let swIsRunning = false;
+        let swLaps = [];
+
+        // STATE COUNTDOWN (Menggunakan Waktu Target Absolut untuk Keandalan Background)
+        let cdInterval = null;
+        let cdTotalSeconds = 0;
+        let cdRemainingSeconds = 0;
+        let cdTargetTime = 0; // Epoch timestamp ketika countdown seharusnya selesai
+        let cdIsRunning = false;
+        let cdIsSetup = true; // true: sedang setel, false: sedang jalan/pause
+
+        // Audio Context & Element Audio MP3
+        let audioCtx = null;
+        let alarmAudio = null;
+
+        // FUNGSI GANTI TAB MODE
+        function switchMode(mode) {
+            if (currentMode === mode) return;
+            currentMode = mode;
+
+            const tabSw = document.getElementById('tab-stopwatch');
+            const tabCd = document.getElementById('tab-countdown');
+            const panelSw = document.getElementById('panel-stopwatch');
+            const panelCd = document.getElementById('panel-countdown');
+
+            if (mode === 'stopwatch') {
+                tabSw.className = "flex-1 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 bg-white text-slate-800 shadow-sm";
+                tabCd.className = "flex-1 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 text-slate-500 hover:text-slate-800";
+                panelSw.classList.remove('hidden');
+                panelSw.classList.add('flex');
+                panelCd.classList.add('hidden');
+                panelCd.classList.remove('flex');
+            } else {
+                tabCd.className = "flex-1 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 bg-white text-slate-800 shadow-sm";
+                tabSw.className = "flex-1 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 text-slate-500 hover:text-slate-800";
+                panelCd.classList.remove('hidden');
+                panelCd.classList.add('flex');
+                panelSw.classList.add('hidden');
+                panelSw.classList.remove('flex');
+            }
+        }
+
+        // ==========================================
+        // FITUR STOPWATCH LOGIC (Akurat berbasis selisih waktu sistem)
+        // ==========================================
+        function formatStopwatchTime(timeMs) {
+            const totalSeconds = Math.floor(timeMs / 1000);
+            const ms = Math.floor((timeMs % 1000) / 10);
+            const sec = totalSeconds % 60;
+            const min = Math.floor(totalSeconds / 60) % 60;
+            
+            return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')},${String(ms).padStart(2, '0')}`;
+        }
+
+        function updateStopwatchDisplay() {
+            document.getElementById('sw-display').innerText = formatStopwatchTime(swElapsedTime);
+            
+            // Animasi visual ring berputar perlahan (per menit)
+            const secondsProgress = (swElapsedTime % 60000) / 60000;
+            const strokeOffset = 289 - (secondsProgress * 289);
+            document.getElementById('stopwatch-progress').setAttribute('stroke-dashoffset', strokeOffset);
+        }
+
+        function toggleStopwatch() {
+            if (swIsRunning) {
+                // JEDA
+                clearInterval(swInterval);
+                swElapsedTime = Date.now() - swStartTime;
+                swIsRunning = false;
+                
+                // Ubah Tampilan Tombol
+                document.getElementById('text-sw-start').innerText = "Lanjut";
+                document.getElementById('icon-sw-start').outerHTML = `<i data-lucide="play" id="icon-sw-start" class="w-5 h-5 fill-white"></i>`;
+                document.getElementById('btn-sw-lap').disabled = true;
+            } else {
+                // MULAI / LANJUT (Sistem mencatat waktu mulai absolut)
+                swStartTime = Date.now() - swElapsedTime;
+                swInterval = setInterval(() => {
+                    swElapsedTime = Date.now() - swStartTime;
+                    updateStopwatchDisplay();
+                }, 30); // Disesuaikan ke 30ms untuk stabilitas di mobile
+                swIsRunning = true;
+
+                // Ubah Tampilan Tombol
+                document.getElementById('text-sw-start').innerText = "Jeda";
+                document.getElementById('icon-sw-start').outerHTML = `<i data-lucide="pause" id="icon-sw-start" class="w-5 h-5 fill-white"></i>`;
+                document.getElementById('btn-sw-lap').disabled = false;
+            }
+            lucide.createIcons();
+        }
+
+        function resetStopwatch() {
+            clearInterval(swInterval);
+            swElapsedTime = 0;
+            swIsRunning = false;
+            swLaps = [];
+            
+            updateStopwatchDisplay();
+            
+            // Atur ulang tombol
+            document.getElementById('text-sw-start').innerText = "Mulai";
+            document.getElementById('icon-sw-start').outerHTML = `<i data-lucide="play" id="icon-sw-start" class="w-5 h-5 fill-white"></i>`;
+            document.getElementById('btn-sw-lap').disabled = true;
+            
+            // Reset Daftar Lap
+            document.getElementById('lap-list').innerHTML = '';
+            document.getElementById('no-lap-text').classList.remove('hidden');
+            
+            lucide.createIcons();
+        }
+
+        function lapStopwatch() {
+            if (!swIsRunning) return;
+            
+            const lapTime = swElapsedTime;
+            swLaps.unshift(lapTime); // Masukkan lap baru di paling atas list
+
+            const lapList = document.getElementById('lap-list');
+            document.getElementById('no-lap-text').classList.add('hidden');
+
+            const lapItem = document.createElement('li');
+            lapItem.className = "flex justify-between items-center bg-white/60 px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 border border-slate-100 shadow-sm transition-all";
+            
+            // Hitung selisih dari lap sebelumnya jika ada
+            let lapDiff = swLaps.length > 1 ? lapTime - swLaps[1] : lapTime;
+
+            lapItem.innerHTML = `
+                <span class="text-slate-400">Putaran ${swLaps.length}</span>
+                <span class="font-mono text-slate-800">${formatStopwatchTime(lapTime)}</span>
+                <span class="font-mono text-brand-green text-[10px]">+${formatStopwatchTime(lapDiff)}</span>
+            `;
+            
+            lapList.insertBefore(lapItem, lapList.firstChild);
+        }
+
+        // ==========================================
+        // FITUR HITUNG MUNDUR (Akurat di Background!)
+        // ==========================================
+        function setCDPreset(minutes) {
+            document.getElementById('input-hours').value = 0;
+            document.getElementById('input-minutes').value = minutes;
+            document.getElementById('input-seconds').value = 0;
+        }
+
+        function formatCountdownTime(totalSecs) {
+            const hrs = Math.floor(totalSecs / 3600);
+            const mins = Math.floor((totalSecs % 3600) / 60);
+            const secs = totalSecs % 60;
+            return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function updateCountdownProgress() {
+            document.getElementById('cd-display').innerText = formatCountdownTime(cdRemainingSeconds);
+            
+            // Kalkulasi persentase ring
+            const percentage = cdTotalSeconds > 0 ? (cdRemainingSeconds / cdTotalSeconds) : 0;
+            const strokeOffset = 289 * (1 - percentage);
+            document.getElementById('countdown-progress').setAttribute('stroke-dashoffset', strokeOffset);
+            
+            // Persentase teks
+            document.getElementById('cd-percent').innerText = `${Math.ceil(percentage * 100)}%`;
+        }
+
+        // Sync fungsi Hitung Mundur secara dinamis
+        function syncCountdown() {
+            const now = Date.now();
+            const difference = cdTargetTime - now;
+
+            if (difference <= 0) {
+                // Selesai saat di latar belakang
+                cdRemainingSeconds = 0;
+                updateCountdownProgress();
+                triggerAlarms();
+                cancelCountdown();
+            } else {
+                cdRemainingSeconds = Math.ceil(difference / 1000);
+                updateCountdownProgress();
+            }
+        }
+
+        function toggleCountdown() {
+            if (cdIsRunning) {
+                // JEDA (Simpan sisa detik saat ini)
+                clearInterval(cdInterval);
+                cdIsRunning = false;
+                document.getElementById('text-cd-start').innerText = "Lanjutkan";
+                document.getElementById('icon-cd-start').outerHTML = `<i data-lucide="play" id="icon-cd-start" class="w-5 h-5 fill-white"></i>`;
+                document.getElementById('cd-status-text').innerText = "Dijeda";
+                document.getElementById('cd-status-text').className = "text-xs font-bold text-amber-500 tracking-widest uppercase mb-1";
+            } else {
+                // JIKA AWAL MULAI
+                if (cdIsSetup) {
+                    const hrs = parseInt(document.getElementById('input-hours').value) || 0;
+                    const mins = parseInt(document.getElementById('input-minutes').value) || 0;
+                    const secs = parseInt(document.getElementById('input-seconds').value) || 0;
+
+                    cdTotalSeconds = (hrs * 3600) + (mins * 60) + secs;
+                    
+                    if (cdTotalSeconds <= 0) {
+                        showToastAlert("Waktu Tidak Valid", "Silakan masukkan durasi waktu terlebih dahulu.");
+                        return;
+                    }
+
+                    cdRemainingSeconds = cdTotalSeconds;
+                    cdIsSetup = false;
+
+                    // Ganti UI ke mode running
+                    document.getElementById('cd-setup').classList.add('hidden');
+                    document.getElementById('cd-running').classList.remove('hidden');
+                    document.getElementById('btn-cd-cancel').disabled = false;
+                }
+
+                // Kalkulasi Target Timestamp masa depan yang mutlak
+                cdTargetTime = Date.now() + (cdRemainingSeconds * 1000);
+
+                // MULAI JALAN
+                cdIsRunning = true;
+                document.getElementById('text-cd-start').innerText = "Jeda";
+                document.getElementById('icon-cd-start').outerHTML = `<i data-lucide="pause" id="icon-cd-start" class="w-5 h-5 fill-white"></i>`;
+                document.getElementById('cd-status-text').innerText = "Berjalan";
+                document.getElementById('cd-status-text').className = "text-xs font-bold text-brand-green tracking-widest uppercase mb-1 pulse-active";
+
+                updateCountdownProgress();
+
+                // Periksa setiap 200 milidetik agar transisi layar tetap mulus saat dibuka kembali
+                cdInterval = setInterval(() => {
+                    syncCountdown();
+                }, 200);
+            }
+            lucide.createIcons();
+        }
+
+        function cancelCountdown() {
+            clearInterval(cdInterval);
+            cdIsRunning = false;
+            cdIsSetup = true;
+            cdRemainingSeconds = 0;
+            cdTotalSeconds = 0;
+
+            // Hentikan alarm jika dibatalkan
+            stopAlarmSound();
+
+            // Kembalikan UI Setup
+            document.getElementById('cd-setup').classList.remove('hidden');
+            document.getElementById('cd-running').classList.add('hidden');
+            document.getElementById('btn-cd-cancel').disabled = true;
+
+            // Reset Tombol Mulai
+            document.getElementById('text-cd-start').innerText = "Mulai";
+            document.getElementById('icon-cd-start').outerHTML = `<i data-lucide="play" id="icon-cd-start" class="w-5 h-5 fill-white"></i>`;
+            
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        // DETEKSI BACKGROUND / MINIMIZE (PAGE VISIBILITY API)
+        // ==========================================
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                // Ketika aplikasi dibuka kembali oleh pengguna
+                if (swIsRunning) {
+                    // Update stopwatch instan dari selisih waktu
+                    swElapsedTime = Date.now() - swStartTime;
+                    updateStopwatchDisplay();
+                }
+                if (cdIsRunning) {
+                    // Sinkronisasi sisa hitung mundur secara instan
+                    syncCountdown();
+                }
+            }
+        });
+
+        // ==========================================
+        // ALARM & CUSTOM ALERT LOGIC
+        // ==========================================
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (!alarmAudio) {
+                // Inisiasi file audio MP3 kustom dari url yang diberikan
+                alarmAudio = new Audio('https://muhardian.eu.org/deni/zikir/alarm.mp3');
+                alarmAudio.preload = 'auto';
+                
+                // Bypass kebijakan 'Autoplay' browser mobile dengan memicu 'play' sesaat lalu jeda
+                alarmAudio.play().then(() => {
+                    alarmAudio.pause();
+                    alarmAudio.currentTime = 0;
+                }).catch(e => {
+                    console.log("Menunggu interaksi pengguna untuk mengaktifkan audio.");
+                });
+            }
+        }
+
+        function playBeepSound(frequency = 880, duration = 0.15) {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+                
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.log("Gagal memutar beep sintetis.");
+            }
+        }
+
+        function stopAlarmSound() {
+            if (alarmAudio) {
+                try {
+                    alarmAudio.pause();
+                    alarmAudio.currentTime = 0;
+                } catch (e) {
+                    console.log("Gagal menghentikan pemutaran audio:", e);
+                }
+            }
+        }
+
+        function triggerAlarms() {
+            // Putar audio MP3 kustom terlebih dahulu (Zikir alarm)
+            if (alarmAudio) {
+                alarmAudio.currentTime = 0;
+                alarmAudio.play().catch(err => {
+                    console.log("Pemutaran MP3 dicegah oleh browser, mencadangkan dengan suara beep:", err);
+                    // Jika MP3 gagal (karena belum ada interaksi fisik pertama), nyalakan beep sistem
+                    let beeps = 0;
+                    const beepInterval = setInterval(() => {
+                        if (beeps < 4) {
+                            playBeepSound(880, 0.3);
+                            beeps++;
+                        } else {
+                            clearInterval(beepInterval);
+                        }
+                    }, 500);
+                });
+            } else {
+                // Jika objek audio belum terinisiasi, cadangkan dengan beep
+                let beeps = 0;
+                const beepInterval = setInterval(() => {
+                    if (beeps < 4) {
+                        playBeepSound(880, 0.3);
+                        beeps++;
+                    } else {
+                        clearInterval(beepInterval);
+                    }
+                }, 500);
+            }
+
+            // Tampilkan Toast Alert Kustom
+            showToastAlert("Waktu Selesai!", "Zikir alarm hitung mundur Anda telah selesai berbunyi.");
+        }
+
+        function showToastAlert(title, message) {
+            document.getElementById('alert-title').innerText = title;
+            document.getElementById('alert-message').innerText = message;
+            
+            const alertElement = document.getElementById('custom-alert');
+            alertElement.classList.remove('translate-y-32', 'opacity-0', 'pointer-events-none');
+            alertElement.classList.add('translate-y-0', 'opacity-100');
+        }
+
+        function dismissAlert() {
+            const alertElement = document.getElementById('custom-alert');
+            alertElement.classList.remove('translate-y-0', 'opacity-100');
+            alertElement.classList.add('translate-y-32', 'opacity-0', 'pointer-events-none');
+            
+            // Berhentikan zikir/suara alarm seketika saat tombol notifikasi di-close oleh pengguna
+            stopAlarmSound();
+        }
+
+        // Daftarkan event listener untuk inisiasi Audio Context saat interaksi pertama
+        document.body.addEventListener('touchstart', initAudio, { once: true });
+        document.body.addEventListener('click', initAudio, { once: true });
+    </script>
+</body>
+</html>
