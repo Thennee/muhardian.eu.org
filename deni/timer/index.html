@@ -259,6 +259,8 @@
         // Audio Context & Element Audio MP3
         let audioCtx = null;
         let alarmAudio = null;
+        let audioUnlocked = false;
+        let mp3LoadFailed = false;
 
         // FUNGSI GANTI TAB MODE
         function switchMode(mode) {
@@ -288,7 +290,7 @@
         }
 
         // ==========================================
-        // FITUR STOPWATCH LOGIC (Akurat berbasis selisih waktu sistem)
+        // FITUR STOPWATCH LOGIC
         // ==========================================
         function formatStopwatchTime(timeMs) {
             const totalSeconds = Math.floor(timeMs / 1000);
@@ -309,6 +311,10 @@
         }
 
         function toggleStopwatch() {
+            // Aktifkan inisialisasi audio saat interaksi fisik
+            initAudio();
+            unlockAudioOnGesture();
+
             if (swIsRunning) {
                 // JEDA
                 clearInterval(swInterval);
@@ -320,12 +326,12 @@
                 document.getElementById('icon-sw-start').outerHTML = `<i data-lucide="play" id="icon-sw-start" class="w-5 h-5 fill-white"></i>`;
                 document.getElementById('btn-sw-lap').disabled = true;
             } else {
-                // MULAI / LANJUT (Sistem mencatat waktu mulai absolut)
+                // MULAI / LANJUT
                 swStartTime = Date.now() - swElapsedTime;
                 swInterval = setInterval(() => {
                     swElapsedTime = Date.now() - swStartTime;
                     updateStopwatchDisplay();
-                }, 30); // Disesuaikan ke 30ms untuk stabilitas di mobile
+                }, 30);
                 swIsRunning = true;
 
                 // Ubah Tampilan Tombol
@@ -360,7 +366,7 @@
             if (!swIsRunning) return;
             
             const lapTime = swElapsedTime;
-            swLaps.unshift(lapTime); // Masukkan lap baru di paling atas list
+            swLaps.unshift(lapTime);
 
             const lapList = document.getElementById('lap-list');
             document.getElementById('no-lap-text').classList.add('hidden');
@@ -368,7 +374,6 @@
             const lapItem = document.createElement('li');
             lapItem.className = "flex justify-between items-center bg-white/60 px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 border border-slate-100 shadow-sm transition-all";
             
-            // Hitung selisih dari lap sebelumnya jika ada
             let lapDiff = swLaps.length > 1 ? lapTime - swLaps[1] : lapTime;
 
             lapItem.innerHTML = `
@@ -399,22 +404,18 @@
         function updateCountdownProgress() {
             document.getElementById('cd-display').innerText = formatCountdownTime(cdRemainingSeconds);
             
-            // Kalkulasi persentase ring
             const percentage = cdTotalSeconds > 0 ? (cdRemainingSeconds / cdTotalSeconds) : 0;
             const strokeOffset = 289 * (1 - percentage);
             document.getElementById('countdown-progress').setAttribute('stroke-dashoffset', strokeOffset);
             
-            // Persentase teks
             document.getElementById('cd-percent').innerText = `${Math.ceil(percentage * 100)}%`;
         }
 
-        // Sync fungsi Hitung Mundur secara dinamis
         function syncCountdown() {
             const now = Date.now();
             const difference = cdTargetTime - now;
 
             if (difference <= 0) {
-                // Selesai saat di latar belakang
                 cdRemainingSeconds = 0;
                 updateCountdownProgress();
                 triggerAlarms();
@@ -426,8 +427,12 @@
         }
 
         function toggleCountdown() {
+            // AMBIL KENDALI AUDIO LANGSUNG SAAT KLIK TOMBOL MULAI (Paling Aman untuk Autoplay)
+            initAudio();
+            unlockAudioOnGesture();
+
             if (cdIsRunning) {
-                // JEDA (Simpan sisa detik saat ini)
+                // JEDA
                 clearInterval(cdInterval);
                 cdIsRunning = false;
                 document.getElementById('text-cd-start').innerText = "Lanjutkan";
@@ -451,16 +456,13 @@
                     cdRemainingSeconds = cdTotalSeconds;
                     cdIsSetup = false;
 
-                    // Ganti UI ke mode running
                     document.getElementById('cd-setup').classList.add('hidden');
                     document.getElementById('cd-running').classList.remove('hidden');
                     document.getElementById('btn-cd-cancel').disabled = false;
                 }
 
-                // Kalkulasi Target Timestamp masa depan yang mutlak
                 cdTargetTime = Date.now() + (cdRemainingSeconds * 1000);
 
-                // MULAI JALAN
                 cdIsRunning = true;
                 document.getElementById('text-cd-start').innerText = "Jeda";
                 document.getElementById('icon-cd-start').outerHTML = `<i data-lucide="pause" id="icon-cd-start" class="w-5 h-5 fill-white"></i>`;
@@ -469,7 +471,6 @@
 
                 updateCountdownProgress();
 
-                // Periksa setiap 200 milidetik agar transisi layar tetap mulus saat dibuka kembali
                 cdInterval = setInterval(() => {
                     syncCountdown();
                 }, 200);
@@ -484,15 +485,12 @@
             cdRemainingSeconds = 0;
             cdTotalSeconds = 0;
 
-            // Hentikan alarm jika dibatalkan
             stopAlarmSound();
 
-            // Kembalikan UI Setup
             document.getElementById('cd-setup').classList.remove('hidden');
             document.getElementById('cd-running').classList.add('hidden');
             document.getElementById('btn-cd-cancel').disabled = true;
 
-            // Reset Tombol Mulai
             document.getElementById('text-cd-start').innerText = "Mulai";
             document.getElementById('icon-cd-start').outerHTML = `<i data-lucide="play" id="icon-cd-start" class="w-5 h-5 fill-white"></i>`;
             
@@ -504,14 +502,11 @@
         // ==========================================
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
-                // Ketika aplikasi dibuka kembali oleh pengguna
                 if (swIsRunning) {
-                    // Update stopwatch instan dari selisih waktu
                     swElapsedTime = Date.now() - swStartTime;
                     updateStopwatchDisplay();
                 }
                 if (cdIsRunning) {
-                    // Sinkronisasi sisa hitung mundur secara instan
                     syncCountdown();
                 }
             }
@@ -525,21 +520,39 @@
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
             if (!alarmAudio) {
-                // Inisiasi file audio MP3 kustom dari url yang diberikan
+                // Inisiasi file audio MP3 kustom dari url
                 alarmAudio = new Audio('https://muhardian.eu.org/deni/zikir/alarm.mp3');
                 alarmAudio.preload = 'auto';
                 
-                // Bypass kebijakan 'Autoplay' browser mobile dengan memicu 'play' sesaat lalu jeda
-                alarmAudio.play().then(() => {
-                    alarmAudio.pause();
-                    alarmAudio.currentTime = 0;
-                }).catch(e => {
-                    console.log("Menunggu interaksi pengguna untuk mengaktifkan audio.");
+                // Daftarkan listener kegagalan load file (CORS / SSL / 404 / Offline)
+                alarmAudio.addEventListener('error', (e) => {
+                    console.error("Gagal mengunduh audio zikir dari server:", e);
+                    mp3LoadFailed = true;
                 });
             }
         }
 
-        function playBeepSound(frequency = 880, duration = 0.15) {
+        // Fungsi khusus untuk memaksa browser membuka kunci pemutar media
+        function unlockAudioOnGesture() {
+            if (audioUnlocked || !alarmAudio) return;
+            
+            // Cara standar industri untuk mem-bypass autoplay block:
+            // Mainkan secara hening sesaat lalu langsung jeda
+            alarmAudio.muted = true;
+            alarmAudio.play()
+                .then(() => {
+                    alarmAudio.pause();
+                    alarmAudio.muted = false;
+                    alarmAudio.currentTime = 0;
+                    audioUnlocked = true;
+                    console.log("Saluran pemutar audio MP3 berhasil dibuka kunci.");
+                })
+                .catch((err) => {
+                    console.warn("Mencoba membuka kunci audio namun tertunda oleh sistem:", err);
+                });
+        }
+
+        function playBeepSound(frequency = 880, duration = 0.2) {
             try {
                 initAudio();
                 const osc = audioCtx.createOscillator();
@@ -557,7 +570,7 @@
                 osc.start();
                 osc.stop(audioCtx.currentTime + duration);
             } catch (e) {
-                console.log("Gagal memutar beep sintetis.");
+                console.log("Beep sintetis gagal.");
             }
         }
 
@@ -567,43 +580,47 @@
                     alarmAudio.pause();
                     alarmAudio.currentTime = 0;
                 } catch (e) {
-                    console.log("Gagal menghentikan pemutaran audio:", e);
+                    console.log("Gagal menghentikan audio:", e);
                 }
             }
         }
 
         function triggerAlarms() {
-            // Putar audio MP3 kustom terlebih dahulu (Zikir alarm)
-            if (alarmAudio) {
-                alarmAudio.currentTime = 0;
-                alarmAudio.play().catch(err => {
-                    console.log("Pemutaran MP3 dicegah oleh browser, mencadangkan dengan suara beep:", err);
-                    // Jika MP3 gagal (karena belum ada interaksi fisik pertama), nyalakan beep sistem
-                    let beeps = 0;
-                    const beepInterval = setInterval(() => {
-                        if (beeps < 4) {
-                            playBeepSound(880, 0.3);
-                            beeps++;
-                        } else {
-                            clearInterval(beepInterval);
-                        }
-                    }, 500);
-                });
-            } else {
-                // Jika objek audio belum terinisiasi, cadangkan dengan beep
-                let beeps = 0;
-                const beepInterval = setInterval(() => {
-                    if (beeps < 4) {
-                        playBeepSound(880, 0.3);
-                        beeps++;
-                    } else {
-                        clearInterval(beepInterval);
-                    }
-                }, 500);
+            // JIKA MP3 GAGAL DIMUAT (Offline / CORS / SSL Salah)
+            if (mp3LoadFailed) {
+                playFallbackBeeps();
+                showToastAlert("Waktu Selesai! (Bip Cadangan)", "Gagal memuat MP3 Zikir dari server. Alarm dialihkan menggunakan bip digital.");
+                return;
             }
 
-            // Tampilkan Toast Alert Kustom
-            showToastAlert("Waktu Selesai!", "Zikir alarm hitung mundur Anda telah selesai berbunyi.");
+            // JIKA MP3 NORMAL, PUTAR SEKARANG
+            if (alarmAudio) {
+                alarmAudio.currentTime = 0;
+                alarmAudio.play()
+                .then(() => {
+                    showToastAlert("Waktu Selesai!", "Zikir alarm hitung mundur Anda telah selesai berbunyi.");
+                })
+                .catch(err => {
+                    console.warn("Pemutaran MP3 ditolak browser saat background, menggunakan bip cadangan:", err);
+                    playFallbackBeeps();
+                    showToastAlert("Waktu Selesai! (Bip Cadangan)", "Sentuh layar saat aplikasi terbuka untuk memicu audio.");
+                });
+            } else {
+                playFallbackBeeps();
+                showToastAlert("Waktu Selesai!", "Zikir alarm hitung mundur telah mencapai nol.");
+            }
+        }
+
+        function playFallbackBeeps() {
+            let beeps = 0;
+            const beepInterval = setInterval(() => {
+                if (beeps < 4) {
+                    playBeepSound(880, 0.3);
+                    beeps++;
+                } else {
+                    clearInterval(beepInterval);
+                }
+            }, 500);
         }
 
         function showToastAlert(title, message) {
@@ -620,13 +637,19 @@
             alertElement.classList.remove('translate-y-0', 'opacity-100');
             alertElement.classList.add('translate-y-32', 'opacity-0', 'pointer-events-none');
             
-            // Berhentikan zikir/suara alarm seketika saat tombol notifikasi di-close oleh pengguna
             stopAlarmSound();
         }
 
-        // Daftarkan event listener untuk inisiasi Audio Context saat interaksi pertama
-        document.body.addEventListener('touchstart', initAudio, { once: true });
-        document.body.addEventListener('click', initAudio, { once: true });
+        // Daftarkan event listener di layar utama untuk jaminan pembukaan kunci awal
+        document.body.addEventListener('touchstart', () => {
+            initAudio();
+            unlockAudioOnGesture();
+        }, { once: true });
+        
+        document.body.addEventListener('click', () => {
+            initAudio();
+            unlockAudioOnGesture();
+        }, { once: true });
     </script>
 </body>
 </html>
