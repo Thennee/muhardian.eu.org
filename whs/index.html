@@ -289,7 +289,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Paste Web App URL dari Google Apps Script Anda di dalam tanda kutip di bawah ini:
+    // Masukkan Web App URL dari Google Apps Script Anda di sini:
     let API_URL = "https://script.google.com/macros/s/AKfycbyi6Xvxr0XFslIIwOEIhGbxzXk5gu1NEkW7kwr4qGC-7CYQ8LT3iSUF-At331wxokiR/exec";
 
     let currentUser = null;
@@ -314,7 +314,7 @@
         }
       }
 
-      // Offline / Mock Simulation Mode (Langsung berjalan tanpa backend jika URL belum diisi)
+      // Offline / Mock Simulation Mode
       return new Promise((resolve) => {
         setTimeout(() => {
           if (action === 'loginUser') {
@@ -331,6 +331,7 @@
               location: payload.location || 'LOC-QR',
               locStart: payload.locStart || '1',
               locEnd: payload.locEnd || '1',
+              pic: payload.pic || 'admin',
               timestamp: new Date().toLocaleString('id-ID')
             });
             resolve({ success: true });
@@ -437,7 +438,8 @@
                 barcode: decodedText,
                 location: 'STUFFING AREA',
                 locStart: '1',
-                locEnd: '1'
+                locEnd: '1',
+                pic: currentUser ? currentUser.username : 'admin'
               };
 
               const res = await apiCall('saveInventory', payload);
@@ -471,7 +473,7 @@
         await stopScanner();
 
         if (activeScanTarget === 'stuffing') {
-          apiCall('saveInventory', { type: 'STUFFING', barcode: simulatedCode, location: 'STUFFING AREA', locStart: '1', locEnd: '1' });
+          apiCall('saveInventory', { type: 'STUFFING', barcode: simulatedCode, location: 'STUFFING AREA', locStart: '1', locEnd: '1', pic: currentUser ? currentUser.username : 'admin' });
           Swal.fire({ toast: true, position: 'top', icon: 'success', title: 'STUFFING Berhasil! (Dummy: ' + simulatedCode + ')', showConfirmButton: false, timer: 2000 });
         } else if (activeScanTarget === 'invBarcode') {
           document.getElementById('invBarcode').value = 'DESC-' + simulatedCode;
@@ -489,7 +491,7 @@
           await html5QrcodeScanner.stop();
           html5QrcodeScanner.clear();
         } catch (err) {
-          // Abaikan jika scanner sudah berhenti
+          // Ignore error if already stopped
         }
         html5QrcodeScanner = null;
       }
@@ -500,7 +502,7 @@
     // --- SUBMIT FORM PUTAWAY IN / OUT ---
     document.getElementById('inventoryForm').onsubmit = async function(e) {
       e.preventDefault();
-      stopScanner();
+      await stopScanner();
 
       const barcodeVal = document.getElementById('invBarcode').value.trim();
       const locationVal = document.getElementById('invLocation').value.trim();
@@ -518,7 +520,8 @@
         barcode: barcodeVal,
         location: locationVal,
         locStart: document.getElementById('invLocStart').value,
-        locEnd: document.getElementById('invLocEnd').value
+        locEnd: document.getElementById('invLocEnd').value,
+        pic: currentUser ? currentUser.username : 'admin'
       };
 
       bootstrap.Modal.getInstance(document.getElementById('inventoryModal')).hide();
@@ -547,6 +550,7 @@
                 <small class="text-muted fw-bold" style="font-size:0.7rem">${item.timestamp}</small>
               </div>
               <h6 class="fw-bold mb-1">${item.barcode}</h6>
+              <div class="text-muted small mb-1">PIC: <b class="text-danger">${item.pic || '-'}</b></div>
               <div class="text-muted small mb-2">Location: <b>${item.location || '-'}</b></div>
               <div class="pt-2 border-top d-flex justify-content-between align-items-center small text-muted">
                 <span>Start: <b class="text-danger">${item.locStart || '1'}</b></span>
@@ -565,7 +569,6 @@
     document.addEventListener('DOMContentLoaded', () => {
       checkLoginState();
 
-      // Listener penutupan modal untuk mematikan scanner secara menyeluruh
       const invModalEl = document.getElementById('inventoryModal');
       if (invModalEl) {
         invModalEl.addEventListener('hidden.bs.modal', async () => {
