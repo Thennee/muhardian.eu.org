@@ -392,10 +392,10 @@
     }
 
     // --- INVENTORY MODAL & SCANNER BARCODE/QR ---
-    function openInventoryModal(moduleType) {
+    async function openInventoryModal(moduleType) {
       activeModule = moduleType;
       document.getElementById('modalTypeTitle').innerText = moduleType;
-      stopScanner();
+      await stopScanner();
 
       const stuffingSection = document.getElementById('stuffingOnlySection');
       const normalForm = document.getElementById('inventoryForm');
@@ -411,59 +411,64 @@
         document.getElementById('modalInstruction').innerText = 'Silakan Scan QR Code untuk Description dan Location.';
       }
 
-      bootstrap.Modal.getOrCreateInstance(document.getElementById('inventoryModal')).show();
+      const modalEl = document.getElementById('inventoryModal');
+      const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+      modalInstance.show();
     }
 
-    function startScanner(targetField) {
+    async function startScanner(targetField) {
       activeScanTarget = targetField;
+      await stopScanner();
       document.getElementById('scannerSection').classList.remove('d-none');
-      html5QrcodeScanner = new Html5Qrcode("reader");
-      html5QrcodeScanner.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        async (decodedText) => {
-          stopScanner();
+      
+      try {
+        html5QrcodeScanner = new Html5Qrcode("reader");
+        await html5QrcodeScanner.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 250, height: 250 } },
+          async (decodedText) => {
+            await stopScanner();
 
-          if (activeScanTarget === 'stuffing') {
-            Swal.fire({ title: 'Memproses STUFFING...', didOpen: () => Swal.showLoading() });
+            if (activeScanTarget === 'stuffing') {
+              Swal.fire({ title: 'Memproses STUFFING...', didOpen: () => Swal.showLoading() });
 
-            const payload = {
-              type: 'STUFFING',
-              barcode: decodedText,
-              location: 'STUFFING AREA',
-              locStart: '1',
-              locEnd: '1'
-            };
+              const payload = {
+                type: 'STUFFING',
+                barcode: decodedText,
+                location: 'STUFFING AREA',
+                locStart: '1',
+                locEnd: '1'
+              };
 
-            const res = await apiCall('saveInventory', payload);
-            if (res.success) {
-              Swal.fire({ 
-                toast: true, 
-                position: 'top', 
-                icon: 'success', 
-                title: 'STUFFING Berhasil!', 
-                text: 'QR: ' + decodedText, 
-                showConfirmButton: false, 
-                timer: 2000 
-              });
-            } else {
-              Swal.fire('Gagal', res.message || 'Terjadi kesalahan', 'error');
+              const res = await apiCall('saveInventory', payload);
+              if (res.success) {
+                Swal.fire({ 
+                  toast: true, 
+                  position: 'top', 
+                  icon: 'success', 
+                  title: 'STUFFING Berhasil!', 
+                  text: 'QR: ' + decodedText, 
+                  showConfirmButton: false, 
+                  timer: 2000 
+                });
+              } else {
+                Swal.fire('Gagal', res.message || 'Terjadi kesalahan', 'error');
+              }
+
+            } else if (activeScanTarget === 'invBarcode') {
+              document.getElementById('invBarcode').value = decodedText;
+              Swal.fire({ toast: true, position: 'top', icon: 'success', title: 'Description Terbaca!', showConfirmButton: false, timer: 1200 });
+            } else if (activeScanTarget === 'invLocation') {
+              document.getElementById('invLocation').value = decodedText;
+              Swal.fire({ toast: true, position: 'top', icon: 'success', title: 'Location Terbaca!', showConfirmButton: false, timer: 1200 });
             }
-
-          } else if (activeScanTarget === 'invBarcode') {
-            document.getElementById('invBarcode').value = decodedText;
-            Swal.fire({ toast: true, position: 'top', icon: 'success', title: 'Description Terbaca!', showConfirmButton: false, timer: 1200 });
-          } else if (activeScanTarget === 'invLocation') {
-            document.getElementById('invLocation').value = decodedText;
-            Swal.fire({ toast: true, position: 'top', icon: 'success', title: 'Location Terbaca!', showConfirmButton: false, timer: 1200 });
-          }
-        },
-        () => {}
-      ).catch(err => {
-        console.error(err);
-        // Fallback Simulasi jika kamera tidak aktif di lingkungan preview
+          },
+          () => {}
+        );
+      } catch (err) {
+        console.error("Scanner error:", err);
         const simulatedCode = 'QR-' + Math.floor(100000 + Math.random() * 900000);
-        stopScanner();
+        await stopScanner();
 
         if (activeScanTarget === 'stuffing') {
           apiCall('saveInventory', { type: 'STUFFING', barcode: simulatedCode, location: 'STUFFING AREA', locStart: '1', locEnd: '1' });
@@ -475,18 +480,21 @@
           document.getElementById('invLocation').value = 'LOC-' + simulatedCode;
           Swal.fire('Simulasi Scan', 'Berhasil mengisi Location dummy: LOC-' + simulatedCode, 'info');
         }
-      });
+      }
     }
 
-    function stopScanner() {
+    async function stopScanner() {
       if (html5QrcodeScanner) {
-        html5QrcodeScanner.stop().then(() => {
+        try {
+          await html5QrcodeScanner.stop();
           html5QrcodeScanner.clear();
-          document.getElementById('scannerSection').classList.add('d-none');
-        }).catch(() => {
-          document.getElementById('scannerSection').classList.add('d-none');
-        });
+        } catch (err) {
+          // Abaikan jika scanner sudah berhenti
+        }
+        html5QrcodeScanner = null;
       }
+      const scannerSec = document.getElementById('scannerSection');
+      if (scannerSec) scannerSec.classList.add('d-none');
     }
 
     // --- SUBMIT FORM PUTAWAY IN / OUT ---
@@ -556,6 +564,16 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       checkLoginState();
+
+      // Listener penutupan modal untuk mematikan scanner secara menyeluruh
+      const invModalEl = document.getElementById('inventoryModal');
+      if (invModalEl) {
+        invModalEl.addEventListener('hidden.bs.modal', async () => {
+          await stopScanner();
+          const form = document.getElementById('inventoryForm');
+          if (form) form.reset();
+        });
+      }
     });
   </script>
 </body>
