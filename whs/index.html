@@ -118,6 +118,49 @@
     .form-control:focus, .form-select:focus { border-color: var(--primary-red); background-color: #fff; box-shadow: 0 0 0 5px rgba(220, 38, 38, 0.1); }
     .form-control[readonly] { background-color: #fee2e2; cursor: not-allowed; border-color: #fca5a5; }
 
+    .scan-input-group {
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1.5px solid #fca5a5;
+      background-color: #fee2e2;
+      display: flex;
+    }
+    .scan-input-group .form-control {
+      background-color: #fee2e2 !important;
+      border: none !important;
+      color: #334155 !important;
+      font-weight: 500;
+      padding: 14px 18px;
+    }
+    .scan-input-group .form-control::placeholder {
+      color: #64748b;
+      font-weight: 400;
+    }
+    .scan-btn {
+      background: #dc2626 !important;
+      color: #ffffff !important;
+      border: none !important;
+      padding: 0 22px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .scan-btn:active {
+      background: #991b1b !important;
+    }
+    .custom-select-box {
+      border-radius: 20px !important;
+      border: 1.5px solid #e2e8f0 !important;
+      background-color: #f8fafc !important;
+      padding: 14px !important;
+      font-weight: 700 !important;
+      color: #1e293b !important;
+      text-align-last: center;
+      text-align: center;
+    }
+
     #fullPageLoader { display:none; position:fixed; inset:0; background:rgba(255,255,255,0.95); z-index: 9999; justify-content:center; align-items:center; flex-direction:column; backdrop-filter: blur(10px); }
     #reader { width: 100%; border-radius: 20px; overflow: hidden; background: #000; }
     .login-logo { width: 110px; height: 110px; object-fit: contain; margin-bottom: 15px; }
@@ -141,6 +184,13 @@
       <button class="btn btn-danger w-100 rounded-pill py-3 fw-bold shadow-lg" 
               style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%); border: none; font-size: 1.1rem;"
               onclick="handleLogin()">Masuk Aplikasi</button>
+      
+      <!-- FOOTER COPYRIGHT LOGIN -->
+      <div class="mt-4 pt-1">
+        <a href="https://muhardian.eu.org" target="_blank" rel="noopener noreferrer" class="text-decoration-none text-muted small fw-semibold" style="font-size: 0.75rem;">
+          &copy; 2026
+        </a>
+      </div>
     </div>
   </div>
 
@@ -229,57 +279,80 @@
             <button class="btn btn-sm btn-secondary w-100 mt-2 rounded-pill" onclick="stopScanner()">Tutup Kamera Scanner</button>
           </div>
 
-          <!-- TAMPILAN KHUSUS MENU STUFFING (HANYA TOMBOL SCAN QR) -->
-          <div id="stuffingOnlySection" class="d-none text-center py-2">
-            <button class="btn btn-danger w-100 rounded-pill py-3 fw-bold shadow-lg" 
-                    style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%); border: none; font-size: 1.1rem;"
-                    onclick="startScanner('stuffing')">
-              <i class="fa-solid fa-qrcode me-2"></i> Scan QR Code
-            </button>
-          </div>
-
-          <!-- FORM LENGKAP UNTUK MENU PUTAWAY IN / OUT -->
-          <form id="inventoryForm">
+          <!-- FORM KHUSUS MENU STUFFING -->
+          <form id="stuffingForm" class="d-none">
             <div class="mb-3">
-              <label class="form-label fw-bold small">DESCRIPTION</label>
+              <label class="form-label fw-bold small">DESCRIPTION / QR CODE STUFFING</label>
               <div class="input-group">
-                <input type="text" id="invBarcode" class="form-control" placeholder="Hasil Scan QR Description" required readonly>
-                <button class="btn btn-danger" type="button" onclick="startScanner('invBarcode')"><i class="fa-solid fa-qrcode me-1"></i> Scan</button>
-              </div>
-            </div>
-            
-            <div class="mb-3">
-              <label class="form-label fw-bold small">LOCATION</label>
-              <div class="input-group">
-                <input type="text" id="invLocation" class="form-control" placeholder="Hasil Scan QR Location" required readonly>
-                <button class="btn btn-danger" type="button" onclick="startScanner('invLocation')"><i class="fa-solid fa-qrcode me-1"></i> Scan</button>
-              </div>
-            </div>
-
-            <div class="row g-2 mb-4">
-              <div class="col-6">
-                <label class="form-label fw-bold small">LOCATION - START</label>
-                <select id="invLocStart" class="form-select fw-bold" required>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                </select>
-              </div>
-              <div class="col-6">
-                <label class="form-label fw-bold small">LOCATION - END</label>
-                <select id="invLocEnd" class="form-select fw-bold" required>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                </select>
+                <input type="text" id="stuffingBarcode" class="form-control" placeholder="Hasil Scan QR Stuffing" required readonly>
+                <button class="btn btn-danger" type="button" onclick="startScanner('stuffingBarcode')"><i class="fa-solid fa-qrcode me-1"></i> Scan</button>
               </div>
             </div>
 
             <button type="submit" class="btn btn-danger w-100 rounded-pill py-3 fw-bold shadow-lg mb-2" 
                     style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%); border: none; font-size: 1.1rem;">
-              Simpan Transaksi
+              SIMPAN
+            </button>
+          </form>
+
+          <!-- FORM LENGKAP UNTUK MENU PUTAWAY IN / OUT -->
+          <form id="inventoryForm" class="d-none">
+            <div class="mb-3">
+              <label class="form-label fw-800 small text-uppercase" style="font-weight: 800; color: #1e293b; letter-spacing: 0.3px;">DESCRIPTION</label>
+              <div class="scan-input-group">
+                <input type="text" id="invBarcode" class="form-control" placeholder="Hasil Scan QR Description" required readonly>
+                <button class="btn scan-btn" type="button" onclick="startScanner('invBarcode')"><i class="fa-solid fa-qrcode"></i> Scan</button>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label fw-800 small text-uppercase" style="font-weight: 800; color: #1e293b; letter-spacing: 0.3px;">LOCATION</label>
+              <div class="scan-input-group">
+                <input type="text" id="invLocation" class="form-control" placeholder="Hasil Scan QR Location" required readonly>
+                <button class="btn scan-btn" type="button" onclick="startScanner('invLocation')"><i class="fa-solid fa-qrcode"></i> Scan</button>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-6">
+                <label class="form-label fw-bold small d-block text-center" style="font-weight: 700; color: #1e293b;">Number of L/Van - Start</label>
+                <select id="invLocStart" class="form-select custom-select-box" required>
+                  <option value="1" selected>1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-bold small d-block text-center" style="font-weight: 700; color: #1e293b;">Number of L/Van - End</label>
+                <select id="invLocEnd" class="form-select custom-select-box" required>
+                  <option value="1" selected>1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                  <option value="11">11</option>
+                  <option value="12">12</option>
+                  <option value="13">13</option>
+                  <option value="14">14</option>
+                  <option value="15">15</option>
+                  <option value="16">16</option>
+                  <option value="17">17</option>
+                  <option value="18">18</option>
+                  <option value="19">19</option>
+                  <option value="20">20</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-danger w-100 rounded-pill py-3 fw-bold shadow-sm" 
+                    style="background: #b91c1c; border: none; font-size: 1.1rem; letter-spacing: 0.5px;">
+              SIMPAN
             </button>
           </form>
         </div>
@@ -398,15 +471,16 @@
       document.getElementById('modalTypeTitle').innerText = moduleType;
       await stopScanner();
 
-      const stuffingSection = document.getElementById('stuffingOnlySection');
+      const stuffingForm = document.getElementById('stuffingForm');
       const normalForm = document.getElementById('inventoryForm');
 
       if (moduleType === 'STUFFING') {
-        stuffingSection.classList.remove('d-none');
+        stuffingForm.classList.remove('d-none');
+        stuffingForm.reset();
         normalForm.classList.add('d-none');
-        document.getElementById('modalInstruction').innerText = 'Tekan tombol di bawah untuk melakukan Scan QR Code.';
+        document.getElementById('modalInstruction').innerText = 'Silakan Scan QR Code lalu tekan Simpan Transaksi.';
       } else {
-        stuffingSection.classList.add('d-none');
+        stuffingForm.classList.add('d-none');
         normalForm.classList.remove('d-none');
         normalForm.reset();
         document.getElementById('modalInstruction').innerText = 'Silakan Scan QR Code untuk Description dan Location.';
@@ -430,33 +504,9 @@
           async (decodedText) => {
             await stopScanner();
 
-            if (activeScanTarget === 'stuffing') {
-              Swal.fire({ title: 'Memproses STUFFING...', didOpen: () => Swal.showLoading() });
-
-              const payload = {
-                type: 'STUFFING',
-                barcode: decodedText,
-                location: 'STUFFING AREA',
-                locStart: '1',
-                locEnd: '1',
-                pic: currentUser ? currentUser.username : 'admin'
-              };
-
-              const res = await apiCall('saveInventory', payload);
-              if (res.success) {
-                Swal.fire({ 
-                  toast: true, 
-                  position: 'top', 
-                  icon: 'success', 
-                  title: 'STUFFING Berhasil!', 
-                  text: 'QR: ' + decodedText, 
-                  showConfirmButton: false, 
-                  timer: 2000 
-                });
-              } else {
-                Swal.fire('Gagal', res.message || 'Terjadi kesalahan', 'error');
-              }
-
+            if (activeScanTarget === 'stuffingBarcode') {
+              document.getElementById('stuffingBarcode').value = decodedText;
+              Swal.fire({ toast: true, position: 'top', icon: 'success', title: 'QR Stuffing Terbaca!', showConfirmButton: false, timer: 1200 });
             } else if (activeScanTarget === 'invBarcode') {
               document.getElementById('invBarcode').value = decodedText;
               Swal.fire({ toast: true, position: 'top', icon: 'success', title: 'Description Terbaca!', showConfirmButton: false, timer: 1200 });
@@ -472,9 +522,9 @@
         const simulatedCode = 'QR-' + Math.floor(100000 + Math.random() * 900000);
         await stopScanner();
 
-        if (activeScanTarget === 'stuffing') {
-          apiCall('saveInventory', { type: 'STUFFING', barcode: simulatedCode, location: 'STUFFING AREA', locStart: '1', locEnd: '1', pic: currentUser ? currentUser.username : 'admin' });
-          Swal.fire({ toast: true, position: 'top', icon: 'success', title: 'STUFFING Berhasil! (Dummy: ' + simulatedCode + ')', showConfirmButton: false, timer: 2000 });
+        if (activeScanTarget === 'stuffingBarcode') {
+          document.getElementById('stuffingBarcode').value = 'STUFF-' + simulatedCode;
+          Swal.fire('Simulasi Scan', 'Berhasil mengisi QR Stuffing dummy: STUFF-' + simulatedCode, 'info');
         } else if (activeScanTarget === 'invBarcode') {
           document.getElementById('invBarcode').value = 'DESC-' + simulatedCode;
           Swal.fire('Simulasi Scan', 'Berhasil mengisi Description dummy: DESC-' + simulatedCode, 'info');
@@ -499,6 +549,36 @@
       if (scannerSec) scannerSec.classList.add('d-none');
     }
 
+    // --- SUBMIT FORM STUFFING ---
+    document.getElementById('stuffingForm').onsubmit = async function(e) {
+      e.preventDefault();
+      await stopScanner();
+
+      const barcodeVal = document.getElementById('stuffingBarcode').value.trim();
+      if (!barcodeVal) {
+        return Swal.fire('QR Kosong', 'Harap lakukan Scan QR Code terlebih dahulu.', 'warning');
+      }
+
+      const payload = {
+        type: 'STUFFING',
+        barcode: barcodeVal,
+        location: 'STUFFING AREA',
+        locStart: '1',
+        locEnd: '1',
+        pic: currentUser ? currentUser.username : 'admin'
+      };
+
+      bootstrap.Modal.getInstance(document.getElementById('inventoryModal')).hide();
+      Swal.fire({ title: 'Menyimpan...', didOpen: () => Swal.showLoading() });
+
+      const res = await apiCall('saveInventory', payload);
+      if (res.success) {
+        Swal.fire({ icon: 'success', title: 'Berhasil Disimpan', timer: 1500, showConfirmButton: false });
+      } else {
+        Swal.fire('Gagal Menyimpan', res.message || 'Terjadi kesalahan', 'error');
+      }
+    };
+
     // --- SUBMIT FORM PUTAWAY IN / OUT ---
     document.getElementById('inventoryForm').onsubmit = async function(e) {
       e.preventDefault();
@@ -515,12 +595,15 @@
         return Swal.fire('Location Kosong', 'Harap lakukan Scan QR Location terlebih dahulu.', 'warning');
       }
 
+      const locStartVal = document.getElementById('invLocStart').value;
+      const locEndVal = document.getElementById('invLocEnd').value;
+
       const payload = {
         type: activeModule,
         barcode: barcodeVal,
         location: locationVal,
-        locStart: document.getElementById('invLocStart').value,
-        locEnd: document.getElementById('invLocEnd').value,
+        locStart: locStartVal,
+        locEnd: locEndVal,
         pic: currentUser ? currentUser.username : 'admin'
       };
 
@@ -543,6 +626,10 @@
         let html = '';
         list.forEach(item => {
           let badgeClass = item.type === 'STUFFING' ? 'bg-danger' : (item.type === 'PUTAWAY - IN' ? 'bg-warning text-dark' : 'bg-dark');
+          let numLVanDisplay = item.locStart && item.locEnd && item.locStart !== item.locEnd 
+            ? `${item.locStart} - ${item.locEnd}` 
+            : (item.locStart || item.locEnd || '1');
+
           html += `
             <div class="card border-0 shadow-sm rounded-4 mb-3 p-3" style="background: white;">
               <div class="d-flex justify-content-between align-items-center mb-2">
@@ -553,8 +640,7 @@
               <div class="text-muted small mb-1">PIC: <b class="text-danger">${item.pic || '-'}</b></div>
               <div class="text-muted small mb-2">Location: <b>${item.location || '-'}</b></div>
               <div class="pt-2 border-top d-flex justify-content-between align-items-center small text-muted">
-                <span>Start: <b class="text-danger">${item.locStart || '1'}</b></span>
-                <span>End: <b class="text-danger">${item.locEnd || '1'}</b></span>
+                <span>Number of L/Van: <b class="text-danger">${numLVanDisplay}</b></span>
               </div>
             </div>`;
         });
@@ -575,6 +661,8 @@
           await stopScanner();
           const form = document.getElementById('inventoryForm');
           if (form) form.reset();
+          const stuffingForm = document.getElementById('stuffingForm');
+          if (stuffingForm) stuffingForm.reset();
         });
       }
     });
