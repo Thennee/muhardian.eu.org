@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Cloud Desktop</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Segoe UI style / Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..0,800;1,300..1,800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            user-select: none;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Open Sans', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Windows 7 Aero Glass styling */
+        .aero-glass {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(200, 225, 255, 0.2));
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .aero-taskbar {
+            background: linear-gradient(180deg, rgba(30, 45, 65, 0.75) 0%, rgba(10, 20, 35, 0.85) 50%, rgba(5, 10, 20, 0.95) 100%);
+            backdrop-filter: blur(12px) saturate(160%);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .aero-window-header {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(200, 220, 240, 0.3) 50%, rgba(150, 180, 210, 0.4) 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .win-btn {
+            transition: all 0.15s ease-in-out;
+        }
+        .win-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+        .win-btn-close:hover {
+            background: linear-gradient(180deg, #f87171, #dc2626) !important;
+            color: white !important;
+        }
+
+        /* Start Orb Glow */
+        .start-orb {
+            background: radial-gradient(circle at 30% 30%, #60a5fa, #1d4ed8, #0f172a);
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .start-orb:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 18px rgba(96, 165, 250, 1), inset 0 2px 4px rgba(255, 255, 255, 0.9);
+        }
+
+        /* Windows 7 Scrollbars */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #cbd5e1, #94a3b8);
+            border-radius: 4px;
+            border: 2px solid #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #94a3b8, #64748b);
+        }
+
+        /* Desktop Icon Selection */
+        .desktop-icon {
+            border: 1px solid transparent;
+            border-radius: 6px;
+            transition: background 0.15s, border 0.15s;
+        }
+        .desktop-icon:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .desktop-icon.selected {
+            background: rgba(147, 197, 253, 0.4);
+            border: 1px solid rgba(59, 130, 246, 0.8);
+        }
+
+        /* Active Taskbar Item */
+        .taskbar-item {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .taskbar-item.active {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(191, 219, 254, 0.3));
+            border: 1px solid rgba(147, 197, 253, 0.8);
+            box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.6);
+        }
+
+        .win-shadow {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden select-none bg-slate-900 relative">
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="absolute inset-0 z-50 flex flex-col items-center justify-between py-12 transition-all duration-700 bg-cover bg-center" style="background-image: radial-gradient(circle at center, #1e3a8a 0%, #0f172a 100%);">
+        <div class="text-center text-white mt-12">
+            <h1 class="text-4xl font-light tracking-wide drop-shadow-md">Windows Cloud Desktop</h1>
+            <p class="text-blue-200 text-sm mt-2 opacity-80"><i class="fa-solid fa-cloud me-2"></i>Powered by Muhardian</p>
+        </div>
+
+        <div class="flex flex-col items-center bg-white/10 backdrop-blur-md p-8 rounded-2xl border border-white/20 shadow-2xl max-w-sm w-full mx-4">
+            <!-- User Avatar -->
+            <div class="w-28 h-28 rounded-full border-4 border-white/80 overflow-hidden shadow-lg mb-4 bg-gradient-to-tr from-blue-400 to-indigo-600 flex items-center justify-center text-white text-5xl">
+                <i class="fa-solid fa-user-gear"></i>
+            </div>
+
+            <div class="text-white font-semibold text-xl mb-1" id="login-username-display">User Cloud</div>
+            <div class="text-xs text-blue-200 mb-6 flex items-center gap-1">
+                <span id="sync-status-badge" class="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+                <span id="sync-status-text">Online</span>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" onsubmit="handleLogin(event)" class="w-full flex flex-col gap-3">
+                <div>
+                    <label class="text-xs text-slate-200 font-medium mb-1 block">Username</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-3 top-3 text-slate-400 text-sm"></i>
+                        <input type="text" id="login-username" value="admin" required class="w-full pl-9 pr-3 py-2 rounded-lg bg-white/90 border border-slate-300 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner" placeholder="Masukkan Username">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-200 font-medium mb-1 block">Password</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-key absolute left-3 top-3 text-slate-400 text-sm"></i>
+                        <input type="password" id="login-password" value="password123" required class="w-full pl-9 pr-10 py-2 rounded-lg bg-white/90 border border-slate-300 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner" placeholder="Masukkan Password">
+                        <button type="submit" class="absolute right-1 top-1 text-white bg-blue-600 hover:bg-blue-700 rounded-md w-8 h-8 flex items-center justify-center transition">
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="login-error" class="hidden text-xs text-rose-300 bg-rose-900/60 p-2 rounded border border-rose-500/50 text-center">
+                    Username atau Password salah!
+                </div>
+
+                <!-- Fast Demo Hints -->
+                <div class="mt-2 pt-3 border-t border-white/10 text-center">
+                    <p class="text-[11px] text-slate-300">Default Demo Credentials:</p>
+                    <p class="text-[11px] text-blue-200 font-mono">User: <span class="font-bold">admin</span> | Pass: <span class="font-bold">password123</span></p>
+                </div>
+            </form>
+        </div>
+
+        <div class="text-center text-slate-400 text-xs flex items-center gap-4">
+            <button onclick="openConfigModal()" class="hover:text-white transition flex items-center gap-1">
+                <i class="fa-solid fa-sliders"></i> Pengaturan
+            </button>
+            <span>•</span>
+            <span>Windows Cloud OS v2.5</span>
+        </div>
+    </div>
+
+    <!-- DESKTOP CONTAINER -->
+    <div id="desktop" class="absolute inset-0 bg-cover bg-center flex flex-col justify-between overflow-hidden" style="background-image: url('https://muhardian.eu.org/deni/cloud/win7.jpg');">
+
+        <!-- DESKTOP ICONS GRID -->
+        <div id="desktop-icons" class="p-4 grid grid-flow-col grid-rows-6 gap-4 auto-cols-max z-10 select-none">
+            <!-- Icons populated by JS -->
+        </div>
+
+        <!-- WINDOWS LAYER (Dynamic App Windows rendered here) -->
+        <div id="window-layer" class="absolute inset-0 pointer-events-none z-20 overflow-hidden">
+            <!-- Dynamic windows will append here -->
+        </div>
+
+        <!-- START MENU -->
+        <div id="start-menu" class="hidden absolute bottom-[46px] left-1 z-40 w-[420px] h-[510px] rounded-t-xl aero-glass border-t border-r border-l border-white/70 win-shadow flex flex-col overflow-visible text-slate-800 p-2 pb-1.5 select-none">
+            
+            <!-- User Avatar protruding top right -->
+            <div class="absolute -top-6 right-5 w-16 h-16 rounded-md border-2 border-white/90 bg-gradient-to-br from-amber-400 via-orange-500 to-indigo-600 shadow-xl z-50 overflow-hidden flex items-center justify-center text-white ring-2 ring-black/20">
+                <i class="fa-solid fa-user-gear text-3xl drop-shadow"></i>
+            </div>
+
+            <!-- Start Menu Body (2 Columns) -->
+            <div class="flex-1 flex w-full h-[calc(100%-42px)] rounded-t-md overflow-hidden shadow-inner border border-slate-400/50">
+                
+                <!-- LEFT COLUMN (White Background) -->
+                <div class="w-[235px] bg-white/95 flex flex-col justify-between border-r border-slate-300/80 p-1.5">
+                    <!-- Programs List / Search Results -->
+                    <div id="start-menu-app-list" class="flex-1 overflow-y-auto space-y-0.5 text-xs pr-1">
+                        <!-- Populated dynamically via renderStartMenuApps() -->
+                    </div>
+
+                    <!-- All Programs / Back Navigation Button -->
+                    <div class="pt-1 border-t border-slate-200 mt-1">
+                        <button id="all-programs-btn" onclick="toggleAllProgramsView()" class="w-full flex items-center gap-2 p-1.5 hover:bg-blue-100/80 rounded text-xs font-semibold text-slate-800 transition">
+                            <i id="all-prog-icon" class="fa-solid fa-caret-right text-emerald-600 text-sm"></i>
+                            <span id="all-prog-text">All Programs</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN (Dark Aero Glass Background) -->
+                <div class="flex-1 bg-gradient-to-b from-[#1b2c3f]/95 via-[#122030]/95 to-[#0a131f]/98 backdrop-blur-md p-2 pt-9 text-white text-xs flex flex-col justify-between border-l border-white/10 shadow-inner">
+                    <div class="space-y-0.5">
+                        <div id="start-username" class="font-bold text-sm text-white px-2 mb-2 truncate drop-shadow">Administrator</div>
+                        
+                        <button onclick="launchApp('explorer'); toggleStartMenu();" class="w-full text-left px-2 py-1 hover:bg-white/20 rounded flex items-center gap-2 transition text-slate-100 hover:text-white">
+                            <span>User Files</span>
+                        </button>
+                        <button onclick="launchApp('explorer'); toggleStartMenu();" class="w-full text-left px-2 py-1 hover:bg-white/20 rounded flex items-center gap-2 transition text-slate-100 hover:text-white">
+                            <span>Documents</span>
+                        </button>
+                        <button onclick="launchApp('explorer'); toggleStartMenu();" class="w-full text-left px-2 py-1 hover:bg-white/20 rounded flex items-center gap-2 transition text-slate-100 hover:text-white">
+                            <span>Pictures</span>
+                        </button>
+                        <button onclick="launchApp('explorer'); toggleStartMenu();" class="w-full text-left px-2 py-1 hover:bg-white/20 rounded flex items-center gap-2 transition text-slate-100 hover:text-white">
+                            <span>Music</span>
+                        </button>
+                        <button onclick="launchApp('explorer'); toggleStartMenu();" class="w-full text-left px-2 py-1 hover:bg-white/20 rounded flex items-center gap-2 transition text-slate-100 hover:text-white">
+                            <span>Games</span>
+                        </button>
+                        
+                        <div class="my-1 border-t border-white/15"></div>
+                        
+                        <button onclick="launchApp('explorer'); toggleStartMenu();" class="w-full text-left px-2 py-1 hover:bg-white/20 rounded flex items-center gap-2 transition text-slate-100 hover:text-white font-medium">
+                            <span>Computer</span>
+                        </button>
+                        <button onclick="launchApp('settings'); toggleStartMenu();" class="w-full text-left px-2 py-1 hover:bg-white/20 rounded flex items-center gap-2 transition text-slate-100 hover:text-white">
+                            <span>Control Panel</span>
+                        </button>
+                        <button onclick="openConfigModal(); toggleStartMenu();" class="w-full text-left px-2 py-1 hover:bg-white/20 rounded flex items-center gap-2 transition text-slate-100 hover:text-white">
+                            <span>Devices and Printers</span>
+                        </button>
+                        <button onclick="launchApp('sheet_db'); toggleStartMenu();" class="w-full text-left px-2 py-1 hover:bg-white/20 rounded flex items-center gap-2 transition text-slate-100 hover:text-white">
+                            <span>Default Programs</span>
+                        </button>
+                        
+                        <div class="my-1 border-t border-white/15"></div>
+                        
+                        <button onclick="showToast('Windows 7 Help & Support Center'); toggleStartMenu();" class="w-full text-left px-2 py-1 hover:bg-white/20 rounded flex items-center gap-2 transition text-slate-100 hover:text-white">
+                            <span>Help and Support</span>
+                        </button>
+                    </div>
+
+                    <!-- Bottom Right Branding -->
+                    <div class="px-2 pb-1 text-[10px] text-blue-200/50 font-semibold tracking-wider uppercase">
+                        Windows 7 Cloud
+                    </div>
+                </div>
+            </div>
+
+            <!-- Start Menu Footer Bar (Search + Shutdown) -->
+            <div class="h-[38px] pt-1.5 flex items-center justify-between gap-2 px-0.5">
+                <!-- Search Box -->
+                <div class="relative flex-1">
+                    <input type="text" id="start-search-input" oninput="filterStartMenuApps(this.value)" placeholder="Search programs and files" class="w-full pl-2.5 pr-7 py-1 rounded bg-white border border-slate-400/80 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-inner italic">
+                    <i class="fa-solid fa-magnifying-glass absolute right-2.5 top-2 text-slate-400 text-xs"></i>
+                </div>
+
+                <!-- Shut Down Split Button -->
+                <div class="relative flex items-center">
+                    <button onclick="logoutSystem()" class="h-7 px-3 bg-gradient-to-b from-blue-500 via-blue-600 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white text-xs font-semibold rounded-l border border-blue-400/60 shadow flex items-center gap-1.5 active:scale-95 transition">
+                        <i class="fa-solid fa-power-off text-[11px] text-red-200"></i>
+                        <span>Shut down</span>
+                    </button>
+                    <button onclick="toggleShutdownMenu(event)" class="h-7 px-1.5 bg-gradient-to-b from-blue-500 via-blue-600 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white text-xs rounded-r border-t border-b border-r border-blue-400/60 border-l border-l-blue-800/60 shadow flex items-center justify-center active:scale-95 transition">
+                        <i class="fa-solid fa-caret-right text-xs"></i>
+                    </button>
+
+                    <!-- Popup Submenu for Shutdown Options -->
+                    <div id="shutdown-popup-menu" class="hidden absolute bottom-8 right-0 w-36 bg-white/95 backdrop-blur-md rounded border border-slate-300 shadow-2xl py-1 text-xs text-slate-800 z-50">
+                        <button onclick="logoutSystem(); toggleShutdownMenu();" class="w-full text-left px-3 py-1.5 hover:bg-blue-600 hover:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-user-lock w-4"></i> Switch user
+                        </button>
+                        <button onclick="logoutSystem(); toggleShutdownMenu();" class="w-full text-left px-3 py-1.5 hover:bg-blue-600 hover:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-right-from-bracket w-4"></i> Log off
+                        </button>
+                        <button onclick="showToast('Locking Cloud Desktop...'); toggleShutdownMenu();" class="w-full text-left px-3 py-1.5 hover:bg-blue-600 hover:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-lock w-4"></i> Lock
+                        </button>
+                        <div class="my-1 border-t border-slate-200"></div>
+                        <button onclick="location.reload();" class="w-full text-left px-3 py-1.5 hover:bg-blue-600 hover:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-rotate-right w-4"></i> Restart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TASKBAR -->
+        <div class="h-11 w-full aero-taskbar z-40 flex items-center justify-between px-1 relative">
+            <!-- Left Taskbar: Start Orb + Apps -->
+            <div class="flex items-center gap-1 h-full">
+                <!-- Start Button Orb -->
+                <button onclick="toggleStartMenu()" class="w-9 h-9 rounded-full start-orb flex items-center justify-center text-white text-xl ml-1 relative group">
+                    <i class="fa-brands fa-windows text-white drop-shadow"></i>
+                </button>
+
+                <div class="h-6 w-[1px] bg-white/20 mx-1"></div>
+
+                <!-- Running Tasks Tabs -->
+                <div id="taskbar-apps" class="flex items-center gap-1 h-full py-1">
+                    <!-- Dynamic task buttons inserted here -->
+                </div>
+            </div>
+
+            <!-- Right Taskbar: System Tray + Clock -->
+            <div class="flex items-center gap-2 text-white text-xs px-2 h-full">
+                <button onclick="showToast('Koneksi Internet & Google Cloud Aktif')" class="hover:bg-white/10 p-1 rounded">
+                    <i class="fa-solid fa-wifi text-emerald-400"></i>
+                </button>
+                <button onclick="showToast('Audio System Windows 7 Active')" class="hover:bg-white/10 p-1 rounded">
+                    <i class="fa-solid fa-volume-high text-slate-200"></i>
+                </button>
+                <div class="h-6 w-[1px] bg-white/20"></div>
+
+                <!-- Clock & Date -->
+                <div class="text-right leading-tight px-1 hover:bg-white/10 rounded cursor-pointer" onclick="showToast('Waktu Sistem Tersinkronisasi')">
+                    <div id="tray-time" class="font-semibold text-xs">12:00 PM</div>
+                    <div id="tray-date" class="text-[10px] text-blue-200">10/09/2026</div>
+                </div>
+
+                <!-- Show Desktop Strip -->
+                <button onclick="minimizeAllWindows()" class="w-2 h-full border-l border-white/30 hover:bg-white/30" title="Tampilkan Desktop"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GOOGLE SHEET CONFIG MODAL -->
+    <div id="config-modal" class="hidden absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-300">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-database"></i> Hubungkan Google Sheet & Drive</h3>
+                <button onclick="closeConfigModal()" class="text-white/80 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-5 text-xs text-slate-700 space-y-4 max-h-[80vh] overflow-y-auto">
+                <p class="text-slate-600 leading-relaxed">
+                    Anda dapat menghubungkan sistem Cloud Desktop ini langsung ke **Google Sheet** (sebagai database login user) dan **Google Drive** (folder berkas).
+                </p>
+
+                <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg text-blue-900">
+                    <p class="font-semibold mb-1"><i class="fa-solid fa-circle-info me-1"></i> Format Google Sheet (Sheet1):</p>
+                    <p class="font-mono text-[11px] bg-white p-2 rounded border border-blue-200">
+                        Kolom A: <strong>username</strong> | Kolom B: <strong>password</strong> | Kolom C: <strong>fullname</strong> | Kolom D: <strong>role</strong>
+                    </p>
+                </div>
+
+                <div>
+                    <label class="font-semibold block mb-1">1. URL Google Sheet / Web App Apps Script</label>
+                    <input type="text" id="cfg-sheet-url" class="w-full p-2 border rounded text-xs font-mono bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500" placeholder="https://script.google.com/macros/s/.../exec ATAU Link Publish CSV">
+                    <span class="text-[10px] text-slate-400">Masukkan Web App URL dari Apps Script Google Sheet Anda.</span>
+                </div>
+
+                <div>
+                    <label class="font-semibold block mb-1">2. ID Folder Google Drive (Opsional)</label>
+                    <input type="text" id="cfg-drive-id" class="w-full p-2 border rounded text-xs font-mono bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500" placeholder="Contoh: 1a2b3c4d5e6f7g8h9...">
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg">
+                    <p class="font-semibold text-amber-900 mb-1"><i class="fa-solid fa-code me-1"></i> Skrip Google Apps Script 1-Klik:</p>
+                    <p class="text-[11px] text-amber-800 mb-2">Salin kode berikut ke menu <em>Extensions &gt; Apps Script</em> di Google Sheet Anda lalu Deploy sebagai Web App:</p>
+                    <textarea readonly class="w-full h-24 p-2 bg-slate-900 text-emerald-400 text-[10px] font-mono rounded select-all focus:outline-none">
+function doGet(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
+  var data = sheet.getDataRange().getValues();
+  var headers = data[0];
+  var result = [];
+  for (var i = 1; i < data.length; i++) {
+    var row = {};
+    for (var j = 0; j < headers.length; j++) {
+      row[headers[j]] = data[i][j];
+    }
+    result.push(row);
+  }
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}
+                    </textarea>
+                </div>
+            </div>
+            <div class="p-3 bg-slate-100 border-t border-slate-200 flex justify-end gap-2">
+                <button onclick="closeConfigModal()" class="px-4 py-1.5 rounded bg-slate-300 hover:bg-slate-400 text-slate-700 text-xs font-medium">Batal</button>
+                <button onclick="saveGoogleConfig()" class="px-4 py-1.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium shadow">Simpan &amp; Uji Koneksi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI TOAST NOTIFICATION -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        // Default Mock Data for immediate standalone usage if Google Sheet is unconfigured
+        const DEFAULT_USERS = [
+            { username: "admin", password: "password123", fullname: "Administrator Cloud", role: "Admin" },
+            { username: "user", password: "cloud2026", fullname: "User Staf", role: "Member" },
+            { username: "budi", password: "123", fullname: "Budi Santoso", role: "Editor" }
+        ];
+
+        const DEFAULT_DRIVE_FILES = [
+            { name: "Laporan_Keuangan_2026.xlsx", type: "sheet", size: "1.2 MB", date: "2026-09-01", url: "https://docs.google.com/spreadsheets" },
+            { name: "Desain_Arsitektur_Cloud.pdf", type: "pdf", size: "4.8 MB", date: "2026-08-28", url: "https://drive.google.com" },
+            { name: "Foto_Kegiatan_Perusahaan.jpg", type: "image", size: "2.4 MB", date: "2026-09-05", url: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800" },
+            { name: "Catatan_Rapat_Cloud.txt", type: "text", size: "12 KB", date: "2026-09-09", url: "" }
+        ];
+
+        let state = {
+            currentUser: null,
+            usersList: JSON.parse(localStorage.getItem('win7_users')) || DEFAULT_USERS,
+            driveFiles: JSON.parse(localStorage.getItem('win7_drive_files')) || DEFAULT_DRIVE_FILES,
+            windows: [],
+            activeWindowId: null,
+            zIndexCounter: 100,
+            sheetUrl: localStorage.getItem('win7_sheet_url') || '',
+            driveFolderId: localStorage.getItem('win7_drive_id') || '',
+            showingAllPrograms: false
+        };
+
+        // All Programs Catalog for Windows 7 Start Menu
+        const START_MENU_PROGRAMS = [
+            { id: 'explorer', name: 'Google Drive File Manager', icon: 'fa-folder-closed', color: 'text-amber-500' },
+            { id: 'sheet_db', name: 'Google Sheet Database', icon: 'fa-table', color: 'text-emerald-600' },
+            { id: 'browser', name: 'Web Explorer', icon: 'fa-globe', color: 'text-blue-500' },
+            { id: 'notepad', name: 'Notepad', icon: 'fa-file-lines', color: 'text-slate-600' },
+            { id: 'calculator', name: 'Kalkulator', icon: 'fa-calculator', color: 'text-indigo-500' },
+            { id: 'paint', name: 'Paint Canvas', icon: 'fa-palette', color: 'text-pink-500' },
+            { id: 'cmd', name: 'Command Prompt', icon: 'fa-terminal', color: 'text-slate-800' },
+            { id: 'settings', name: 'Control Panel', icon: 'fa-sliders', color: 'text-slate-500' },
+            { id: 'media_player', name: 'Windows Media Player', icon: 'fa-circle-play', color: 'text-blue-600', action: () => showToast('Windows Media Player Loaded') },
+            { id: 'dvd_maker', name: 'Windows DVD Maker', icon: 'fa-compact-disc', color: 'text-amber-600', action: () => showToast('Windows DVD Maker Loaded') },
+            { id: 'fax_scan', name: 'Windows Fax and Scan', icon: 'fa-print', color: 'text-sky-600', action: () => showToast('Windows Fax & Scan Ready') },
+            { id: 'win_update', name: 'Windows Update', icon: 'fa-rotate-right', color: 'text-emerald-500', action: () => showToast('System is up to date') }
+        ];
+
+        function renderStartMenuApps(filterQuery = '') {
+            const container = document.getElementById('start-menu-app-list');
+            if (!container) return;
+
+            let list = START_MENU_PROGRAMS;
+
+            if (filterQuery.trim() !== '') {
+                const q = filterQuery.toLowerCase();
+                list = list.filter(p => p.name.toLowerCase().includes(q));
+            } else if (!state.showingAllPrograms) {
+                // Show pinned / frequent apps
+                list = list.slice(0, 8);
+            }
+
+            if (list.length === 0) {
+                container.innerHTML = `<div class="p-3 text-slate-400 italic text-[11px] text-center">No programs found</div>`;
+                return;
+            }
+
+            container.innerHTML = list.map(app => `
+                <button onclick="handleStartMenuAppClick('${app.id}'); toggleStartMenu();" class="w-full flex items-center gap-2.5 p-1.5 hover:bg-blue-100/90 rounded text-slate-700 text-left transition group">
+                    <div class="w-5 text-center text-sm ${app.color} group-hover:scale-110 transition-transform">
+                        <i class="fa-solid ${app.icon}"></i>
+                    </div>
+                    <span class="truncate text-xs text-slate-800 font-medium">${app.name}</span>
+                </button>
+            `).join('');
+        }
+
+        function handleStartMenuAppClick(appId) {
+            const item = START_MENU_PROGRAMS.find(p => p.id === appId);
+            if (item && item.action) {
+                item.action();
+            } else {
+                launchApp(appId);
+            }
+        }
+
+        function toggleAllProgramsView() {
+            state.showingAllPrograms = !state.showingAllPrograms;
+            const btnText = document.getElementById('all-prog-text');
+            const btnIcon = document.getElementById('all-prog-icon');
+
+            if (state.showingAllPrograms) {
+                if (btnText) btnText.innerText = 'Back';
+                if (btnIcon) btnIcon.className = 'fa-solid fa-circle-arrow-left text-blue-600 text-sm';
+            } else {
+                if (btnText) btnText.innerText = 'All Programs';
+                if (btnIcon) btnIcon.className = 'fa-solid fa-caret-right text-emerald-600 text-sm';
+            }
+
+            renderStartMenuApps(document.getElementById('start-search-input')?.value || '');
+        }
+
+        function filterStartMenuApps(val) {
+            renderStartMenuApps(val);
+        }
+
+        function toggleShutdownMenu(e) {
+            if (e) e.stopPropagation();
+            const menu = document.getElementById('shutdown-popup-menu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        // Web Audio API Sound Effects (Synthesized Win7 Chimes)
+        function playAudioEffect(type) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'startup') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.5);
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.8);
+                } else if (type === 'click') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(600, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.05, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.05);
+                }
+            } catch (e) { console.log('Audio Context restricted', e); }
+        }
+
+        // Fetch Live User Data from Google Sheet URL if configured
+        async function fetchUsersFromGoogleSheet() {
+            if (!state.sheetUrl) return;
+
+            const badge = document.getElementById('sync-status-badge');
+            const text = document.getElementById('sync-status-text');
+            if (badge) badge.className = 'w-2 h-2 rounded-full bg-amber-400 inline-block animate-ping';
+            if (text) text.innerText = 'Menyinkronkan Sheet...';
+
+            try {
+                const response = await fetch(state.sheetUrl);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        state.usersList = data;
+                        localStorage.setItem('win7_users', JSON.stringify(data));
+                        if (badge) badge.className = 'w-2 h-2 rounded-full bg-emerald-400 inline-block';
+                        if (text) text.innerText = 'Google Sheet Terkoneksi (' + data.length + ' User)';
+                        showToast('Data User Berhasil Diperbarui dari Google Sheet!');
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.warn('Gagal sync Google Sheet, menggunakan lokal cache:', err);
+                if (badge) badge.className = 'w-2 h-2 rounded-full bg-blue-400 inline-block';
+                if (text) text.innerText = 'Mode Lokal / Fallback';
+            }
+        }
+
+        const APP_DEFINITIONS = {
+            explorer: { name: 'Google Drive', icon: 'fa-folder-closed', color: 'text-amber-400' },
+            sheet_db: { name: 'Sheet Database', icon: 'fa-table', color: 'text-emerald-400' },
+            browser: { name: 'Web Explorer', icon: 'fa-globe', color: 'text-blue-400' },
+            notepad: { name: 'Notepad', icon: 'fa-file-lines', color: 'text-slate-300' },
+            calculator: { name: 'Kalkulator', icon: 'fa-calculator', color: 'text-indigo-400' },
+            paint: { name: 'Paint', icon: 'fa-palette', color: 'text-pink-400' },
+            settings: { name: 'Control Panel', icon: 'fa-sliders', color: 'text-slate-400' },
+            cmd: { name: 'CMD Prompt', icon: 'fa-terminal', color: 'text-slate-200' }
+        };
+
+        function renderDesktopIcons() {
+            const container = document.getElementById('desktop-icons');
+            container.innerHTML = '';
+
+            Object.keys(APP_DEFINITIONS).forEach(appId => {
+                const app = APP_DEFINITIONS[appId];
+                const iconEl = document.createElement('div');
+                iconEl.className = 'desktop-icon w-24 h-24 flex flex-col items-center justify-center p-2 cursor-pointer text-white text-center gap-1 hover:scale-105 transition-transform';
+                iconEl.ondblclick = () => launchApp(appId);
+                iconEl.onclick = (e) => {
+                    document.querySelectorAll('.desktop-icon').forEach(el => el.classList.remove('selected'));
+                    iconEl.classList.add('selected');
+                    e.stopPropagation();
+                };
+
+                iconEl.innerHTML = `
+                    <div class="text-3xl filter drop-shadow-md ${app.color}">
+                        <i class="fa-solid ${app.icon}"></i>
+                    </div>
+                    <span class="text-xs font-normal drop-shadow-md line-clamp-2 leading-tight">${app.name}</span>
+                `;
+                container.appendChild(iconEl);
+            });
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            playAudioEffect('click');
+
+            const uInput = document.getElementById('login-username').value.trim();
+            const pInput = document.getElementById('login-password').value.trim();
+            const errorEl = document.getElementById('login-error');
+
+            // Find matching user in Sheet data or Default
+            const matchedUser = state.usersList.find(
+                u => String(u.username).toLowerCase() === uInput.toLowerCase() && String(u.password) === pInput
+            );
+
+            if (matchedUser) {
+                state.currentUser = matchedUser;
+                errorEl.classList.add('hidden');
+
+                // Animate login screen hide
+                const loginScreen = document.getElementById('login-screen');
+                loginScreen.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+
+                playAudioEffect('startup');
+                document.getElementById('start-username').innerText = matchedUser.fullname || matchedUser.username;
+                showToast(`Selamat datang kembali, ${matchedUser.fullname || matchedUser.username}!`);
+            } else {
+                errorEl.classList.remove('hidden');
+                errorEl.innerText = 'Username atau Password salah';
+            }
+        }
+
+        function logoutSystem() {
+            playAudioEffect('click');
+            state.currentUser = null;
+            // Close all windows
+            state.windows.forEach(w => closeWindow(w.id));
+
+            const loginScreen = document.getElementById('login-screen');
+            loginScreen.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+            toggleStartMenu(false);
+            showToast('Anda telah Log Off.');
+        }
+
+        function launchApp(appId, customParams = {}) {
+            playAudioEffect('click');
+
+            // Prevent duplicate window if already open
+            const existingWin = state.windows.find(w => w.appId === appId && !customParams.multiInstance);
+            if (existingWin) {
+                focusWindow(existingWin.id);
+                if (existingWin.minimized) restoreWindow(existingWin.id);
+                return;
+            }
+
+            const winId = 'win_' + Date.now();
+            const appMeta = APP_DEFINITIONS[appId] || { name: 'Aplikasi Cloud', icon: 'fa-window-maximize', color: 'text-blue-500' };
+
+            const winObj = {
+                id: winId,
+                appId: appId,
+                title: customParams.title || appMeta.name,
+                icon: appMeta.icon,
+                minimized: false,
+                maximized: false,
+                x: 100 + (state.windows.length * 30),
+                y: 60 + (state.windows.length * 30),
+                width: customParams.width || 680,
+                height: customParams.height || 480
+            };
+
+            state.windows.push(winObj);
+            renderWindowDOM(winObj);
+            renderTaskbarApps();
+            focusWindow(winId);
+        }
+
+        function renderWindowDOM(win) {
+            const layer = document.getElementById('window-layer');
+            const winEl = document.createElement('div');
+            winEl.id = win.id;
+            winEl.className = 'absolute pointer-events-auto rounded-t-lg aero-glass border border-white/50 win-shadow flex flex-col overflow-hidden transition-all duration-75';
+            winEl.style.left = win.x + 'px';
+            winEl.style.top = win.y + 'px';
+            winEl.style.width = win.width + 'px';
+            winEl.style.height = win.height + 'px';
+            winEl.style.zIndex = ++state.zIndexCounter;
+
+            winEl.onmousedown = () => focusWindow(win.id);
+
+            // Window Template
+            winEl.innerHTML = `
+                <!-- Header / Titlebar -->
+                <div id="${win.id}_header" class="aero-window-header px-3 py-1.5 flex items-center justify-between cursor-move select-none">
+                    <div class="flex items-center gap-2 text-slate-800 font-semibold text-xs truncate">
+                        <i class="fa-solid ${win.icon} text-slate-700"></i>
+                        <span>${win.title}</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="minimizeWindow('${win.id}')" class="win-btn w-6 h-5 rounded text-slate-700 hover:text-black flex items-center justify-center text-xs">
+                            <i class="fa-solid fa-minus"></i>
+                        </button>
+                        <button onclick="toggleMaximize('${win.id}')" class="win-btn w-6 h-5 rounded text-slate-700 hover:text-black flex items-center justify-center text-[10px]">
+                            <i class="fa-regular fa-square"></i>
+                        </button>
+                        <button onclick="closeWindow('${win.id}')" class="win-btn win-btn-close w-7 h-5 rounded text-slate-700 hover:text-white flex items-center justify-center text-xs">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Window Content Container -->
+                <div class="flex-1 bg-white/95 backdrop-blur-sm overflow-auto text-slate-800 relative p-3">
+                    ${getAppContentHTML(win.appId)}
+                </div>
+            `;
+
+            layer.appendChild(winEl);
+            makeWindowDraggable(win.id);
+        }
+
+        function makeWindowDraggable(winId) {
+            const winEl = document.getElementById(winId);
+            const header = document.getElementById(`${winId}_header`);
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+
+            header.onmousedown = (e) => {
+                if (e.target.closest('button')) return; // Ignore control buttons
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialLeft = winEl.offsetLeft;
+                initialTop = winEl.offsetTop;
+                focusWindow(winId);
+
+                document.onmousemove = (e) => {
+                    if (!isDragging) return;
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    winEl.style.left = (initialLeft + dx) + 'px';
+                    winEl.style.top = Math.max(0, initialTop + dy) + 'px';
+                };
+
+                document.onmouseup = () => {
+                    isDragging = false;
+                    document.onmousemove = null;
+                    document.onmouseup = null;
+                };
+            };
+        }
+
+        function focusWindow(winId) {
+            state.activeWindowId = winId;
+            const winEl = document.getElementById(winId);
+            if (winEl) {
+                winEl.style.zIndex = ++state.zIndexCounter;
+            }
+            renderTaskbarApps();
+        }
+
+        function minimizeWindow(winId) {
+            const win = state.windows.find(w => w.id === winId);
+            if (win) {
+                win.minimized = true;
+                const el = document.getElementById(winId);
+                if (el) el.classList.add('hidden');
+                renderTaskbarApps();
+            }
+        }
+
+        function restoreWindow(winId) {
+            const win = state.windows.find(w => w.id === winId);
+            if (win) {
+                win.minimized = false;
+                const el = document.getElementById(winId);
+                if (el) el.classList.remove('hidden');
+                focusWindow(winId);
+            }
+        }
+
+        function toggleMaximize(winId) {
+            const winEl = document.getElementById(winId);
+            const win = state.windows.find(w => w.id === winId);
+            if (!winEl || !win) return;
+
+            if (win.maximized) {
+                winEl.style.left = win.prevLeft;
+                winEl.style.top = win.prevTop;
+                winEl.style.width = win.prevWidth;
+                winEl.style.height = win.prevHeight;
+                win.maximized = false;
+            } else {
+                win.prevLeft = winEl.style.left;
+                win.prevTop = winEl.style.top;
+                win.prevWidth = winEl.style.width;
+                win.prevHeight = winEl.style.height;
+
+                winEl.style.left = '0px';
+                winEl.style.top = '0px';
+                winEl.style.width = '100vw';
+                winEl.style.height = 'calc(100vh - 44px)';
+                win.maximized = true;
+            }
+        }
+
+        function closeWindow(winId) {
+            playAudioEffect('click');
+            state.windows = state.windows.filter(w => w.id !== winId);
+            const el = document.getElementById(winId);
+            if (el) el.remove();
+            renderTaskbarApps();
+        }
+
+        function minimizeAllWindows() {
+            state.windows.forEach(w => minimizeWindow(w.id));
+        }
+
+        function renderTaskbarApps() {
+            const container = document.getElementById('taskbar-apps');
+            container.innerHTML = '';
+
+            state.windows.forEach(win => {
+                const btn = document.createElement('button');
+                const isActive = state.activeWindowId === win.id && !win.minimized;
+                btn.className = `taskbar-item h-full px-3 rounded flex items-center gap-2 text-white text-xs max-w-[150px] truncate ${isActive ? 'active' : ''}`;
+                btn.onclick = () => {
+                    if (win.minimized) {
+                        restoreWindow(win.id);
+                    } else if (isActive) {
+                        minimizeWindow(win.id);
+                    } else {
+                        focusWindow(win.id);
+                    }
+                };
+
+                btn.innerHTML = `
+                    <i class="fa-solid ${win.icon} text-sm"></i>
+                    <span class="truncate">${win.title}</span>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function getAppContentHTML(appId) {
+            switch (appId) {
+                case 'explorer':
+                    return `
+                        <div class="flex flex-col h-full gap-3 text-xs">
+                            <div class="flex items-center justify-between bg-slate-100 p-2 rounded border border-slate-200">
+                                <div class="flex items-center gap-2 font-semibold text-slate-700">
+                                    <i class="fa-solid fa-cloud-arrow-up text-blue-600 text-base"></i>
+                                    <span>Google Drive Cloud Workspace</span>
+                                </div>
+                                <button onclick="addDriveFilePrompt()" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium flex items-center gap-1 shadow">
+                                    <i class="fa-solid fa-plus text-xs"></i> Tambah File Google Drive
+                                </button>
+                            </div>
+
+                            <div class="border border-slate-200 rounded overflow-hidden flex-1 bg-white">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="bg-slate-100 border-b border-slate-200 text-slate-600 font-semibold">
+                                        <tr>
+                                            <th class="p-2">Nama Berkas</th>
+                                            <th class="p-2">Tipe</th>
+                                            <th class="p-2">Ukuran</th>
+                                            <th class="p-2">Tanggal Update</th>
+                                            <th class="p-2 text-right">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100" id="drive-files-list">
+                                        ${renderDriveFilesRows()}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+
+                case 'sheet_db':
+                    return `
+                        <div class="flex flex-col h-full gap-3 text-xs">
+                            <div class="flex items-center justify-between bg-emerald-50 p-2.5 rounded border border-emerald-200">
+                                <div>
+                                    <div class="font-bold text-emerald-900 flex items-center gap-2">
+                                        <i class="fa-solid fa-table-cells text-emerald-600 text-base"></i>
+                                        <span>Kelola User Login (Google Sheet - Sheet1)</span>
+                                    </div>
+                                    <div class="text-[11px] text-emerald-700">Perubahan dapat disinkronkan langsung dengan Sheet1 Anda.</div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="fetchUsersFromGoogleSheet()" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-medium shadow flex items-center gap-1">
+                                        <i class="fa-solid fa-rotate"></i> Sync Sheet Now
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="border border-slate-200 rounded overflow-hidden flex-1 bg-white">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="bg-slate-100 border-b border-slate-200 text-slate-700 font-semibold">
+                                        <tr>
+                                            <th class="p-2">Username</th>
+                                            <th class="p-2">Password</th>
+                                            <th class="p-2">Nama Lengkap</th>
+                                            <th class="p-2">Role Access</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${state.usersList.map(u => `
+                                            <tr class="hover:bg-slate-50">
+                                                <td class="p-2 font-mono font-semibold text-blue-700">${u.username}</td>
+                                                <td class="p-2 font-mono text-slate-500">${u.password}</td>
+                                                <td class="p-2">${u.fullname || '-'}</td>
+                                                <td class="p-2"><span class="px-2 py-0.5 rounded text-[10px] bg-blue-100 text-blue-800 font-semibold">${u.role || 'User'}</span></td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+
+                case 'browser':
+                    return `
+                        <div class="flex flex-col h-full gap-2 text-xs">
+                            <div class="flex items-center gap-2 bg-slate-100 p-2 rounded border border-slate-200">
+                                <i class="fa-solid fa-globe text-blue-500"></i>
+                                <input type="text" id="browser-url-input" value="https://www.google.com/search?igu=1" class="flex-1 p-1.5 border rounded text-xs font-mono bg-white">
+                                <button onclick="navigateBrowser()" class="px-3 py-1.5 bg-blue-600 text-white rounded font-medium">Buka</button>
+                            </div>
+                            <iframe id="browser-iframe" src="https://www.google.com/search?igu=1" class="w-full flex-1 border border-slate-300 rounded bg-white"></iframe>
+                        </div>
+                    `;
+
+                case 'notepad':
+                    return `
+                        <div class="flex flex-col h-full gap-2">
+                            <div class="flex items-center gap-2 border-b border-slate-200 pb-2 text-xs">
+                                <button onclick="showToast('Dokumen Dibuat Baru')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded border">Baru</button>
+                                <button onclick="showToast('Catatan disimpan ke memori cloud lokal!')" class="px-2 py-1 bg-blue-600 text-white rounded">Simpan ke Drive</button>
+                            </div>
+                            <textarea class="w-full flex-1 p-3 font-mono text-sm border border-slate-200 rounded focus:outline-none resize-none bg-slate-50" placeholder="Ketik catatan cloud di sini..."></textarea>
+                        </div>
+                    `;
+
+                case 'calculator':
+                    return `
+                        <div class="max-w-xs mx-auto h-full flex flex-col justify-center p-2 bg-slate-100 rounded-lg border border-slate-300">
+                            <input type="text" id="calc-screen" readonly value="0" class="w-full p-3 text-right text-2xl font-mono bg-white border border-slate-300 rounded mb-3 shadow-inner">
+                            <div class="grid grid-cols-4 gap-2">
+                                <button onclick="calcPress('C')" class="p-3 bg-red-100 text-red-700 font-bold rounded hover:bg-red-200">C</button>
+                                <button onclick="calcPress('/')" class="p-3 bg-slate-200 font-bold rounded hover:bg-slate-300">/</button>
+                                <button onclick="calcPress('*')" class="p-3 bg-slate-200 font-bold rounded hover:bg-slate-300">*</button>
+                                <button onclick="calcPress('-')" class="p-3 bg-slate-200 font-bold rounded hover:bg-slate-300">-</button>
+                                <button onclick="calcPress('7')" class="p-3 bg-white font-bold rounded hover:bg-slate-100">7</button>
+                                <button onclick="calcPress('8')" class="p-3 bg-white font-bold rounded hover:bg-slate-100">8</button>
+                                <button onclick="calcPress('9')" class="p-3 bg-white font-bold rounded hover:bg-slate-100">9</button>
+                                <button onclick="calcPress('+')" class="p-3 bg-slate-200 font-bold rounded hover:bg-slate-300">+</button>
+                                <button onclick="calcPress('4')" class="p-3 bg-white font-bold rounded hover:bg-slate-100">4</button>
+                                <button onclick="calcPress('5')" class="p-3 bg-white font-bold rounded hover:bg-slate-100">5</button>
+                                <button onclick="calcPress('6')" class="p-3 bg-white font-bold rounded hover:bg-slate-100">6</button>
+                                <button onclick="calcEqual()" class="row-span-2 p-3 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 flex items-center justify-center">=</button>
+                                <button onclick="calcPress('1')" class="p-3 bg-white font-bold rounded hover:bg-slate-100">1</button>
+                                <button onclick="calcPress('2')" class="p-3 bg-white font-bold rounded hover:bg-slate-100">2</button>
+                                <button onclick="calcPress('3')" class="p-3 bg-white font-bold rounded hover:bg-slate-100">3</button>
+                                <button onclick="calcPress('0')" class="col-span-2 p-3 bg-white font-bold rounded hover:bg-slate-100">0</button>
+                                <button onclick="calcPress('.')" class="p-3 bg-white font-bold rounded hover:bg-slate-100">.</button>
+                            </div>
+                        </div>
+                    `;
+
+                case 'paint':
+                    return `
+                        <div class="flex flex-col h-full gap-2">
+                            <div class="flex items-center gap-2 bg-slate-100 p-2 rounded border border-slate-200 text-xs">
+                                <label class="font-semibold">Warna:</label>
+                                <input type="color" id="paint-color" value="#2563eb" class="w-8 h-8 cursor-pointer border rounded">
+                                <button onclick="clearPaintCanvas()" class="px-3 py-1 bg-slate-200 hover:bg-slate-300 rounded">Bersihkan Canvas</button>
+                            </div>
+                            <canvas id="paint-canvas" width="600" height="350" class="border border-slate-300 rounded bg-white cursor-crosshair flex-1 w-full"></canvas>
+                        </div>
+                    `;
+
+                case 'settings':
+                    return `
+                        <div class="space-y-4 text-xs">
+                            <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 flex items-center justify-between">
+                                <div>
+                                    <div class="font-bold text-blue-900 text-sm">Control Panel - Windows 7 Cloud</div>
+                                    <div class="text-blue-700">Atur integrasi Google API dan tampilan Wallpaper</div>
+                                </div>
+                                <button onclick="openConfigModal()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded shadow">
+                                    Konfigurasi Google Sheet / Drive
+                                </button>
+                            </div>
+
+                            <div class="border border-slate-200 p-3 rounded-lg bg-white">
+                                <h4 class="font-bold text-slate-800 mb-2">Ganti Wallpaper Desktop</h4>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button onclick="changeWallpaper('https://muhardian.eu.org/deni/cloud/win7.jpg')" class="h-16 rounded overflow-hidden border border-slate-300 hover:opacity-80">
+                                        <img src="https://muhardian.eu.org/deni/cloud/win7.jpg" class="w-full h-full object-cover">
+                                    </button>
+                                    <button onclick="changeWallpaper('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000')" class="h-16 rounded overflow-hidden border border-slate-300 hover:opacity-80">
+                                        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=300" class="w-full h-full object-cover">
+                                    </button>
+                                    <button onclick="changeWallpaper('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=2000')" class="h-16 rounded overflow-hidden border border-slate-300 hover:opacity-80">
+                                        <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=300" class="w-full h-full object-cover">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                case 'cmd':
+                    return `
+                        <div class="h-full bg-slate-950 text-emerald-400 p-3 font-mono text-xs rounded border border-slate-800 flex flex-col justify-between" onclick="document.getElementById('cmd-input').focus()">
+                            <div id="cmd-output" class="overflow-y-auto space-y-1">
+                                <div>Microsoft Windows [Version 6.1.7601] Cloud Edition</div>
+                                <div>(c) 2026 Microsoft Corporation. All rights reserved.</div>
+                                <div class="mt-2 text-slate-400">Ketik 'help' untuk daftar perintah shell cloud.</div>
+                            </div>
+                            <div class="flex items-center gap-2 mt-2 border-t border-slate-800 pt-2">
+                                <span class="text-blue-400">C:\\Users\\CloudOS&gt;</span>
+                                <input type="text" id="cmd-input" onkeydown="handleCmdInput(event)" class="bg-transparent text-emerald-400 outline-none flex-1 font-mono">
+                            </div>
+                        </div>
+                    `;
+
+                default:
+                    return `<div class="p-4 text-center text-slate-500">Aplikasi sedang memuat...</div>`;
+            }
+        }
+
+        function renderDriveFilesRows() {
+            return state.driveFiles.map((file, idx) => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-2 font-medium flex items-center gap-2">
+                        <i class="fa-solid ${getFileIcon(file.type)} text-base"></i>
+                        <span>${file.name}</span>
+                    </td>
+                    <td class="p-2 text-slate-500 uppercase text-[10px]">${file.type}</td>
+                    <td class="p-2 text-slate-500">${file.size}</td>
+                    <td class="p-2 text-slate-500">${file.date}</td>
+                    <td class="p-2 text-right">
+                        ${file.url ? `<a href="${file.url}" target="_blank" class="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded font-semibold text-[11px] inline-flex items-center gap-1"><i class="fa-solid fa-external-link text-[10px]"></i> Buka Drive</a>` : `<span class="text-slate-400 italic">File Lokal</span>`}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getFileIcon(type) {
+            switch (type) {
+                case 'sheet': return 'fa-file-excel text-emerald-600';
+                case 'pdf': return 'fa-file-pdf text-rose-600';
+                case 'image': return 'fa-file-image text-indigo-600';
+                default: return 'fa-file-lines text-slate-500';
+            }
+        }
+
+        function addDriveFilePrompt() {
+            const name = prompt('Masukkan nama file Google Drive:');
+            if (!name) return;
+            const url = prompt('Masukkan Link Google Drive (misal: https://drive.google.com/...):') || 'https://drive.google.com';
+
+            const newFile = {
+                name: name,
+                type: name.endsWith('.xlsx') ? 'sheet' : name.endsWith('.pdf') ? 'pdf' : 'text',
+                size: '1.5 MB',
+                date: new Date().toISOString().split('T')[0],
+                url: url
+            };
+
+            state.driveFiles.push(newFile);
+            localStorage.setItem('win7_drive_files', JSON.stringify(state.driveFiles));
+
+            const container = document.getElementById('drive-files-list');
+            if (container) container.innerHTML = renderDriveFilesRows();
+            showToast('File berhasil ditambahkan ke Google Drive Workspace!');
+        }
+
+        function calcPress(val) {
+            const screen = document.getElementById('calc-screen');
+            if (!screen) return;
+            if (val === 'C') {
+                screen.value = '0';
+            } else {
+                if (screen.value === '0') screen.value = val;
+                else screen.value += val;
+            }
+        }
+
+        function calcEqual() {
+            const screen = document.getElementById('calc-screen');
+            if (!screen) return;
+            try {
+                screen.value = eval(screen.value);
+            } catch (e) {
+                screen.value = 'Error';
+            }
+        }
+
+        function navigateBrowser() {
+            const input = document.getElementById('browser-url-input');
+            const iframe = document.getElementById('browser-iframe');
+            if (input && iframe) {
+                iframe.src = input.value;
+            }
+        }
+
+        function handleCmdInput(e) {
+            if (e.key === 'Enter') {
+                const input = e.target;
+                const cmd = input.value.trim().toLowerCase();
+                const output = document.getElementById('cmd-output');
+
+                const line = document.createElement('div');
+                line.className = 'text-white';
+                line.innerText = `C:\\Users\\CloudOS> ${input.value}`;
+                output.appendChild(line);
+
+                const res = document.createElement('div');
+                res.className = 'text-slate-300 mb-1';
+
+                if (cmd === 'help') {
+                    res.innerText = 'Perintah tersedia: sheet, drive, ping, ver, cls, date';
+                } else if (cmd === 'sheet') {
+                    res.innerText = `Google Sheet URL: ${state.sheetUrl || 'Belum Dikonfigurasi'}`;
+                } else if (cmd === 'drive') {
+                    res.innerText = `Total File Drive: ${state.driveFiles.length} File`;
+                } else if (cmd === 'ver') {
+                    res.innerText = 'Windows 7 Cloud OS [Version 6.1.7601]';
+                } else if (cmd === 'cls') {
+                    output.innerHTML = '';
+                    input.value = '';
+                    return;
+                } else if (cmd === 'ping') {
+                    res.innerText = 'Pinging google.com [142.250.190.46] with 32 bytes of data:\nReply from 142.250.190.46: time=14ms TTL=118';
+                } else {
+                    res.innerText = `'${cmd}' is not recognized as an internal command.`;
+                }
+
+                output.appendChild(res);
+                input.value = '';
+                output.scrollTop = output.scrollHeight;
+            }
+        }
+
+        function openConfigModal() {
+            document.getElementById('cfg-sheet-url').value = state.sheetUrl;
+            document.getElementById('cfg-drive-id').value = state.driveFolderId;
+            document.getElementById('config-modal').classList.remove('hidden');
+        }
+
+        function closeConfigModal() {
+            document.getElementById('config-modal').classList.add('hidden');
+        }
+
+        function saveGoogleConfig() {
+            const url = document.getElementById('cfg-sheet-url').value.trim();
+            const driveId = document.getElementById('cfg-drive-id').value.trim();
+
+            state.sheetUrl = url;
+            state.driveFolderId = driveId;
+
+            localStorage.setItem('win7_sheet_url', url);
+            localStorage.setItem('win7_drive_id', driveId);
+
+            closeConfigModal();
+            fetchUsersFromGoogleSheet();
+        }
+
+        function changeWallpaper(url) {
+            document.getElementById('desktop').style.backgroundImage = `url('${url}')`;
+            showToast('Wallpaper berhasil diganti!');
+        }
+
+        function toggleStartMenu(forceState) {
+            const menu = document.getElementById('start-menu');
+            if (!menu) return;
+
+            const isHidden = menu.classList.contains('hidden');
+            const shouldShow = typeof forceState === 'boolean' ? forceState : isHidden;
+
+            if (shouldShow) {
+                menu.classList.remove('hidden');
+                // Reset search & program list view
+                state.showingAllPrograms = false;
+                const searchInput = document.getElementById('start-search-input');
+                if (searchInput) searchInput.value = '';
+                const btnText = document.getElementById('all-prog-text');
+                const btnIcon = document.getElementById('all-prog-icon');
+                if (btnText) btnText.innerText = 'All Programs';
+                if (btnIcon) btnIcon.className = 'fa-solid fa-caret-right text-emerald-600 text-sm';
+                
+                renderStartMenuApps();
+            } else {
+                menu.classList.add('hidden');
+                const shutdownMenu = document.getElementById('shutdown-popup-menu');
+                if (shutdownMenu) shutdownMenu.classList.add('hidden');
+            }
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'bg-slate-800/90 text-white text-xs px-4 py-2.5 rounded-lg border border-white/20 shadow-xl backdrop-blur flex items-center gap-2 pointer-events-auto transition-all duration-300';
+            toast.innerHTML = `<i class="fa-solid fa-bell text-blue-400"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-[-10px]');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
+
+            const timeStr = `${hours}:${minutes} ${ampm}`;
+            const dateStr = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`;
+
+            const tEl = document.getElementById('tray-time');
+            const dEl = document.getElementById('tray-date');
+            if (tEl) tEl.innerText = timeStr;
+            if (dEl) dEl.innerText = dateStr;
+        }
+
+        // Close start menu when clicking on desktop
+        document.onclick = (e) => {
+            if (!e.target.closest('#start-menu') && !e.target.closest('.start-orb') && !e.target.closest('#shutdown-popup-menu')) {
+                toggleStartMenu(false);
+            }
+        };
+
+        // Window load initialization
+        window.onload = () => {
+            renderDesktopIcons();
+            renderStartMenuApps();
+            setInterval(updateClock, 1000);
+            updateClock();
+            fetchUsersFromGoogleSheet();
+        };
+    </script>
+</body>
+</html>
