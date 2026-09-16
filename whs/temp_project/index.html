@@ -135,7 +135,10 @@
     .form-control[readonly] { background-color: #fee2e2; cursor: pointer; border-color: #fca5a5; color: #7f1d1d; font-weight: 700; }
 
     #fullPageLoader { display:none; position:fixed; inset:0; background:rgba(255,255,255,0.95); z-index: 9999; justify-content:center; align-items:center; flex-direction:column; backdrop-filter: blur(10px); }
-    #reader { width: 100%; border-radius: 20px; overflow: hidden; background: #000; }
+    #reader { width: 100%; border-radius: 20px; overflow: hidden; background: #000; position: relative; }
+    #reader video { width: 100% !important; height: auto !important; object-fit: cover; border-radius: 20px; }
+    /* Sembunyikan elemen overlay shaded region jika ada */
+    #reader #qr-shaded-region { display: none !important; }
     .login-logo { width: 100px; height: 100px; object-fit: contain; margin-bottom: 15px; }
   </style>
 </head>
@@ -161,7 +164,7 @@
               onclick="handleLogin()">Masuk Aplikasi</button>
       
       <div class="mt-4 pt-1">
-        <span class="text-muted small fw-semibold" style="font-size: 0.75rem;">&copy; 2026 Warehouse Inventory System v1</span>
+        <span class="text-muted small fw-semibold" style="font-size: 0.75rem;">&copy; 2026 Warehouse Inventory System v2</span>
       </div>
     </div>
   </div>
@@ -427,32 +430,19 @@
       if (readerEl) readerEl.innerHTML = '';
 
       try {
-        // Konfigurasi pembaca dinamis untuk QR & Barcode 1D
+        // Konfigurasi pembaca dinamis untuk QR & Barcode (Full Frame Scan tanpa bingkai/garis)
         html5QrcodeScanner = new Html5Qrcode("reader", {
           verbose: false,
           experimentalFeatures: {
-            useBarCodeDetectorIfSupported: true // Gunakan hardware akselerasi hp jika didukung
+            useBarCodeDetectorIfSupported: true // Gunakan akselerasi deteksi hardware jika didukung browser HP
           }
         });
 
-        // Hitung area scan dinamis (persegi panjang flexibel)
-        const qrboxFunction = function(viewfinderWidth, viewfinderHeight) {
-          const minEdgePercentage = 0.75; // 75% dari lebar layar
-          const minDimension = Math.min(viewfinderWidth, viewfinderHeight);
-          const qrboxSize = Math.floor(minDimension * minEdgePercentage);
-          return {
-            width: Math.max(qrboxSize, 250),
-            height: Math.max(Math.floor(qrboxSize * 0.6), 150) // Fleksibel untuk Barcode 1D & QR 2D
-          };
-        };
-
+        // Tanpa qrbox agar pemindaian dilakukan di SELURUH area layar video (Full Frame)
+        // Ini menghilangkan bingkai putih & garis hijau berkedip, serta mempermudah pembacaan kode
         const config = {
-          fps: 20,
-          qrbox: qrboxFunction,
-          aspectRatio: 1.333333,
-          videoConstraints: {
-            facingMode: { exact: "environment" } // Prioritaskan kamera belakang utama
-          }
+          fps: 10, // 10 FPS memberikan waktu pemrosesan dekode gambar yang optimal tanpa lag
+          aspectRatio: 1.333333
         };
 
         const startSuccessCallback = async (decodedText) => {
