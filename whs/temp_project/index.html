@@ -3,17 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Inventory System - QR Scanner</title>
-  
-  <!-- CSS Dependencies -->
+  <title>QR Scanner System</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- JS Dependencies -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- HTML5-QRCode untuk Fitur Scan Barcode/QR Code -->
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-
   <style>
     :root {
       --primary-red: #dc2626;
@@ -54,19 +50,8 @@
       overflow: hidden;
     }
 
-    #loginPage { 
-      background: linear-gradient(135deg, var(--dark-red) 0%, var(--primary-red) 100%); 
-      justify-content: center; 
-      padding: 20px; 
-      z-index: 5; 
-    }
-    .login-card { 
-      background: white; 
-      border-radius: 36px; 
-      padding: 40px 30px; 
-      width: 100%; 
-      box-shadow: 0 25px 50px rgba(0,0,0,0.25); 
-    }
+    #loginPage { background: linear-gradient(135deg, var(--dark-red) 0%, var(--primary-red) 100%); justify-content: center; padding: 20px; z-index: 5; }
+    .login-card { background: white; border-radius: 40px; padding: 45px 35px; width: 100%; box-shadow: 0 25px 50px rgba(0,0,0,0.2); }
 
     .header-section { 
       position: absolute; top: 0; left: 0; width: 100%; height: var(--header-height);
@@ -74,10 +59,7 @@
       -webkit-backdrop-filter: blur(15px); border-bottom-left-radius: 35px; border-bottom-right-radius: 35px; 
       box-shadow: 0 4px 20px rgba(220, 38, 38, 0.08); z-index: 1010; display: flex; flex-direction: column; justify-content: center; 
     }
-    .btn-header-action { 
-      background: #fee2e2; border: none; color: var(--dark-red); width: 42px; height: 42px; 
-      border-radius: 14px; display: flex; align-items: center; justify-content: center; transition: 0.2s; 
-    }
+    .btn-header-action { background: #fee2e2; border: none; color: var(--dark-red); width: 42px; height: 42px; border-radius: 14px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
     .btn-header-action:active { transform: scale(0.9); background: #fca5a5; }
 
     .scrollable-content {
@@ -111,9 +93,9 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 1.6rem;
       flex-shrink: 0;
-      background: #fee2e2;
-      color: var(--dark-red);
     }
+
+    .bg-soft-red { background: #fee2e2; color: var(--dark-red); }
 
     .bottom-nav { 
       position: absolute; bottom: 0; left: 0; width: 100%; height: calc(var(--nav-height) + var(--safe-area-bottom)); 
@@ -128,45 +110,15 @@
 
     .modal-dialog { position: fixed !important; bottom: 0 !important; margin: 0 !important; width: 100% !important; max-width: var(--app-max-width) !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 5001; }
     .modal-content { border-radius: 40px 40px 0 0 !important; border: none; padding-bottom: calc(20px + var(--safe-area-bottom)); max-height: 92dvh; overflow-y: auto; scrollbar-width: none; box-shadow: 0 -15px 50px rgba(153, 27, 27, 0.15); }
-    .modal-handle { width: 50px; height: 6px; background: #e2e8f0; border-radius: 10px; margin: 15px auto 20px; flex-shrink: 0; }
+    .modal-handle { width: 50px; height: 6px; background: #e2e8f0; border-radius: 10px; margin: 15px auto 25px; flex-shrink: 0; }
     
     .form-control { border-radius: 20px; border: 2px solid #f1f5f9; padding: 15px 20px; font-size: 1rem; background-color: #f8fafc; font-weight: 500; }
     .form-control:focus { border-color: var(--primary-red); background-color: #fff; box-shadow: 0 0 0 5px rgba(220, 38, 38, 0.1); }
-    .form-control[readonly] { background-color: #fee2e2; cursor: pointer; border-color: #fca5a5; color: #7f1d1d; font-weight: 700; }
+    .form-control[readonly] { background-color: #fee2e2; cursor: not-allowed; border-color: #fca5a5; }
 
     #fullPageLoader { display:none; position:fixed; inset:0; background:rgba(255,255,255,0.95); z-index: 9999; justify-content:center; align-items:center; flex-direction:column; backdrop-filter: blur(10px); }
-    #reader { width: 100%; border-radius: 20px; overflow: hidden; background: #000; position: relative; min-height: 260px; }
-    #reader video { width: 100% !important; height: 100% !important; object-fit: contain !important; border-radius: 20px; }
-    /* Sembunyikan elemen overlay shaded region bawaan library jika ada */
-    #reader #qr-shaded-region { display: none !important; }
-    
-    /* Target Overlay & Laser Animation untuk Panduan Pemindaian Presisi */
-    .scanner-overlay-box {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 220px; height: 220px;
-      border: 3px solid #dc2626;
-      border-radius: 20px;
-      box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.45);
-      pointer-events: none;
-      z-index: 10;
-    }
-    .scanner-laser {
-      position: absolute;
-      top: 10%; left: 8%; right: 8%;
-      height: 3px;
-      background: #ef4444;
-      box-shadow: 0 0 12px #ef4444, 0 0 4px #f87171;
-      border-radius: 2px;
-      animation: scanLaserAnim 1.8s infinite ease-in-out;
-    }
-    @keyframes scanLaserAnim {
-      0%, 100% { top: 10%; }
-      50% { top: 88%; }
-    }
-    
-    .login-logo { width: 100px; height: 100px; object-fit: contain; margin-bottom: 15px; }
+    #reader { width: 100%; border-radius: 20px; overflow: hidden; background: #000; }
+    .login-logo { width: 110px; height: 110px; object-fit: contain; margin-bottom: 15px; }
   </style>
 </head>
 <body>
@@ -176,35 +128,36 @@
     <p class="mt-3 fw-bold small text-danger text-uppercase" style="letter-spacing: 1px;">Memproses Data...</p>
   </div>
 
-  <!-- LOGIN PAGE -->
+  <!-- HALAMAN LOGIN -->
   <div id="loginPage">
     <div class="login-card text-center">
-      <img src="https://muhardian.eu.org/whs/sf_logo.png" alt="Logo System" class="login-logo mx-auto d-block">
-      <h3 class="fw-800 mb-1" style="letter-spacing: -1.5px; font-weight: 800; color: var(--dark-red);">INVENTORY SYSTEM</h3>
-      <p class="text-muted small mb-4">QR & BARCODE SCANNER</p>
-      
-      <input type="text" id="username" class="form-control mb-3" placeholder="Username" value="admin">
-      <input type="password" id="password" class="form-control mb-4" placeholder="Password" value="admin">
-      
+      <img src="https://muhardian.eu.org/whs/sf_logo.png" alt="Logo System" class="login-logo mx-auto d-block" onerror="this.src='https://cdn-icons-png.flaticon.com/512/6831/6831000.png'">
+      <h3 class="fw-800 mb-1" style="letter-spacing: -1.5px; font-weight: 800; color: var(--dark-red);">SCANNER SYSTEM</h3>
+      <p class="text-muted small mb-4">Masuk untuk Memulai Scan</p>
+      <input type="text" id="username" class="form-control mb-3" placeholder="Username">
+      <input type="password" id="password" class="form-control mb-4" placeholder="Password">
       <button class="btn btn-danger w-100 rounded-pill py-3 fw-bold shadow-lg" 
               style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%); border: none; font-size: 1.1rem;"
               onclick="handleLogin()">Masuk Aplikasi</button>
       
+      <!-- FOOTER COPYRIGHT LOGIN -->
       <div class="mt-4 pt-1">
-        <span class="text-muted small fw-semibold" style="font-size: 0.75rem;">&copy; 2026 Warehouse Inventory System v5</span>
+        <a href="https://muhardian.eu.org" target="_blank" rel="noopener noreferrer" class="text-decoration-none text-muted small fw-semibold" style="font-size: 0.75rem;">
+          &copy; 2026
+        </a>
       </div>
     </div>
   </div>
 
+  <!-- APLIKASI UTAMA -->
   <div id="mainApp" class="d-none">
-    <!-- HEADER -->
     <div class="header-section">
       <div class="d-flex justify-content-between align-items-center">
         <div class="ps-1">
-          <h2 class="fw-bold m-0" id="currentTitle" style="font-size: 1.5rem; letter-spacing: -0.8px; color: var(--dark-red);">Menu Inventory</h2>
+          <h2 class="fw-bold m-0" id="currentTitle" style="font-size: 1.5rem; letter-spacing: -0.8px; color: var(--dark-red);">Menu Scanner</h2>
           <div class="d-flex align-items-center gap-2 mt-1">
             <div style="width: 8px; height: 8px; background: var(--primary-red); border-radius: 50%; box-shadow: 0 0 10px var(--primary-red);"></div>
-            <p class="text-muted small fw-bold text-uppercase m-0" id="userGreeting" style="font-size: 0.65rem; letter-spacing: 0.8px;">OPERATOR WAREHOUSE : ADMIN</p>
+            <p class="text-muted small fw-bold text-uppercase m-0" id="userGreeting" style="font-size: 0.65rem; letter-spacing: 0.8px;">OPERATOR : ADMIN</p>
           </div>
         </div>
         <div class="d-flex gap-2">
@@ -213,89 +166,65 @@
       </div>
     </div>
 
-    <!-- CONTENT AREA -->
     <div class="scrollable-content" id="appContentArea">
-      <!-- DASHBOARD HOME MENU -->
+      <!-- DASHBOARD MENU UTAMA -->
       <div id="page-home">
-        <p class="text-muted small fw-bold mb-3 uppercase" style="letter-spacing: 0.5px;">MODUL UTAMA</p>
+        <p class="text-muted small fw-bold mb-3 uppercase" style="letter-spacing: 0.5px;">PILIH FITUR</p>
         
         <!-- MENU SCANNER -->
-        <div class="menu-card" onclick="openInventoryModal('SCANNER')">
-          <div class="menu-icon-box">
+        <div class="menu-card" onclick="openScannerModal()">
+          <div class="menu-icon-box bg-soft-red">
             <i class="fa-solid fa-qrcode"></i>
           </div>
           <div>
             <h5 class="fw-bold m-0 text-dark">SCANNER</h5>
-            <small class="text-muted">Pindai QR / Barcode & Simpan Ke Database</small>
+            <small class="text-muted">Proses Scan QR / Barcode</small>
           </div>
         </div>
       </div>
 
-      <!-- HISTORY TAB -->
+      <!-- RIWAYAT TRANSAKSI -->
       <div id="page-history" class="d-none">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h6 class="fw-bold text-muted m-0">RIWAYAT SCAN DATA</h6>
-          <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="exportToCSV()"><i class="fa-solid fa-file-csv me-1"></i> Export CSV</button>
-        </div>
-
-        <div class="input-group mb-3">
-          <span class="input-group-text bg-white border-0 shadow-sm rounded-start-4 ps-3"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
-          <input type="text" id="historySearchInput" class="form-control border-0 shadow-sm rounded-end-4" placeholder="Cari barcode / PIC..." onkeyup="filterHistory()">
-        </div>
-
-        <div id="historySummaryCard" class="mb-3 p-3 bg-white rounded-4 shadow-sm border-start border-4 border-danger d-flex justify-content-between align-items-center">
-          <div>
-            <span class="text-muted small d-block">Total Data Tersimpan</span>
-            <h4 class="fw-bold m-0 text-danger" id="totalScanCount">0 Items</h4>
-          </div>
-          <button class="btn btn-light btn-sm rounded-circle shadow-sm" onclick="loadHistorySummary()" title="Refresh"><i class="fa-solid fa-rotate-right text-danger"></i></button>
-        </div>
-
+        <h6 class="fw-bold text-muted mb-3">RIWAYAT SCAN</h6>
         <div id="historyContent"></div>
       </div>
     </div>
 
     <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
-      <a href="#" class="nav-item-custom active" id="navHome" onclick="showPage('home', this, 'Menu Inventory')"><i class="fa-solid fa-cubes"></i><span>Menu</span></a>
-      <a href="#" class="nav-item-custom" id="navHistory" onclick="showPage('history', this, 'Riwayat Transaksi')"><i class="fa-solid fa-clock-rotate-left"></i><span>Riwayat</span></a>
+      <a href="#" class="nav-item-custom active" id="navHome" onclick="showPage('home', this, 'Menu Scanner')"><i class="fa-solid fa-qrcode"></i><span>Scanner</span></a>
+      <a href="#" class="nav-item-custom" id="navHistory" onclick="showPage('history', this, 'Riwayat Scan')"><i class="fa-solid fa-clock-rotate-left"></i><span>Riwayat</span></a>
     </nav>
   </div>
 
-  <!-- MODAL SCANNER -->
-  <div class="modal fade" id="inventoryModal" tabindex="-1" aria-hidden="true">
+  <!-- MODAL FORM & SCANNER BARCODE / QR CODE -->
+  <div class="modal fade" id="scannerModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-handle"></div>
         <div class="modal-body p-4 pt-0">
-          <h4 class="fw-800 mb-1" id="modalTypeTitle" style="font-weight: 800; letter-spacing: -0.5px; color: var(--dark-red);">SCANNER</h4>
-          <p class="text-muted small mb-3" id="modalInstruction">Arahkan kamera ke QR / Barcode. Hasil scan akan tersimpan di kolom.</p>
+          <h4 class="fw-800 mb-1" style="font-weight: 800; letter-spacing: -0.5px; color: var(--dark-red);">SCANNER</h4>
+          <p class="text-muted small mb-3">Arahkan kamera ke QR Code / Barcode.</p>
           
-          <!-- AREA SCANNER KAMERA -->
-          <div id="scannerSection" class="mb-3 d-none position-relative">
+          <!-- AREA SCANNER CAMERA -->
+          <div id="scannerSection" class="mb-3 d-none">
             <div id="reader"></div>
-            <div class="scanner-overlay-box">
-              <div class="scanner-laser"></div>
-            </div>
             <button class="btn btn-sm btn-secondary w-100 mt-2 rounded-pill" onclick="stopScanner()">Tutup Kamera Scanner</button>
           </div>
 
           <!-- FORM SCANNER -->
-          <form id="stuffingForm">
+          <form id="scannerForm">
             <div class="mb-3">
-              <label class="form-label fw-bold small text-uppercase">HASIL SCAN QR / BARCODE</label>
+              <label class="form-label fw-bold small">HASIL SCAN BARCODE / QR CODE</label>
               <div class="input-group">
-                <input type="text" id="stuffingBarcode" class="form-control" placeholder="Tekan Scan atau izinkan kamera" required readonly>
-                <button class="btn btn-danger px-3 fw-bold" type="button" onclick="startScanner('stuffingBarcode')"><i class="fa-solid fa-qrcode me-1"></i> Scan Ulang</button>
+                <input type="text" id="scanResult" class="form-control" placeholder="Hasil Scan" required readonly>
+                <button class="btn btn-danger" type="button" onclick="startScanner()"><i class="fa-solid fa-qrcode me-1"></i> Scan</button>
               </div>
             </div>
 
-            <!-- SIMULASI DUMMY FOR TESTING -->
-            <button type="button" class="btn btn-sm btn-light text-muted w-100 rounded-pill mb-3" onclick="simulateScanResult()"><i class="fa-solid fa-vial me-1"></i> Simulasi Scan Random Code</button>
-
             <button type="submit" class="btn btn-danger w-100 rounded-pill py-3 fw-bold shadow-lg mb-2" 
                     style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%); border: none; font-size: 1.1rem;">
-              SIMPAN SCAN
+              SIMPAN
             </button>
           </form>
         </div>
@@ -305,28 +234,15 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // URL Web App Google Apps Script
     let API_URL = "https://script.google.com/macros/s/AKfycbxmU7HK1ey_ap49ClTac_OPWKZ_u1IxWcBG6em7xHqcMRfAMeGgUai_ZaWsCg-Pvuj8/exec";
 
     let currentUser = null;
-    let activeModule = 'SCANNER';
     let dbHistory = [];
     let html5QrcodeScanner = null;
 
-    // Local Storage Backup Handler
-    function saveLocalHistory() {
-      localStorage.setItem('local_inventory_db', JSON.stringify(dbHistory));
-    }
-
-    function loadLocalHistory() {
-      const saved = localStorage.getItem('local_inventory_db');
-      if (saved) {
-        try { dbHistory = JSON.parse(saved); } catch(e) { dbHistory = []; }
-      }
-    }
-
+    // --- API CALL HANDLER ---
     async function apiCall(action, payload = {}) {
-      if (API_URL && API_URL.trim() !== "" && !API_URL.includes("ENTER_YOUR_SCRIPT")) {
+      if (API_URL && API_URL.trim() !== "" && !API_URL.includes("AKfycbx...")) {
         try {
           const res = await fetch(API_URL, {
             method: 'POST',
@@ -336,52 +252,42 @@
           return await res.json();
         } catch (err) {
           console.error("API Call error:", err);
+          return { success: false, message: "Gagal menghubungkan ke server." };
         }
       }
 
-      // Offline / Local Simulation Mode
+      // Offline / Mock Simulation Mode
       return new Promise((resolve) => {
         setTimeout(() => {
           if (action === 'loginUser') {
-            if (payload.username && payload.password) {
-              resolve({ success: true, user: { username: payload.username, fullname: payload.username.toUpperCase() } });
+            if (payload.username === 'admin' && payload.password === 'admin') {
+              resolve({ success: true, user: { username: 'admin', fullname: 'Admin' } });
             } else {
-              resolve({ success: false, message: 'Username dan password wajib diisi!' });
+              resolve({ success: false, message: 'Username atau password salah!' });
             }
           } else if (action === 'saveInventory') {
-            const cleanBarcode = (payload.barcode || '').trim();
-            const isDuplicate = dbHistory.some(i => i.barcode && i.barcode.trim().toLowerCase() === cleanBarcode.toLowerCase());
-            
-            if (isDuplicate) {
-              resolve({ success: false, message: `Duplikat Scan! Barcode "${cleanBarcode}" sudah pernah di-scan sebelumnya.` });
-              return;
-            }
-
-            const newItem = {
+            dbHistory.unshift({
               id: Date.now(),
               type: 'SCANNER',
-              barcode: payload.barcode || 'NO-BARCODE',
-              location: payload.location || '-',
+              barcode: payload.barcode || 'QR-CODE',
               pic: payload.pic || 'admin',
               timestamp: new Date().toLocaleString('id-ID')
-            };
-            dbHistory.unshift(newItem);
-            saveLocalHistory();
-            resolve({ success: true, item: newItem });
+            });
+            resolve({ success: true });
           } else if (action === 'getHistory') {
-            loadLocalHistory();
             resolve({ success: true, history: dbHistory });
           } else {
             resolve({ success: true });
           }
-        }, 350);
+        }, 300);
       });
     }
 
+    // --- OTENTIKASI ---
     async function handleLogin() {
-      const u = document.getElementById('username').value.trim();
-      const p = document.getElementById('password').value.trim();
-      if (!u || !p) return Swal.fire('Peringatan', 'Lengkapi username dan password', 'warning');
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
+      if (!u || !p) return Swal.fire('Oops', 'Lengkapi username dan password', 'warning');
       
       showLoader('OTENTIKASI...');
       const res = await apiCall('loginUser', { username: u, password: p });
@@ -400,7 +306,7 @@
         document.getElementById('loginPage').classList.add('d-none'); 
         document.getElementById('mainApp').classList.remove('d-none'); 
         updateUserUI();
-        showPage('home', document.getElementById('navHome'), 'Menu Inventory'); 
+        showPage('home', document.getElementById('navHome'), 'Menu Scanner'); 
       } else { 
         document.getElementById('loginPage').classList.remove('d-none'); 
         document.getElementById('mainApp').classList.add('d-none'); 
@@ -409,289 +315,133 @@
 
     function updateUserUI() {
       if (currentUser) {
-        document.getElementById('userGreeting').innerText = `OPERATOR WAREHOUSE : ${currentUser.username.toUpperCase()}`;
+        document.getElementById('userGreeting').innerText = `OPERATOR : ${currentUser.username.toUpperCase()}`;
       }
     }
 
     function logout() { currentUser = null; checkLoginState(); }
 
+    // --- NAVIGASI ---
     function showPage(p, el, title) {
       if (title) document.getElementById('currentTitle').innerText = title;
       document.querySelectorAll('[id^="page-"]').forEach(pg => pg.classList.add('d-none'));
       document.getElementById('page-'+p).classList.remove('d-none');
       document.querySelectorAll('.nav-item-custom').forEach(n => n.classList.remove('active'));
       if (el) el.classList.add('active');
-      if (p === 'history') loadHistorySummary();
+      if (p === 'history') loadHistory();
     }
 
-    async function openInventoryModal(moduleType = 'SCANNER') {
-      activeModule = moduleType;
-      document.getElementById('modalTypeTitle').innerText = 'SCANNER';
+    // --- SCANNER MODAL ---
+    async function openScannerModal() {
       await stopScanner();
+      const form = document.getElementById('scannerForm');
+      form.reset();
 
-      const res = await apiCall('getHistory');
-      if (res && res.success) {
-        dbHistory = res.history || [];
-      }
-
-      const stuffingForm = document.getElementById('stuffingForm');
-      stuffingForm.reset();
-      document.getElementById('modalInstruction').innerText = 'Arahkan kamera ke QR / Barcode. Hasil scan akan tersimpan di kolom.';
-
-      const modalEl = document.getElementById('inventoryModal');
+      const modalEl = document.getElementById('scannerModal');
       const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
       modalInstance.show();
-
-      // Directly open camera when modal shows up
-      setTimeout(() => {
-        startScanner('stuffingBarcode');
-      }, 350);
     }
 
-    async function startScanner(targetField) {
-      // Pastikan scanner sebelumnya telah benar-benar berhenti
+    async function startScanner() {
       await stopScanner();
+      document.getElementById('scannerSection').classList.remove('d-none');
       
-      const scannerSec = document.getElementById('scannerSection');
-      if (scannerSec) scannerSec.classList.remove('d-none');
-
-      // Bersihkan kontainer DOM reader agar tidak tertumpuk
-      const readerEl = document.getElementById('reader');
-      if (readerEl) readerEl.innerHTML = '';
-
       try {
         html5QrcodeScanner = new Html5Qrcode("reader");
-
-        // Konfigurasi optimal: Crop region (qrbox) super cepat + Rasio Asli tanpa Distorsi
-        const config = {
-          fps: 15,
-          qrbox: (viewfinderWidth, viewfinderHeight) => {
-            const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-            const edgeSize = Math.max(Math.floor(minEdge * 0.72), 180);
-            return { width: edgeSize, height: edgeSize };
+        await html5QrcodeScanner.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 250, height: 250 } },
+          async (decodedText) => {
+            await stopScanner();
+            document.getElementById('scanResult').value = decodedText;
+            Swal.fire({ toast: true, position: 'top', icon: 'success', title: 'QR/Barcode Terbaca!', showConfirmButton: false, timer: 1200 });
           },
-          aspectRatio: 1.0
-        };
-
-        const startSuccessCallback = async (decodedText) => {
-          handleScanSuccess(decodedText);
-        };
-
-        const startErrorCallback = () => {};
-
-        // Jalankan kamera belakang HP secara optimal
-        try {
-          await html5QrcodeScanner.start(
-            { facingMode: { ideal: "environment" } },
-            config,
-            startSuccessCallback,
-            startErrorCallback
-          );
-        } catch (eEnv) {
-          console.warn("Fallback ke mode kamera standar...", eEnv);
-          await html5QrcodeScanner.start(
-            { facingMode: "user" },
-            config,
-            startSuccessCallback,
-            startErrorCallback
-          );
-        }
-
+          () => {}
+        );
       } catch (err) {
-        console.error("Kamera tidak dapat diakses:", err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Akses Kamera Gagal',
-          text: 'Pastikan Anda telah memberikan izin kamera pada browser dan menggunakan koneksi HTTPS.',
-          confirmButtonColor: '#dc2626'
-        });
-        if (scannerSec) scannerSec.classList.add('d-none');
-      }
-    }
-
-    async function handleScanSuccess(decodedText) {
-      const cleanCode = decodedText.trim();
-      
-      // Duplicate detection check
-      const isDuplicate = dbHistory.some(item => 
-        item.barcode && item.barcode.trim().toLowerCase() === cleanCode.toLowerCase()
-      );
-
-      if (isDuplicate) {
+        console.error("Scanner error:", err);
+        const simulatedCode = 'SCAN-' + Math.floor(100000 + Math.random() * 900000);
         await stopScanner();
-        const inputEl = document.getElementById('stuffingBarcode');
-        if (inputEl) inputEl.value = '';
-
-        Swal.fire({
-          icon: 'error',
-          title: 'Duplikat Scan!',
-          text: `Barcode / QR Code "${cleanCode}" SUDAH PERNAH DI-SCAN sebelumnya!`,
-          confirmButtonColor: '#dc2626',
-          confirmButtonText: 'Mengerti'
-        });
-        return;
+        document.getElementById('scanResult').value = simulatedCode;
+        Swal.fire('Simulasi Scan', 'Berhasil mengisi data dummy: ' + simulatedCode, 'info');
       }
-
-      // Hentikan kamera dengan aman setelah scan sukses
-      await stopScanner();
-      
-      // Set nilai barcode ke field input
-      const inputEl = document.getElementById('stuffingBarcode');
-      if (inputEl) {
-        inputEl.value = cleanCode;
-      }
-
-      Swal.fire({ 
-        toast: true, 
-        position: 'top', 
-        icon: 'success', 
-        title: 'Barcode/QR Terbaca!', 
-        text: 'Hasil scan tersimpan di kolom. Klik SIMPAN SCAN untuk melanjutkan.',
-        showConfirmButton: false, 
-        timer: 2000 
-      });
-    }
-
-    function simulateScanResult() {
-      const simulatedCode = 'SCAN-' + Math.floor(100000 + Math.random() * 900000);
-      handleScanSuccess(simulatedCode);
     }
 
     async function stopScanner() {
       if (html5QrcodeScanner) {
         try {
-          // Periksa state scanner sebelum memanggil stop()
-          const state = html5QrcodeScanner.getState();
-          if (state === 2 || state === 3) { // 2 = SCANNING, 3 = PAUSED
-            await html5QrcodeScanner.stop();
-          }
+          await html5QrcodeScanner.stop();
           html5QrcodeScanner.clear();
         } catch (err) {
-          console.warn("Stop scanner warning:", err);
+          // Ignore error jika sudah terhenti
         }
         html5QrcodeScanner = null;
       }
-      
       const scannerSec = document.getElementById('scannerSection');
       if (scannerSec) scannerSec.classList.add('d-none');
-      
-      const readerEl = document.getElementById('reader');
-      if (readerEl) readerEl.innerHTML = '';
     }
 
-    document.getElementById('stuffingForm').onsubmit = async function(e) {
+    // --- SUBMIT FORM SCANNER ---
+    document.getElementById('scannerForm').onsubmit = async function(e) {
       e.preventDefault();
       await stopScanner();
 
-      const barcodeVal = document.getElementById('stuffingBarcode').value.trim();
+      const barcodeVal = document.getElementById('scanResult').value.trim();
       if (!barcodeVal) {
-        return Swal.fire({ icon: 'warning', title: 'Barcode/QR Kosong', text: 'Harap lakukan Scan Barcode / QR Code terlebih dahulu.', confirmButtonColor: '#dc2626' });
-      }
-
-      const isDuplicate = dbHistory.some(item => 
-        item.barcode && item.barcode.trim().toLowerCase() === barcodeVal.toLowerCase()
-      );
-
-      if (isDuplicate) {
-        return Swal.fire({
-          icon: 'error',
-          title: 'Duplikat Scan!',
-          text: `Data dengan Barcode / QR Code "${barcodeVal}" sudah pernah tersimpan dalam sistem.`,
-          confirmButtonColor: '#dc2626'
-        });
+        return Swal.fire('QR Kosong', 'Harap lakukan Scan QR Code/Barcode terlebih dahulu.', 'warning');
       }
 
       const payload = {
         type: 'SCANNER',
         barcode: barcodeVal,
-        location: '-',
         pic: currentUser ? currentUser.username : 'admin'
       };
 
-      bootstrap.Modal.getInstance(document.getElementById('inventoryModal')).hide();
-      showLoader('Menyimpan Data Scan...');
+      bootstrap.Modal.getInstance(document.getElementById('scannerModal')).hide();
+      Swal.fire({ title: 'Menyimpan...', didOpen: () => Swal.showLoading() });
 
       const res = await apiCall('saveInventory', payload);
-      hideLoader();
-
       if (res.success) {
         Swal.fire({ icon: 'success', title: 'Berhasil Disimpan', timer: 1500, showConfirmButton: false });
-        loadHistorySummary();
       } else {
-        Swal.fire({ icon: 'error', title: 'Gagal Menyimpan', text: res.message || 'Terjadi kesalahan', confirmButtonColor: '#dc2626' });
+        Swal.fire('Gagal Menyimpan', res.message || 'Terjadi kesalahan', 'error');
       }
     };
 
-    async function loadHistorySummary() {
-      showLoader('Memuat Riwayat...');
+    // --- RIWAYAT SCAN ---
+    async function loadHistory() {
       const res = await apiCall('getHistory');
-      hideLoader();
-
       if (res.success) {
-        dbHistory = res.history || [];
-        renderHistoryList(dbHistory);
+        const list = res.history || [];
+        let html = '';
+        list.forEach(item => {
+          html += `
+            <div class="card border-0 shadow-sm rounded-4 mb-3 p-3" style="background: white;">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge bg-danger fw-bold" style="font-size:0.7rem">${item.type || 'SCANNER'}</span>
+                <small class="text-muted fw-bold" style="font-size:0.7rem">${item.timestamp}</small>
+              </div>
+              <h6 class="fw-bold mb-1">${item.barcode}</h6>
+              <div class="text-muted small">PIC: <b class="text-danger">${item.pic || '-'}</b></div>
+            </div>`;
+        });
+        document.getElementById('historyContent').innerHTML = html || '<div class="text-center py-5 text-muted">Belum ada riwayat scan</div>';
       }
     }
 
-    function renderHistoryList(list) {
-      document.getElementById('totalScanCount').innerText = `${list.length} Items`;
-      let html = '';
-
-      list.forEach(item => {
-        html += `
-          <div class="card border-0 shadow-sm rounded-4 mb-3 p-3" style="background: white;">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="badge bg-danger fw-bold" style="font-size:0.7rem">${item.type || 'SCANNER'}</span>
-              <small class="text-muted fw-bold" style="font-size:0.7rem">${item.timestamp}</small>
-            </div>
-            <h6 class="fw-bold mb-1 text-dark" style="word-break: break-all;">${item.barcode}</h6>
-            <div class="text-muted small">PIC Operator: <b class="text-danger">${item.pic || '-'}</b></div>
-          </div>`;
-      });
-
-      document.getElementById('historyContent').innerHTML = html || '<div class="text-center py-5 text-muted small">Belum ada riwayat scan data</div>';
-    }
-
-    function filterHistory() {
-      const q = document.getElementById('historySearchInput').value.toLowerCase();
-      const filtered = dbHistory.filter(i => 
-        (i.barcode && i.barcode.toLowerCase().includes(q)) || 
-        (i.pic && i.pic.toLowerCase().includes(q))
-      );
-      renderHistoryList(filtered);
-    }
-
-    function exportToCSV() {
-      if (!dbHistory || dbHistory.length === 0) {
-        return Swal.fire('Export Gagal', 'Tidak ada data untuk diexport.', 'warning');
-      }
-
-      let csv = 'ID,Type,Barcode,PIC,Timestamp\n';
-      dbHistory.forEach(r => {
-        csv += `"${r.id}","${r.type || 'SCANNER'}","${r.barcode}","${r.pic}","${r.timestamp}"\n`;
-      });
-
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", `Inventory_Scan_Export_${Date.now()}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
+    // --- UTILS ---
     function showLoader(m) { const l = document.getElementById('fullPageLoader'); if (l) { l.querySelector('p').innerText = m || 'LOADING...'; l.style.display = 'flex'; } }
     function hideLoader() { const l = document.getElementById('fullPageLoader'); if (l) l.style.display = 'none'; }
 
     document.addEventListener('DOMContentLoaded', () => {
-      loadLocalHistory();
       checkLoginState();
 
-      const invModalEl = document.getElementById('inventoryModal');
-      if (invModalEl) {
-        invModalEl.addEventListener('hidden.bs.modal', async () => {
+      const scannerModalEl = document.getElementById('scannerModal');
+      if (scannerModalEl) {
+        scannerModalEl.addEventListener('hidden.bs.modal', async () => {
           await stopScanner();
+          const form = document.getElementById('scannerForm');
+          if (form) form.reset();
         });
       }
     });
