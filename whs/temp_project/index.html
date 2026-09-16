@@ -164,7 +164,7 @@
               onclick="handleLogin()">Masuk Aplikasi</button>
       
       <div class="mt-4 pt-1">
-        <span class="text-muted small fw-semibold" style="font-size: 0.75rem;">&copy; 2026 Warehouse Inventory System v2</span>
+        <span class="text-muted small fw-semibold" style="font-size: 0.75rem;">&copy; 2026 Warehouse Inventory System v3</span>
       </div>
     </div>
   </div>
@@ -430,19 +430,31 @@
       if (readerEl) readerEl.innerHTML = '';
 
       try {
-        // Konfigurasi pembaca dinamis untuk QR & Barcode (Full Frame Scan tanpa bingkai/garis)
+        // Konfigurasi pembaca dinamis untuk QR & Barcode dengan Akselerasi Hardware Native
         html5QrcodeScanner = new Html5Qrcode("reader", {
           verbose: false,
           experimentalFeatures: {
-            useBarCodeDetectorIfSupported: true // Gunakan akselerasi deteksi hardware jika didukung browser HP
+            useBarCodeDetectorIfSupported: true // Gunakan akselerasi deteksi hardware bawaan browser HP jika tersedia
           }
         });
 
-        // Tanpa qrbox agar pemindaian dilakukan di SELURUH area layar video (Full Frame)
-        // Ini menghilangkan bingkai putih & garis hijau berkedip, serta mempermudah pembacaan kode
+        // Tentukan format utama saja agar proses decoding super cepat tanpa membebani CPU
+        let formatsToSupport = undefined;
+        if (typeof Html5QrcodeSupportedFormats !== 'undefined') {
+          formatsToSupport = [
+            Html5QrcodeSupportedFormats.QR_CODE,
+            Html5QrcodeSupportedFormats.CODE_128,
+            Html5QrcodeSupportedFormats.CODE_39,
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.EAN_8
+          ];
+        }
+
+        // Konfigurasi performa tinggi untuk kecepatan pemindaian instan (25 FPS)
         const config = {
-          fps: 10, // 10 FPS memberikan waktu pemrosesan dekode gambar yang optimal tanpa lag
-          aspectRatio: 1.333333
+          fps: 25, 
+          aspectRatio: 1.333333,
+          ...(formatsToSupport ? { formatsToSupport } : {})
         };
 
         const startSuccessCallback = async (decodedText) => {
@@ -451,22 +463,43 @@
 
         const startErrorCallback = () => {};
 
-        // Coba jalankan dengan kamera belakang utama
+        // Opsi parameter kamera: Resolusi HD & Continuous Focus agar QR Code langsung terbaca tajam
+        const primaryConstraints = {
+          facingMode: { exact: "environment" },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          advanced: [{ focusMode: "continuous" }]
+        };
+
+        const fallbackConstraints = {
+          facingMode: "environment",
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        };
+
         try {
           await html5QrcodeScanner.start(
-            { facingMode: "environment" },
+            primaryConstraints,
             config,
             startSuccessCallback,
             startErrorCallback
           );
         } catch (e) {
-          // Fallback jika facingMode exact gagal di beberapa tipe HP
-          await html5QrcodeScanner.start(
-            { facingMode: "user" },
-            config,
-            startSuccessCallback,
-            startErrorCallback
-          );
+          try {
+            await html5QrcodeScanner.start(
+              fallbackConstraints,
+              config,
+              startSuccessCallback,
+              startErrorCallback
+            );
+          } catch (errFallback) {
+            await html5QrcodeScanner.start(
+              { facingMode: "user" },
+              config,
+              startSuccessCallback,
+              startErrorCallback
+            );
+          }
         }
 
       } catch (err) {
