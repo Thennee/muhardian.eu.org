@@ -427,25 +427,64 @@
       if (readerEl) readerEl.innerHTML = '';
 
       try {
-        html5QrcodeScanner = new Html5Qrcode("reader");
-        await html5QrcodeScanner.start(
-          { facingMode: "environment" },
-          { 
-            fps: 15, 
-            qrbox: { width: 220, height: 220 },
-            aspectRatio: 1.0
-          },
-          async (decodedText) => {
-            handleScanSuccess(decodedText);
-          },
-          () => {} // Abaikan kesalahan per frame
-        );
+        // Konfigurasi pembaca dinamis untuk QR & Barcode 1D
+        html5QrcodeScanner = new Html5Qrcode("reader", {
+          verbose: false,
+          experimentalFeatures: {
+            useBarCodeDetectorIfSupported: true // Gunakan hardware akselerasi hp jika didukung
+          }
+        });
+
+        // Hitung area scan dinamis (persegi panjang flexibel)
+        const qrboxFunction = function(viewfinderWidth, viewfinderHeight) {
+          const minEdgePercentage = 0.75; // 75% dari lebar layar
+          const minDimension = Math.min(viewfinderWidth, viewfinderHeight);
+          const qrboxSize = Math.floor(minDimension * minEdgePercentage);
+          return {
+            width: Math.max(qrboxSize, 250),
+            height: Math.max(Math.floor(qrboxSize * 0.6), 150) // Fleksibel untuk Barcode 1D & QR 2D
+          };
+        };
+
+        const config = {
+          fps: 20,
+          qrbox: qrboxFunction,
+          aspectRatio: 1.333333,
+          videoConstraints: {
+            facingMode: { exact: "environment" } // Prioritaskan kamera belakang utama
+          }
+        };
+
+        const startSuccessCallback = async (decodedText) => {
+          handleScanSuccess(decodedText);
+        };
+
+        const startErrorCallback = () => {};
+
+        // Coba jalankan dengan kamera belakang utama
+        try {
+          await html5QrcodeScanner.start(
+            { facingMode: "environment" },
+            config,
+            startSuccessCallback,
+            startErrorCallback
+          );
+        } catch (e) {
+          // Fallback jika facingMode exact gagal di beberapa tipe HP
+          await html5QrcodeScanner.start(
+            { facingMode: "user" },
+            config,
+            startSuccessCallback,
+            startErrorCallback
+          );
+        }
+
       } catch (err) {
         console.error("Kamera tidak dapat diakses:", err);
         Swal.fire({
           icon: 'error',
           title: 'Akses Kamera Gagal',
-          text: 'Pastikan Anda memberikan izin kamera pada browser dan aplikasi dijalankan di koneksi HTTPS.',
+          text: 'Pastikan Anda memberikan izin kamera pada browser, pastikan lampu/cahaya cukup, dan jalankan di HTTPS.',
           confirmButtonColor: '#dc2626'
         });
         if (scannerSec) scannerSec.classList.add('d-none');
