@@ -164,7 +164,7 @@
               onclick="handleLogin()">Masuk Aplikasi</button>
       
       <div class="mt-4 pt-1">
-        <span class="text-muted small fw-semibold" style="font-size: 0.75rem;">&copy; 2026 Warehouse Inventory System v3</span>
+        <span class="text-muted small fw-semibold" style="font-size: 0.75rem;">&copy; 2026 Warehouse Inventory System v4</span>
       </div>
     </div>
   </div>
@@ -430,15 +430,15 @@
       if (readerEl) readerEl.innerHTML = '';
 
       try {
-        // Konfigurasi pembaca dinamis untuk QR & Barcode dengan Akselerasi Hardware Native
+        // Konfigurasi pembaca dinamis untuk QR & Barcode
         html5QrcodeScanner = new Html5Qrcode("reader", {
           verbose: false,
           experimentalFeatures: {
-            useBarCodeDetectorIfSupported: true // Gunakan akselerasi deteksi hardware bawaan browser HP jika tersedia
+            useBarCodeDetectorIfSupported: true
           }
         });
 
-        // Tentukan format utama saja agar proses decoding super cepat tanpa membebani CPU
+        // Tentukan format utama saja agar proses decoding super cepat
         let formatsToSupport = undefined;
         if (typeof Html5QrcodeSupportedFormats !== 'undefined') {
           formatsToSupport = [
@@ -450,7 +450,6 @@
           ];
         }
 
-        // Konfigurasi performa tinggi untuk kecepatan pemindaian instan (25 FPS)
         const config = {
           fps: 25, 
           aspectRatio: 1.333333,
@@ -463,43 +462,48 @@
 
         const startErrorCallback = () => {};
 
-        // Opsi parameter kamera: Resolusi HD & Continuous Focus agar QR Code langsung terbaca tajam
-        const primaryConstraints = {
-          facingMode: { exact: "environment" },
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          advanced: [{ focusMode: "continuous" }]
-        };
+        // Cari daftar kamera yang tersedia terlebih dahulu untuk reliabilitas tinggi
+        try {
+          const devices = await Html5Qrcode.getCameras();
+          if (devices && devices.length > 0) {
+            // Prioritaskan kamera belakang (back / environment / rear)
+            let selectedCam = devices.find(d => 
+              d.label.toLowerCase().includes('back') || 
+              d.label.toLowerCase().includes('rear') ||
+              d.label.toLowerCase().includes('environment')
+            );
+            
+            // Jika tidak ditemukan label spesifik, gunakan kamera terakhir (biasanya kamera belakang) atau kamera pertama
+            const cameraId = selectedCam ? selectedCam.id : devices[devices.length - 1].id;
 
-        const fallbackConstraints = {
-          facingMode: "environment",
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        };
+            await html5QrcodeScanner.start(
+              cameraId,
+              config,
+              startSuccessCallback,
+              startErrorCallback
+            );
+            return;
+          }
+        } catch (eCam) {
+          console.warn("Gagal mendeteksi daftar kamera, mencoba opsi standar facingMode...", eCam);
+        }
 
+        // Fallback ke facingMode fleksibel jika getCameras tidak diizinkan / gagal
         try {
           await html5QrcodeScanner.start(
-            primaryConstraints,
+            { facingMode: "environment" },
             config,
             startSuccessCallback,
             startErrorCallback
           );
-        } catch (e) {
-          try {
-            await html5QrcodeScanner.start(
-              fallbackConstraints,
-              config,
-              startSuccessCallback,
-              startErrorCallback
-            );
-          } catch (errFallback) {
-            await html5QrcodeScanner.start(
-              { facingMode: "user" },
-              config,
-              startSuccessCallback,
-              startErrorCallback
-            );
-          }
+        } catch (errEnv) {
+          // Fallback terakhir ke kamera default/depan/webcam apa saja yang tersedia
+          await html5QrcodeScanner.start(
+            { facingMode: "user" },
+            config,
+            startSuccessCallback,
+            startErrorCallback
+          );
         }
 
       } catch (err) {
@@ -507,7 +511,7 @@
         Swal.fire({
           icon: 'error',
           title: 'Akses Kamera Gagal',
-          text: 'Pastikan Anda memberikan izin kamera pada browser, pastikan lampu/cahaya cukup, dan jalankan di HTTPS.',
+          text: 'Pastikan Anda telah memberikan izin kamera pada browser, jalankan di protokol HTTPS, atau gunakan tombol "Simulasi Scan Random Code" untuk pengujian.',
           confirmButtonColor: '#dc2626'
         });
         if (scannerSec) scannerSec.classList.add('d-none');
