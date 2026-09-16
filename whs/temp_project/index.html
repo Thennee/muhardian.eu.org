@@ -135,10 +135,37 @@
     .form-control[readonly] { background-color: #fee2e2; cursor: pointer; border-color: #fca5a5; color: #7f1d1d; font-weight: 700; }
 
     #fullPageLoader { display:none; position:fixed; inset:0; background:rgba(255,255,255,0.95); z-index: 9999; justify-content:center; align-items:center; flex-direction:column; backdrop-filter: blur(10px); }
-    #reader { width: 100%; border-radius: 20px; overflow: hidden; background: #000; position: relative; }
-    #reader video { width: 100% !important; height: auto !important; object-fit: cover; border-radius: 20px; }
-    /* Sembunyikan elemen overlay shaded region jika ada */
+    #reader { width: 100%; border-radius: 20px; overflow: hidden; background: #000; position: relative; min-height: 260px; }
+    #reader video { width: 100% !important; height: 100% !important; object-fit: contain !important; border-radius: 20px; }
+    /* Sembunyikan elemen overlay shaded region bawaan library jika ada */
     #reader #qr-shaded-region { display: none !important; }
+    
+    /* Target Overlay & Laser Animation untuk Panduan Pemindaian Presisi */
+    .scanner-overlay-box {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 220px; height: 220px;
+      border: 3px solid #dc2626;
+      border-radius: 20px;
+      box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.45);
+      pointer-events: none;
+      z-index: 10;
+    }
+    .scanner-laser {
+      position: absolute;
+      top: 10%; left: 8%; right: 8%;
+      height: 3px;
+      background: #ef4444;
+      box-shadow: 0 0 12px #ef4444, 0 0 4px #f87171;
+      border-radius: 2px;
+      animation: scanLaserAnim 1.8s infinite ease-in-out;
+    }
+    @keyframes scanLaserAnim {
+      0%, 100% { top: 10%; }
+      50% { top: 88%; }
+    }
+    
     .login-logo { width: 100px; height: 100px; object-fit: contain; margin-bottom: 15px; }
   </style>
 </head>
@@ -164,7 +191,7 @@
               onclick="handleLogin()">Masuk Aplikasi</button>
       
       <div class="mt-4 pt-1">
-        <span class="text-muted small fw-semibold" style="font-size: 0.75rem;">&copy; 2026 Warehouse Inventory System v4</span>
+        <span class="text-muted small fw-semibold" style="font-size: 0.75rem;">&copy; 2026 Warehouse Inventory System v5</span>
       </div>
     </div>
   </div>
@@ -245,8 +272,11 @@
           <p class="text-muted small mb-3" id="modalInstruction">Arahkan kamera ke QR / Barcode. Hasil scan akan tersimpan di kolom.</p>
           
           <!-- AREA SCANNER KAMERA -->
-          <div id="scannerSection" class="mb-3 d-none">
+          <div id="scannerSection" class="mb-3 d-none position-relative">
             <div id="reader"></div>
+            <div class="scanner-overlay-box">
+              <div class="scanner-laser"></div>
+            </div>
             <button class="btn btn-sm btn-secondary w-100 mt-2 rounded-pill" onclick="stopScanner()">Tutup Kamera Scanner</button>
           </div>
 
@@ -430,30 +460,17 @@
       if (readerEl) readerEl.innerHTML = '';
 
       try {
-        // Konfigurasi pembaca dinamis untuk QR & Barcode
-        html5QrcodeScanner = new Html5Qrcode("reader", {
-          verbose: false,
-          experimentalFeatures: {
-            useBarCodeDetectorIfSupported: true
-          }
-        });
+        html5QrcodeScanner = new Html5Qrcode("reader");
 
-        // Tentukan format utama saja agar proses decoding super cepat
-        let formatsToSupport = undefined;
-        if (typeof Html5QrcodeSupportedFormats !== 'undefined') {
-          formatsToSupport = [
-            Html5QrcodeSupportedFormats.QR_CODE,
-            Html5QrcodeSupportedFormats.CODE_128,
-            Html5QrcodeSupportedFormats.CODE_39,
-            Html5QrcodeSupportedFormats.EAN_13,
-            Html5QrcodeSupportedFormats.EAN_8
-          ];
-        }
-
+        // Konfigurasi optimal: Crop region (qrbox) super cepat + Rasio Asli tanpa Distorsi
         const config = {
-          fps: 25, 
-          aspectRatio: 1.333333,
-          ...(formatsToSupport ? { formatsToSupport } : {})
+          fps: 15,
+          qrbox: (viewfinderWidth, viewfinderHeight) => {
+            const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+            const edgeSize = Math.max(Math.floor(minEdge * 0.72), 180);
+            return { width: edgeSize, height: edgeSize };
+          },
+          aspectRatio: 1.0
         };
 
         const startSuccessCallback = async (decodedText) => {
@@ -462,42 +479,16 @@
 
         const startErrorCallback = () => {};
 
-        // Cari daftar kamera yang tersedia terlebih dahulu untuk reliabilitas tinggi
-        try {
-          const devices = await Html5Qrcode.getCameras();
-          if (devices && devices.length > 0) {
-            // Prioritaskan kamera belakang (back / environment / rear)
-            let selectedCam = devices.find(d => 
-              d.label.toLowerCase().includes('back') || 
-              d.label.toLowerCase().includes('rear') ||
-              d.label.toLowerCase().includes('environment')
-            );
-            
-            // Jika tidak ditemukan label spesifik, gunakan kamera terakhir (biasanya kamera belakang) atau kamera pertama
-            const cameraId = selectedCam ? selectedCam.id : devices[devices.length - 1].id;
-
-            await html5QrcodeScanner.start(
-              cameraId,
-              config,
-              startSuccessCallback,
-              startErrorCallback
-            );
-            return;
-          }
-        } catch (eCam) {
-          console.warn("Gagal mendeteksi daftar kamera, mencoba opsi standar facingMode...", eCam);
-        }
-
-        // Fallback ke facingMode fleksibel jika getCameras tidak diizinkan / gagal
+        // Jalankan kamera belakang HP secara optimal
         try {
           await html5QrcodeScanner.start(
-            { facingMode: "environment" },
+            { facingMode: { ideal: "environment" } },
             config,
             startSuccessCallback,
             startErrorCallback
           );
-        } catch (errEnv) {
-          // Fallback terakhir ke kamera default/depan/webcam apa saja yang tersedia
+        } catch (eEnv) {
+          console.warn("Fallback ke mode kamera standar...", eEnv);
           await html5QrcodeScanner.start(
             { facingMode: "user" },
             config,
@@ -511,7 +502,7 @@
         Swal.fire({
           icon: 'error',
           title: 'Akses Kamera Gagal',
-          text: 'Pastikan Anda telah memberikan izin kamera pada browser, jalankan di protokol HTTPS, atau gunakan tombol "Simulasi Scan Random Code" untuk pengujian.',
+          text: 'Pastikan Anda telah memberikan izin kamera pada browser dan menggunakan koneksi HTTPS.',
           confirmButtonColor: '#dc2626'
         });
         if (scannerSec) scannerSec.classList.add('d-none');
