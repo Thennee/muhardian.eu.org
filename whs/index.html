@@ -38,7 +38,7 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background: radial-gradient(circle at top, #881337 0%, #30030f 60%, #110005 100%);
+            background: radial-gradient(circle at top, #be123c 0%, #881337 45%, #4c0519 85%, #28030d 100%);
             min-height: 100vh;
             overflow-x: hidden;
         }
@@ -46,9 +46,9 @@
         /* Ambient Glow Effect */
         .ambient-glow {
             position: absolute;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(225,29,72,0.35) 0%, rgba(0,0,0,0) 70%);
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle, rgba(244, 63, 94, 0.4) 0%, rgba(0,0,0,0) 70%);
             border-radius: 50%;
             pointer-events: none;
             z-index: 0;
@@ -73,6 +73,12 @@
             perspective: 1000px;
         }
 
+        .float-3d-delayed-2 {
+            animation: floatAnim 4s ease-in-out infinite 3s;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
         @keyframes floatAnim {
             0% {
                 transform: translateY(0px) rotateX(0deg) rotateY(0deg);
@@ -88,7 +94,6 @@
             }
         }
 
-        /* Card 3D Depth & Hover */
         .card-3d {
             background: linear-gradient(135deg, rgba(190, 18, 60, 0.35) 0%, rgba(76, 5, 25, 0.65) 100%);
             backdrop-filter: blur(16px);
@@ -158,20 +163,18 @@
     <div class="w-full max-w-md md:max-w-3xl lg:max-w-4xl z-10 my-auto flex flex-col items-center justify-center gap-6 md:gap-10 py-6">
         
         <!-- HEADER / LOGO 1 BLOCK -->
-        <div class="w-full flex justify-center">
-            <div class="w-full md:w-3/4 lg:w-2/3 card-3d shine rounded-2xl p-6 md:p-8 flex flex-col items-center justify-center shadow-2xl border border-red-500/30">
-                <div class="relative w-full max-w-[280px] sm:max-w-[340px] h-28 sm:h-36 flex items-center justify-center">
-                    <img 
-                        src="https://muhardian.eu.org/whs/sf_logo.png" 
-                        alt="Logo Utama" 
-                        class="max-h-full max-w-full object-contain filter drop-shadow-[0_10px_15px_rgba(0,0,0,0.5)] transition-transform duration-300 hover:scale-105"
-                        onerror="this.onerror=null; this.src='https://placehold.co/300x120/9f1239/ffffff?text=LOGO+1';"
-                    >
-                </div>
+        <div class="w-full flex justify-center py-2">
+            <div class="relative w-full max-w-[280px] sm:max-w-[360px] h-28 sm:h-36 flex items-center justify-center">
+                <img 
+                    src="https://muhardian.eu.org/whs/sf_logo.png" 
+                    alt="Logo Utama" 
+                    class="max-h-full max-w-full object-contain filter drop-shadow-[0_10px_15px_rgba(0,0,0,0.5)] transition-transform duration-300 hover:scale-105"
+                    onerror="this.onerror=null; this.src='https://placehold.co/300x120/9f1239/ffffff?text=LOGO+1';"
+                >
             </div>
         </div>
 
-        <!-- MAIN BUTTONS / CARD SECTIONS (LOGO 2 & LOGO 3) -->
+        <!-- MAIN BUTTONS / CARD SECTIONS -->
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 px-2">
             
             <!-- CARD 1: STUFFING (Logo 2) -->
@@ -195,25 +198,54 @@
                 </button>
             </div>
 
-            <!-- CARD 2: ATTENDANCE (Logo 3) -->
-            <div 
-                id="btnAttendance" 
-                onclick="handleButtonClick('Attendance', 'https://muhardian.eu.org/whs/att')" 
-                class="float-3d-delayed card-3d shine rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-between cursor-pointer group select-none min-h-[240px] sm:min-h-[280px]"
-            >
-                <div class="w-full flex-1 flex items-center justify-center p-2 mb-4">
-                    <img 
-                        src="https://muhardian.eu.org/whs/logo_att.png" 
-                        alt="Logo Attendance" 
-                        class="max-h-28 sm:max-h-36 w-auto object-contain filter drop-shadow-[0_8px_12px_rgba(0,0,0,0.4)] group-hover:scale-110 transition-transform duration-300"
-                        onerror="this.onerror=null; this.src='https://placehold.co/200x150/be123c/ffffff?text=ATTENDANCE+LOGO';"
-                    >
+            <!-- COLUMN CONTAINING ATTENDANCE AND TEMP PROJECT BELOW IT -->
+            <div class="flex flex-col gap-6 sm:gap-8">
+                <!-- CARD 2: ATTENDANCE (Logo 3) -->
+                <div 
+                    id="btnAttendance" 
+                    onclick="handleButtonClick('Attendance', 'https://muhardian.eu.org/whs/att')" 
+                    class="float-3d-delayed card-3d shine rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-between cursor-pointer group select-none min-h-[240px] sm:min-h-[280px]"
+                >
+                    <div class="w-full flex-1 flex items-center justify-center p-2 mb-4">
+                        <img 
+                            src="https://muhardian.eu.org/whs/logo_att.png" 
+                            alt="Logo Attendance" 
+                            class="max-h-28 sm:max-h-36 w-auto object-contain filter drop-shadow-[0_8px_12px_rgba(0,0,0,0.4)] group-hover:scale-110 transition-transform duration-300"
+                            onerror="this.onerror=null; this.src='https://placehold.co/200x150/be123c/ffffff?text=ATTENDANCE+LOGO';"
+                        >
+                    </div>
+
+                    <button class="w-full py-3.5 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-lg sm:text-xl rounded-xl shadow-lg border border-red-400/40 tracking-wider flex items-center justify-center gap-3 transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(244,63,94,0.6)]">
+                        <i class="fa-solid fa-clipboard-user text-rose-200"></i>
+                        <span>ATTENDANCE</span>
+                    </button>
                 </div>
 
-                <button class="w-full py-3.5 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-lg sm:text-xl rounded-xl shadow-lg border border-red-400/40 tracking-wider flex items-center justify-center gap-3 transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(244,63,94,0.6)]">
-                    <i class="fa-solid fa-clipboard-user text-rose-200"></i>
-                    <span>ATTENDANCE</span>
-                </button>
+                <!-- CARD 3: TEMP PROJECT (Directly Below Attendance) -->
+                <div 
+                    id="btnTempProject" 
+                    onclick="handleButtonClick('Temp Project', 'https://muhardian.eu.org/whs/temp_project')" 
+                    class="float-3d-delayed-2 card-3d shine rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-between cursor-pointer group select-none min-h-[240px] sm:min-h-[280px]"
+                >
+                    <div class="w-full flex-1 flex items-center justify-center p-2 mb-4">
+                        <img 
+                            src="https://muhardian.eu.org/whs/temp.png" 
+                            alt="Logo Temp Project" 
+                            class="max-h-28 sm:max-h-36 w-auto object-contain filter drop-shadow-[0_8px_12px_rgba(0,0,0,0.4)] group-hover:scale-110 transition-transform duration-300"
+                            onerror="this.onerror=null; this.src='https://placehold.co/200x150/be123c/ffffff?text=TEMP+PROJECT';"
+                        >
+                    </div>
+
+                    <button class="w-full py-3.5 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-lg sm:text-xl rounded-xl shadow-lg border border-red-400/40 tracking-wider flex items-center justify-center gap-3 transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(244,63,94,0.6)]">
+                        <img 
+                            src="https://muhardian.eu.org/whs/temp.png" 
+                            alt="Icon Temp Project" 
+                            class="w-7 h-7 object-contain filter drop-shadow group-hover:scale-110 transition-transform duration-300"
+                            onerror="this.onerror=null; this.src='https://placehold.co/30x30/ffffff/be123c?text=TP';"
+                        >
+                        <span>TEMP PROJECT</span>
+                    </button>
+                </div>
             </div>
 
         </div>
@@ -221,8 +253,8 @@
         <!-- FOOTER / COPYRIGHT LINK -->
         <footer class="text-center text-xs text-rose-300/80 mt-4">
             <a href="https://muhardian.eu.org" class="hover:text-rose-100 transition-colors duration-200 underline-offset-4 hover:underline flex items-center justify-center gap-1 font-medium tracking-wide">
-                <span>&copy; 2026</span>
-                        </a>
+                <span>&copy; 2026 Santafe Warehouse</span>
+            </a>
         </footer>
 
     </div>
@@ -241,7 +273,7 @@
         const audioWelcome = document.getElementById('audioWelcome');
         const audioNotice = document.getElementById('audioNotice');
 
-        // Fungsi Memutar Suara Welcome Otomatis setelah 3 Detik tanpa perlu klik
+        // Memutar Suara Welcome Otomatis setelah 3 Detik
         window.addEventListener('load', () => {
             setTimeout(() => {
                 playWelcomeAudio();
@@ -261,7 +293,7 @@
             }
         }
 
-        // Fungsi Memutar Suara saat Tombol Klik dan Redirect jika URL diberikan
+        // Memutar Suara saat Tombol Klik dan Redirect
         function handleButtonClick(type, url) {
             // Hentikan audio welcome jika sedang berjalan
             if (!audioWelcome.paused) {
@@ -276,7 +308,7 @@
 
             console.log(`Tombol ${type} diklik!`);
 
-            // Pindah halaman dengan jeda singkat agar suara notice terdengar lebih dulu
+            // Pindah halaman dengan jeda singkat agar suara notice terdengar
             if (url) {
                 setTimeout(() => {
                     window.location.href = url;
