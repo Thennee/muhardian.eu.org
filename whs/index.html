@@ -38,7 +38,8 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background: radial-gradient(circle at top, #be123c 0%, #881337 45%, #4c0519 85%, #28030d 100%);
+            /* Background diperterang dengan gradasi merah cerah ke merah anggur hangat */
+            background: radial-gradient(circle at 50% 15%, #f43f5e 0%, #e11d48 30%, #be123c 65%, #700c25 100%);
             min-height: 100vh;
             overflow-x: hidden;
         }
@@ -46,21 +47,82 @@
         /* Ambient Glow Effect */
         .ambient-glow {
             position: absolute;
-            width: 320px;
-            height: 320px;
-            background: radial-gradient(circle, rgba(244, 63, 94, 0.4) 0%, rgba(0,0,0,0) 70%);
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.35) 0%, rgba(244, 63, 94, 0.2) 50%, rgba(0,0,0,0) 75%);
             border-radius: 50%;
             pointer-events: none;
             z-index: 0;
-            animation: pulseGlow 6s infinite alternate ease-in-out;
+            animation: pulseGlow 5s infinite alternate ease-in-out;
+        }
+
+        /* Yellow Header Spotlight untuk kontras tinggi logo */
+        .logo-spotlight {
+            position: absolute;
+            width: 320px;
+            height: 180px;
+            background: radial-gradient(ellipse at center, rgba(254, 240, 138, 0.4) 0%, rgba(251, 191, 36, 0.2) 45%, rgba(0,0,0,0) 80%);
+            border-radius: 50%;
+            filter: blur(20px);
+            pointer-events: none;
+            z-index: 0;
+            animation: spotlightPulse 3s infinite alternate ease-in-out;
         }
 
         @keyframes pulseGlow {
-            0% { transform: scale(0.9) translate(-10px, -10px); opacity: 0.6; }
-            100% { transform: scale(1.2) translate(10px, 10px); opacity: 0.9; }
+            0% { transform: scale(0.95) translate(-10px, -10px); opacity: 0.7; }
+            100% { transform: scale(1.25) translate(10px, 10px); opacity: 0.95; }
         }
 
-        /* 3D Floating Animation */
+        @keyframes spotlightPulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            100% { transform: scale(1.15); opacity: 1; }
+        }
+
+        /* Logo Emboss Bersinar Kuning Menyala-Nyala */
+        .logo-emboss-yellow {
+            /* Kombinasi filter drop-shadow berlapis untuk efek emboss 3D & pendaran api/kuning neon */
+            filter: 
+                drop-shadow(0 0 4px #ffffff)
+                drop-shadow(0 0 10px #fde047)
+                drop-shadow(0 0 20px #facc15)
+                drop-shadow(0 0 35px #eab308)
+                drop-shadow(3px 5px 6px rgba(0, 0, 0, 0.85));
+            animation: yellowFlames 2.2s infinite ease-in-out alternate;
+            transition: transform 0.3s ease;
+        }
+
+        @keyframes yellowFlames {
+            0% {
+                filter: 
+                    drop-shadow(0 0 3px #ffffff)
+                    drop-shadow(0 0 8px #fde047)
+                    drop-shadow(0 0 18px #facc15)
+                    drop-shadow(0 0 30px #eab308)
+                    drop-shadow(2px 4px 5px rgba(0, 0, 0, 0.8));
+                transform: scale(1);
+            }
+            50% {
+                filter: 
+                    drop-shadow(0 0 6px #ffffff)
+                    drop-shadow(0 0 15px #fef08a)
+                    drop-shadow(0 0 28px #facc15)
+                    drop-shadow(0 0 45px #ca8a04)
+                    drop-shadow(3px 6px 8px rgba(0, 0, 0, 0.9));
+                transform: scale(1.03);
+            }
+            100% {
+                filter: 
+                    drop-shadow(0 0 4px #ffffff)
+                    drop-shadow(0 0 10px #fde047)
+                    drop-shadow(0 0 22px #eab308)
+                    drop-shadow(0 0 38px #ca8a04)
+                    drop-shadow(2px 5px 6px rgba(0, 0, 0, 0.85));
+                transform: scale(1.01);
+            }
+        }
+
+        /* 3D Floating Animation untuk Card */
         .float-3d {
             animation: floatAnim 4s ease-in-out infinite;
             transform-style: preserve-3d;
@@ -82,22 +144,22 @@
         @keyframes floatAnim {
             0% {
                 transform: translateY(0px) rotateX(0deg) rotateY(0deg);
-                box-shadow: 0 15px 35px -5px rgba(225, 29, 72, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+                box-shadow: 0 15px 35px -5px rgba(225, 29, 72, 0.35), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
             }
             50% {
                 transform: translateY(-12px) rotateX(4deg) rotateY(-2deg);
-                box-shadow: 0 25px 45px 0px rgba(225, 29, 72, 0.45), 0 15px 15px -5px rgba(0, 0, 0, 0.6);
+                box-shadow: 0 25px 45px 0px rgba(244, 63, 94, 0.5), 0 15px 15px -5px rgba(0, 0, 0, 0.6);
             }
             100% {
                 transform: translateY(0px) rotateX(0deg) rotateY(0deg);
-                box-shadow: 0 15px 35px -5px rgba(225, 29, 72, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+                box-shadow: 0 15px 35px -5px rgba(225, 29, 72, 0.35), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
             }
         }
 
         .card-3d {
-            background: linear-gradient(135deg, rgba(190, 18, 60, 0.35) 0%, rgba(76, 5, 25, 0.65) 100%);
+            background: linear-gradient(135deg, rgba(190, 18, 60, 0.45) 0%, rgba(76, 5, 25, 0.75) 100%);
             backdrop-filter: blur(16px);
-            border: 1px solid rgba(244, 63, 94, 0.3);
+            border: 1px solid rgba(251, 113, 133, 0.4);
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             position: relative;
         }
@@ -109,15 +171,15 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(90deg, #f43f5e, #be123c, #fb7185);
+            background: linear-gradient(90deg, #fde047, #f43f5e, #be123c);
             border-top-left-radius: 1rem;
             border-top-right-radius: 1rem;
         }
 
         .card-3d:hover {
             transform: translateY(-8px) scale(1.03) rotateX(6deg);
-            border-color: rgba(244, 63, 94, 0.8);
-            box-shadow: 0 20px 40px rgba(225, 29, 72, 0.5), 0 0 20px rgba(244, 63, 94, 0.4);
+            border-color: rgba(250, 204, 21, 0.8);
+            box-shadow: 0 20px 40px rgba(225, 29, 72, 0.6), 0 0 25px rgba(250, 204, 21, 0.5);
         }
 
         .card-3d:active {
@@ -140,7 +202,7 @@
             background: linear-gradient(
                 60deg,
                 transparent 30%,
-                rgba(255, 255, 255, 0.15) 50%,
+                rgba(255, 255, 255, 0.2) 50%,
                 transparent 70%
             );
             transform: rotate(30deg);
@@ -156,20 +218,23 @@
 </head>
 <body class="text-white min-h-screen flex flex-col items-center justify-center p-4 relative overflow-x-hidden">
 
-    <div class="ambient-glow top-10 left-10"></div>
-    <div class="ambient-glow bottom-10 right-10"></div>
+    <div class="ambient-glow top-5 left-5"></div>
+    <div class="ambient-glow bottom-5 right-5"></div>
 
     <!-- Container Utama -->
     <div class="w-full max-w-md md:max-w-3xl lg:max-w-4xl z-10 my-auto flex flex-col items-center justify-center gap-6 md:gap-10 py-6">
         
-        <!-- HEADER / LOGO 1 BLOCK -->
-        <div class="w-full flex justify-center py-2">
-            <div class="relative w-full max-w-[280px] sm:max-w-[360px] h-28 sm:h-36 flex items-center justify-center">
+        <!-- HEADER / LOGO 1 BLOCK WITH EMBOSSED YELLOW GLOW -->
+        <div class="w-full flex justify-center py-2 relative">
+            <!-- Spotlight Kuning di Belakang Logo Santa Fe -->
+            <div class="logo-spotlight"></div>
+
+            <div class="relative z-10 w-full max-w-[300px] sm:max-w-[380px] h-32 sm:h-40 flex items-center justify-center">
                 <img 
                     src="https://muhardian.eu.org/whs/sf_logo.png" 
-                    alt="Logo Utama" 
-                    class="max-h-full max-w-full object-contain filter drop-shadow-[0_10px_15px_rgba(0,0,0,0.5)] transition-transform duration-300 hover:scale-105"
-                    onerror="this.onerror=null; this.src='https://placehold.co/300x120/9f1239/ffffff?text=LOGO+1';"
+                    alt="Santa Fe Logo" 
+                    class="max-h-full max-w-full object-contain logo-emboss-yellow cursor-pointer"
+                    onerror="this.onerror=null; this.src='https://placehold.co/320x130/be123c/fde047?text=SANTA+FE+RELOCATION';"
                 >
             </div>
         </div>
@@ -177,30 +242,54 @@
         <!-- MAIN BUTTONS / CARD SECTIONS -->
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 px-2">
             
-            <!-- CARD 1: STUFFING (Logo 2) -->
-            <div 
-                id="btnStuffing" 
-                onclick="handleButtonClick('Stuffing', 'https://muhardian.eu.org/whs/staffing')" 
-                class="float-3d card-3d shine rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-between cursor-pointer group select-none min-h-[240px] sm:min-h-[280px]"
-            >
-                <div class="w-full flex-1 flex items-center justify-center p-2 mb-4">
-                    <img 
-                        src="https://muhardian.eu.org/whs/logo_staffing1.png" 
-                        alt="Logo Stuffing" 
-                        class="max-h-28 sm:max-h-36 w-auto object-contain filter drop-shadow-[0_8px_12px_rgba(0,0,0,0.4)] group-hover:scale-110 transition-transform duration-300"
-                        onerror="this.onerror=null; this.src='https://placehold.co/200x150/be123c/ffffff?text=STUFFING+LOGO';"
-                    >
+            <!-- LEFT COLUMN: STUFFING & REPORT -->
+            <div class="flex flex-col gap-6 sm:gap-8">
+                <!-- CARD 1: STUFFING -->
+                <div 
+                    id="btnStuffing" 
+                    onclick="handleButtonClick('Stuffing', 'https://muhardian.eu.org/whs/staffing')" 
+                    class="float-3d card-3d shine rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-between cursor-pointer group select-none min-h-[240px] sm:min-h-[280px]"
+                >
+                    <div class="w-full flex-1 flex items-center justify-center p-2 mb-4">
+                        <img 
+                            src="https://muhardian.eu.org/whs/logo_staffing1.png" 
+                            alt="Logo Stuffing" 
+                            class="max-h-28 sm:max-h-36 w-auto object-contain filter drop-shadow-[0_8px_12px_rgba(0,0,0,0.4)] group-hover:scale-110 transition-transform duration-300"
+                            onerror="this.onerror=null; this.src='https://placehold.co/200x150/be123c/ffffff?text=STUFFING+LOGO';"
+                        >
+                    </div>
+                    
+                    <button class="w-full py-3.5 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-lg sm:text-xl rounded-xl shadow-lg border border-red-400/40 tracking-wider flex items-center justify-center gap-3 transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(250,204,21,0.6)]">
+                        <i class="fa-solid fa-boxes-packing text-amber-300"></i>
+                        <span>STUFFING</span>
+                    </button>
                 </div>
-                
-                <button class="w-full py-3.5 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-lg sm:text-xl rounded-xl shadow-lg border border-red-400/40 tracking-wider flex items-center justify-center gap-3 transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(244,63,94,0.6)]">
-                    <i class="fa-solid fa-boxes-packing text-rose-200"></i>
-                    <span>STUFFING</span>
-                </button>
+
+                <!-- CARD 4: REPORT -->
+                <div 
+                    id="btnReport" 
+                    onclick="handleButtonClick('Report', 'https://muhardian.eu.org/whs/report')" 
+                    class="float-3d-delayed-2 card-3d shine rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-between cursor-pointer group select-none min-h-[240px] sm:min-h-[280px]"
+                >
+                    <div class="w-full flex-1 flex items-center justify-center p-2 mb-4 overflow-hidden rounded-xl">
+                        <img 
+                            src="https://muhardian.eu.org/whs/report/report.jpg" 
+                            alt="Logo Report" 
+                            class="max-h-28 sm:max-h-36 w-auto object-contain rounded-xl filter drop-shadow-[0_8px_12px_rgba(0,0,0,0.4)] group-hover:scale-110 transition-transform duration-300"
+                            onerror="this.onerror=null; this.src='https://placehold.co/200x150/be123c/ffffff?text=REPORT';"
+                        >
+                    </div>
+
+                    <button class="w-full py-3.5 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-lg sm:text-xl rounded-xl shadow-lg border border-red-400/40 tracking-wider flex items-center justify-center gap-3 transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(250,204,21,0.6)]">
+                        <i class="fa-solid fa-chart-line text-amber-300"></i>
+                        <span>REPORT</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- COLUMN CONTAINING ATTENDANCE AND TEMP PROJECT BELOW IT -->
+            <!-- RIGHT COLUMN: ATTENDANCE & TEMP PROJECT -->
             <div class="flex flex-col gap-6 sm:gap-8">
-                <!-- CARD 2: ATTENDANCE (Logo 3) -->
+                <!-- CARD 2: ATTENDANCE -->
                 <div 
                     id="btnAttendance" 
                     onclick="handleButtonClick('Attendance', 'https://muhardian.eu.org/whs/att')" 
@@ -215,13 +304,13 @@
                         >
                     </div>
 
-                    <button class="w-full py-3.5 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-lg sm:text-xl rounded-xl shadow-lg border border-red-400/40 tracking-wider flex items-center justify-center gap-3 transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(244,63,94,0.6)]">
-                        <i class="fa-solid fa-clipboard-user text-rose-200"></i>
+                    <button class="w-full py-3.5 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-lg sm:text-xl rounded-xl shadow-lg border border-red-400/40 tracking-wider flex items-center justify-center gap-3 transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(250,204,21,0.6)]">
+                        <i class="fa-solid fa-clipboard-user text-amber-300"></i>
                         <span>ATTENDANCE</span>
                     </button>
                 </div>
 
-                <!-- CARD 3: TEMP PROJECT (Directly Below Attendance) -->
+                <!-- CARD 3: TEMP PROJECT -->
                 <div 
                     id="btnTempProject" 
                     onclick="handleButtonClick('Temp Project', 'https://muhardian.eu.org/whs/temp_project')" 
@@ -236,7 +325,7 @@
                         >
                     </div>
 
-                    <button class="w-full py-3.5 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-lg sm:text-xl rounded-xl shadow-lg border border-red-400/40 tracking-wider flex items-center justify-center gap-3 transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(244,63,94,0.6)]">
+                    <button class="w-full py-3.5 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-lg sm:text-xl rounded-xl shadow-lg border border-red-400/40 tracking-wider flex items-center justify-center gap-3 transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(250,204,21,0.6)]">
                         <img 
                             src="https://muhardian.eu.org/whs/temp.png" 
                             alt="Icon Temp Project" 
@@ -250,9 +339,9 @@
 
         </div>
 
-        <!-- FOOTER / COPYRIGHT LINK -->
-        <footer class="text-center text-xs text-rose-300/80 mt-4">
-            <a href="https://muhardian.eu.org" class="hover:text-rose-100 transition-colors duration-200 underline-offset-4 hover:underline flex items-center justify-center gap-1 font-medium tracking-wide">
+        <!-- FOOTER -->
+        <footer class="text-center text-xs text-rose-200/90 mt-4">
+            <a href="https://muhardian.eu.org" class="hover:text-amber-200 transition-colors duration-200 underline-offset-4 hover:underline flex items-center justify-center gap-1 font-medium tracking-wide">
                 <span>&copy; 2026 Santafe Warehouse</span>
             </a>
         </footer>
@@ -268,7 +357,6 @@
         <source src="https://muhardian.eu.org/whs/att_notice.wav" type="audio/wav">
     </audio>
 
-    <!-- JAVASCRIPT LOGIC -->
     <script>
         const audioWelcome = document.getElementById('audioWelcome');
         const audioNotice = document.getElementById('audioNotice');
@@ -288,27 +376,24 @@
                 playPromise.then(() => {
                     console.log("Audio welcome diputar secara otomatis.");
                 }).catch(error => {
-                    console.log("Autoplay audio:", error);
+                    console.log("Autoplay audio disesuaikan kebijakan browser:", error);
                 });
             }
         }
 
-        // Memutar Suara saat Tombol Klik dan Redirect
+        // Memutar Suara saat Tombol Klik dan Redirect dalam 1 Halaman yang sama
         function handleButtonClick(type, url) {
-            // Hentikan audio welcome jika sedang berjalan
             if (!audioWelcome.paused) {
                 audioWelcome.pause();
             }
 
-            // Putar audio notice
             audioNotice.currentTime = 0;
             audioNotice.play().catch(err => {
                 console.log("Gagal memutar audio notice:", err);
             });
 
-            console.log(`Tombol ${type} diklik!`);
+            console.log(`Tombol ${type} diklik! Menuju ke: ${url}`);
 
-            // Pindah halaman dengan jeda singkat agar suara notice terdengar
             if (url) {
                 setTimeout(() => {
                     window.location.href = url;
