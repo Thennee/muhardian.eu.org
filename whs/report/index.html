@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Santafe Report Viewer - Portal</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fef2f2',
+                            100: '#ffe1e1',
+                            200: '#ffc8c8',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                            800: '#991b1b',
+                            900: '#7f1d1d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: flex;
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        input, select, textarea {
+            font-size: 16px !important;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            font-weight: 600;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            max-width: 90%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.show {
+            bottom: 24px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .code-block {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #0f172a;
+            color: #38bdf8;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- Screen: Login -->
+    <div id="loginScreen" class="fixed inset-0 z-[600] bg-slate-900/90 backdrop-blur-md p-6 md:p-8 flex flex-col justify-center items-center overflow-y-auto">
+        <div class="w-full max-w-md bg-white rounded-3xl p-6 md:p-8 shadow-2xl space-y-6 relative border border-slate-100">
+
+            <div class="text-center pt-2">
+                <img src="https://muhardian.eu.org/whs/sf_logo.png" 
+                     onerror="this.src='https://placehold.co/100x100/dc2626/ffffff?text=WHS'"
+                     alt="Santafe WHS Logo" class="w-20 h-20 object-contain mx-auto mb-3 drop-shadow-md">
+                <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">Santafe Report Viewer</h1>
+                <p class="text-gray-500 mt-1 text-xs md:text-sm">Sistem Portal Laporan WHS</p>
+            </div>
+
+            <form onsubmit="event.preventDefault(); handleLogin();" class="space-y-4">
+                <div class="relative">
+                    <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="loginUsername" placeholder="Username / ID User" required
+                        class="w-full pl-12 pr-4 py-3.5 bg-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-brand-600 font-bold transition-all text-sm text-slate-800">
+                </div>
+                <div class="relative">
+                    <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="password" id="loginPass" placeholder="Kata Sandi" required
+                        class="w-full pl-12 pr-4 py-3.5 bg-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-brand-600 font-bold transition-all text-sm text-slate-800">
+                </div>
+                
+                <button type="submit" id="btnLogin"
+                    class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-brand-600/30 active:scale-95 transition-all text-sm flex items-center justify-center gap-2">
+                    <span id="loginBtnText">MASUK KE PORTAL</span>
+                    <i id="loginBtnSpinner" class="fas fa-spinner fa-spin hidden"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- App Main Container -->
+    <div id="app" class="hidden flex-1 flex flex-col h-screen overflow-hidden">
+        
+        <!-- Navbar Top -->
+        <header class="p-3 md:px-6 bg-white border-b border-gray-200 flex justify-between items-center z-30 shrink-0 shadow-sm">
+            <div class="flex items-center gap-3">
+                <img src="https://muhardian.eu.org/whs/sf_logo.png" 
+                     onerror="this.src='https://placehold.co/80x80/dc2626/ffffff?text=WHS'"
+                     alt="Santafe WHS Logo" class="w-9 h-9 object-contain">
+                <div>
+                    <h2 class="text-base font-extrabold text-gray-900 leading-tight">Santafe Reports</h2>
+                    <p class="text-[10px] font-bold text-brand-600 uppercase tracking-widest">Portal</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 md:gap-3">
+                <!-- Tombol Tambah Sheet (HANYA UNTUK ADMIN) -->
+                <button id="adminAddBtn" onclick="openAddReportModal()" 
+                    class="hidden items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-md shadow-brand-600/20 active:scale-95 transition-all">
+                    <i class="fas fa-plus"></i>
+                    <span class="hidden sm:inline">Tambah Sheet</span>
+                </button>
+
+                <!-- Tombol Pengaturan API Backend (HANYA UNTUK ADMIN) -->
+                <button id="apiConfigBtn" onclick="openApiConfigModal()" class="hidden p-2 text-slate-500 hover:text-brand-600 hover:bg-slate-100 rounded-xl transition-all" title="Pengaturan API Backend">
+                    <i class="fas fa-sliders text-sm"></i>
+                </button>
+
+                <div class="h-6 w-px bg-gray-200 hidden sm:block"></div>
+
+                <!-- User Role Badge -->
+                <div class="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-xl">
+                    <div id="userRoleIcon" class="w-7 h-7 rounded-lg bg-brand-600 text-white flex items-center justify-center font-bold text-xs">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="hidden md:flex flex-col text-left">
+                        <span id="userName" class="text-xs font-bold text-gray-800 leading-tight">User</span>
+                        <span id="userRoleBadge" class="text-[9px] font-extrabold text-brand-600 uppercase">View Only</span>
+                    </div>
+                </div>
+
+                <button onclick="handleLogout()" title="Keluar Aplikasi"
+                    class="w-9 h-9 bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-brand-600 rounded-xl flex items-center justify-center transition-colors">
+                    <i class="fas fa-power-off"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Body Workspace -->
+        <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+
+            <!-- Left Sidebar Navigation / List of Reports -->
+            <aside id="sidebar" class="w-full md:w-80 bg-white border-r border-slate-200 flex flex-col shrink-0 z-20 transition-all">
+                
+                <!-- Status Akses & API Banner -->
+                <div id="permissionBanner" class="px-3 py-2 bg-slate-100 text-[11px] font-semibold text-slate-600 border-b border-slate-200 flex justify-between items-center">
+                    <span class="flex items-center gap-1.5">
+                        <i class="fas fa-shield-halved text-slate-400"></i> Peran:
+                        <span id="bannerRoleLabel" class="font-extrabold px-2 py-0.5 rounded-md bg-slate-200 text-slate-700">Viewer</span>
+                    </span>
+                    <span id="appBackendStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span> Offline
+                    </span>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="p-3 border-b border-slate-100 bg-slate-50/50 flex gap-2">
+                    <div class="relative flex-1">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="text" id="searchReport" onkeyup="filterReports()" placeholder="Cari laporan..."
+                            class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-600 font-medium">
+                    </div>
+                    <button onclick="fetchReportsFromBackend()" title="Refresh Data dari Server Google Sheets" class="p-2 bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 rounded-xl text-xs transition-colors">
+                        <i id="refreshReportsBtnIcon" class="fas fa-rotate"></i>
+                    </button>
+                </div>
+
+                <!-- Report List Container -->
+                <div class="flex-1 overflow-y-auto p-2 space-y-1.5" id="reportList">
+                    <!-- Dynamic Items will be rendered here -->
+                </div>
+
+                <!-- Mobile Quick Add Button Footer (Admin Only) -->
+                <div id="mobileAdminFooter" class="p-3 border-t border-slate-100 bg-white sm:hidden hidden">
+                    <button onclick="openAddReportModal()" 
+                        class="w-full flex items-center justify-center gap-2 bg-brand-600 text-white py-2.5 rounded-xl text-xs font-bold">
+                        <i class="fas fa-plus"></i> Tambah Link Sheet Baru
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Content Area / Embedded Sheet Viewer -->
+            <main class="flex-1 bg-slate-100 flex flex-col overflow-hidden relative">
+                
+                <!-- Active Sheet Header & Toolbar -->
+                <div id="viewerToolbar" class="bg-white border-b border-slate-200 px-4 py-2.5 flex justify-between items-center shrink-0">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div id="activeIconContainer" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                            <i class="fas fa-file-excel text-sm"></i>
+                        </div>
+                        <div class="truncate">
+                            <h3 id="activeTitle" class="text-sm font-bold text-slate-900 truncate">Pilih Laporan</h3>
+                            <p id="activeSubtitle" class="text-[10px] font-semibold text-slate-400 truncate">Google Sheets Viewer</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button onclick="refreshActiveIframe()" title="Refresh Frame"
+                            class="p-2 text-slate-500 hover:text-brand-600 hover:bg-slate-100 rounded-lg transition-colors">
+                            <i class="fas fa-arrows-rotate text-xs"></i>
+                        </button>
+                        <button onclick="openActiveExternal()" title="Buka di Tab Baru Google Sheets"
+                            class="p-2 text-slate-500 hover:text-brand-600 hover:bg-slate-100 rounded-lg transition-colors">
+                            <i class="fas fa-arrow-up-right-from-square text-xs"></i>
+                        </button>
+                        <button onclick="toggleFullscreen()" title="Layar Penuh"
+                            class="p-2 text-slate-500 hover:text-brand-600 hover:bg-slate-100 rounded-lg transition-colors">
+                            <i class="fas fa-expand text-xs"></i>
+                        </button>
+                        
+                        <!-- Admin Control Buttons (Edit & Hapus - HANYA ADMIN) -->
+                        <div id="adminActionGroup" class="hidden items-center gap-1.5 pl-1">
+                            <div class="h-4 w-px bg-slate-200 mx-1"></div>
+                            <button onclick="editCurrentReport()" title="Edit Laporan Ini (Admin)"
+                                class="p-2 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
+                                <i class="fas fa-pen text-xs"></i>
+                            </button>
+                            <button onclick="deleteCurrentReport()" title="Hapus Laporan Ini (Admin)"
+                                class="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                <i class="fas fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Embedded Frame Body -->
+                <div id="embedWrapper" class="flex-1 relative w-full h-full overflow-hidden bg-white">
+                    <!-- Loading Spinner Overlay -->
+                    <div id="iframeLoader" class="absolute inset-0 bg-white/90 backdrop-blur-sm z-10 flex flex-col items-center justify-center gap-3 transition-opacity">
+                        <div class="w-10 h-10 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin"></div>
+                        <p class="text-xs font-bold text-slate-500">Memuat Dokumen Google Sheets...</p>
+                    </div>
+
+                    <!-- Placeholder / Empty State -->
+                    <div id="emptyState" class="hidden absolute inset-0 bg-slate-50 z-0 flex flex-col items-center justify-center p-6 text-center">
+                        <div class="w-16 h-16 bg-slate-200 text-slate-400 rounded-2xl flex items-center justify-center mb-4 text-2xl">
+                            <i class="fas fa-file-circle-exclamation"></i>
+                        </div>
+                        <h4 class="text-base font-bold text-slate-700">Belum ada Laporan Dipilih</h4>
+                        <p class="text-xs text-slate-400 max-w-sm mt-1 mb-4">Pilih salah satu laporan di menu sebelah kiri atau tambahkan laporan Google Sheets baru.</p>
+                        <button id="emptyStateAddBtn" onclick="openAddReportModal()" class="hidden px-4 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold shadow-md">
+                            <i class="fas fa-plus mr-1"></i> Tambah Link Sheet
+                        </button>
+                    </div>
+
+                    <!-- The Actual Embed Iframe -->
+                    <iframe id="sheetIframe" src="about:blank" class="w-full h-full border-0"></iframe>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL: Tambah / Edit Sheet Link (Admin Only) -->
+    <div id="reportModal" class="fixed inset-0 z-[700] bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl p-6 space-y-4 shadow-2xl animate-fadeIn">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 id="modalTitle" class="text-lg font-black text-slate-900">Tambah Link Sheet Laporan</h3>
+                <button onclick="closeReportModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center">
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+
+            <input type="hidden" id="editReportId">
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Judul Laporan</label>
+                    <input type="text" id="sheetTitle" placeholder="Contoh: Laporan Penjualan Bulanan"
+                        class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-brand-600 font-bold text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">URL / Link Google Sheet</label>
+                    <input type="text" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/..."
+                        class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-brand-600 text-xs font-medium">
+                    <p class="text-[10px] text-slate-400 mt-1 italic">*Format URL biasa atau link share akan dikonversi ke tampilan embed otomatis.</p>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Ikon Warna</label>
+                    <select id="sheetTheme" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-brand-600 font-bold text-xs">
+                        <option value="emerald">Hijau (Excel/Sheet)</option>
+                        <option value="brand">Merah Santafe</option>
+                        <option value="blue">Biru Informasi</option>
+                        <option value="amber">Kuning / Oranye</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Deskripsi Singkat (Opsional)</label>
+                    <textarea id="sheetDesc" rows="2" placeholder="Catatan singkat tentang isi laporan ini..."
+                        class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-brand-600 text-xs"></textarea>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeReportModal()" class="flex-1 py-3.5 font-bold text-slate-400 hover:text-slate-600 text-xs">Batal</button>
+                <button onclick="saveReport()" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl font-bold text-xs shadow-lg shadow-brand-600/20 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <span id="saveReportBtnText">Simpan Laporan</span>
+                    <i id="saveReportSpinner" class="fas fa-spinner fa-spin hidden"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Confirmation Modal for Deleting Reports -->
+    <div id="deleteModal" class="fixed inset-0 z-[700] bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 space-y-4 shadow-2xl text-center animate-fadeIn">
+            <div class="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center mx-auto text-xl">
+                <i class="fas fa-trash-can"></i>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-slate-900">Hapus Laporan?</h3>
+                <p id="deleteModalText" class="text-xs text-slate-500 mt-1">Apakah Anda yakin ingin menghapus laporan ini?</p>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeDeleteModal()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs">Batal</button>
+                <button onclick="confirmDeleteReport()" class="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-xs shadow-md shadow-red-600/20 active:scale-95 transition-all flex items-center justify-center gap-1.5">
+                    <span id="deleteBtnText">Hapus</span>
+                    <i id="deleteBtnSpinner" class="fas fa-spinner fa-spin hidden"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Google Apps Script Web App URL Configuration -->
+    <div id="apiConfigModal" class="fixed inset-0 z-[700] bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl p-6 space-y-4 shadow-2xl animate-fadeIn">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-link text-brand-600"></i>
+                    <h3 class="text-base font-extrabold text-slate-900">Pengaturan Google Apps Script</h3>
+                </div>
+                <button onclick="closeApiConfigModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center">
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <p class="text-xs text-slate-500">Masukkan <strong>Web App URL</strong> yang dihasilkan setelah men-deploy skrip Google Apps Script sebagai Web App (akses: <em>Anyone / Siapa Saja</em>).</p>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Web App URL (exec)</label>
+                    <input type="text" id="webAppUrlInput" placeholder="https://script.google.com/macros/s/.../exec"
+                        class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-brand-600 text-xs font-mono">
+                </div>
+
+                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs flex items-center justify-between">
+                    <span id="apiConfigStatusText" class="text-slate-500 font-medium">Status: Belum diuji</span>
+                    <button onclick="testApiConnection()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl text-[11px] transition-all">
+                        Tes Koneksi
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button onclick="openAppsScriptModal()" class="flex-1 py-3 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-2xl font-bold text-xs flex items-center justify-center gap-1">
+                    <i class="fas fa-code"></i> Lihat Code.gs
+                </button>
+                <button onclick="saveApiUrl()" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl font-bold text-xs shadow-md active:scale-95 transition-all">
+                    Simpan URL
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Google Apps Script Backend Code & Setup -->
+    <div id="appsScriptModal" class="fixed inset-0 z-[700] bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl rounded-3xl p-6 space-y-4 shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-code text-amber-500 text-lg"></i>
+                    <div>
+                        <h3 class="text-base font-black text-slate-900 leading-tight">Google Apps Script (`Code.gs`)</h3>
+                        <p class="text-[11px] text-slate-400 font-semibold">Salin kode ini ke Google Sheets -> Extensions -> Apps Script</p>
+                    </div>
+                </div>
+                <button onclick="closeAppsScriptModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center">
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-2 text-xs text-slate-600 bg-amber-50 p-3 rounded-2xl border border-amber-200">
+                <p class="font-bold text-amber-900"><i class="fas fa-bolt mr-1"></i> Cara Menjalankan setupSheet():</p>
+                <ol class="list-decimal list-inside space-y-1 text-[11px]">
+                    <li>Buka Spreadsheet Google Anda, klik menu <strong>Ekstensi (Extensions)</strong> &gt; <strong>Apps Script</strong>.</li>
+                    <li>Hapus isi default, lalu <strong>tempelkan (paste)</strong> kode di bawah ini.</li>
+                    <li>Pilih fungsi <code>setupSheet</code> di bagian atas dan klik <strong>Run (Jalankan)</strong>.</li>
+                    <li>Klik <strong>Deploy &gt; New Deployment &gt; Web App</strong> (Execute as: <em>Me</em>, Who has access: <em>Anyone</em>).</li>
+                    <li>Salin <strong>Web App URL</strong> lalu tempelkan di Pengaturan URL Script portal ini.</li>
+                </ol>
+            </div>
+
+            <!-- Code Editor Output -->
+            <div class="flex-1 overflow-hidden relative rounded-2xl border border-slate-800 bg-slate-950 p-3 flex flex-col">
+                <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                    <span class="text-[10px] font-mono text-slate-400">Code.gs</span>
+                    <button onclick="copyAppsScriptCode()" class="text-xs bg-slate-800 hover:bg-slate-700 text-amber-400 px-3 py-1 rounded-lg font-bold flex items-center gap-1">
+                        <i class="fas fa-copy"></i> Salin Kode
+                    </button>
+                </div>
+                <pre class="flex-1 overflow-auto code-block p-2 text-[11px] leading-relaxed select-all" id="appsScriptCodeContent"></pre>
+            </div>
+
+            <div class="pt-1 flex justify-end">
+                <button onclick="closeAppsScriptModal()" class="px-5 py-2.5 bg-slate-800 text-white rounded-xl text-xs font-bold">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i id="toastIcon" class="fas fa-circle-info"></i>
+        <span id="toastMessage">Notifikasi...</span>
+    </div>
+
+    <script>
+        // =========================================================================
+        // CONFIGURATION: MASUKKAN WEB APP URL GOOGLE APPS SCRIPT DI SINI
+        // Contoh: "https://script.google.com/macros/s/AKfycbx.../exec"
+        // =========================================================================
+        const HARDCODED_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxh4AY7L_sACHwttoRGLqiz8IEv_pMojnVvwaOE4ahcrVAZHNtplhgw0aw1wiCkOCZf/exec"; // <-- TEMPELKAN WEB APP URL ANDA DI SINI
+
+        let webAppUrl = HARDCODED_WEB_APP_URL || localStorage.getItem('santafe_gas_url') || '';
+        let reports = [];
+        let currentActiveId = null;
+        let currentUser = null; // { name, role, username }
+        let reportToDeleteId = null;
+
+        window.onload = () => {
+            generateAppsScriptCodeText();
+            updateConnectionBadgeStatus();
+
+            // Document iframe listener
+            const iframe = document.getElementById('sheetIframe');
+            if (iframe) {
+                iframe.addEventListener('load', hideIframeLoader);
+            }
+
+            // Restore login session if available
+            const savedUser = localStorage.getItem('report_viewer_user_v2');
+            if (savedUser) {
+                setupApp(JSON.parse(savedUser));
+            }
+
+            // Set initial input for API modal
+            const urlInput = document.getElementById('webAppUrlInput');
+            if (urlInput && webAppUrl) {
+                urlInput.value = webAppUrl;
+            }
+        };
+
+        /** Generic fetch call helper for Google Apps Script Web App API */
+        async function callGasApi(action, payload = {}) {
+            if (!webAppUrl) {
+                throw new Error("URL Google Apps Script belum diisi pada variabel HARDCODED_WEB_APP_URL di file index.html.");
+            }
+
+            const bodyData = JSON.stringify({
+                action: action,
+                ...payload
+            });
+
+            const response = await fetch(webAppUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8"
+                },
+                body: bodyData
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP Error status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            return result;
+        }
+
+        async function handleLogin() {
+            const usernameInput = document.getElementById('loginUsername').value.trim();
+            const passInput = document.getElementById('loginPass').value.trim();
+
+            if (!usernameInput || !passInput) {
+                showToast("⚠️ Harap isi username dan password!", "warning");
+                return;
+            }
+
+            if (!webAppUrl) {
+                showToast("⚠️ URL Google Apps Script belum diatur pada file index.html (HARDCODED_WEB_APP_URL).", "error");
+                return;
+            }
+
+            setLoginLoading(true);
+
+            try {
+                const res = await callGasApi("login", { username: usernameInput, password: passInput });
+                if (res && res.status === "success" && res.user) {
+                    const userData = res.user;
+                    localStorage.setItem('report_viewer_user_v2', JSON.stringify(userData));
+                    setupApp(userData);
+                    showToast(`🔓 Login Berhasil! Selamat Datang, ${userData.name}`, "success");
+                } else if (res && res.message) {
+                    showToast(`❌ ${res.message}`, "error");
+                } else {
+                    showToast("❌ Gagal memproses login dari database.", "error");
+                }
+            } catch (err) {
+                console.error("GAS API Login Error:", err);
+                showToast(`❌ ${err.message}`, "error");
+            } finally {
+                setLoginLoading(false);
+            }
+        }
+
+        function setLoginLoading(isLoading) {
+            const btn = document.getElementById('btnLogin');
+            const text = document.getElementById('loginBtnText');
+            const spinner = document.getElementById('loginBtnSpinner');
+
+            if (isLoading) {
+                btn.disabled = true;
+                text.innerText = "VERIFIKASI...";
+                spinner.classList.remove('hidden');
+            } else {
+                btn.disabled = false;
+                text.innerText = "MASUK KE PORTAL";
+                spinner.classList.add('hidden');
+            }
+        }
+
+        function setupApp(userData) {
+            currentUser = userData;
+
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            document.getElementById('userName').innerText = userData.name;
+
+            applyRoleUI(userData.role);
+            fetchReportsFromBackend();
+        }
+
+        function applyRoleUI(role) {
+            const isAdmin = (role === 'admin');
+
+            const badge = document.getElementById('userRoleBadge');
+            const iconContainer = document.getElementById('userRoleIcon');
+            const bannerLabel = document.getElementById('bannerRoleLabel');
+            const apiBtn = document.getElementById('apiConfigBtn');
+
+            if (isAdmin) {
+                badge.innerText = "ADMINISTRATOR";
+                badge.className = "text-[9px] font-extrabold text-red-600 uppercase";
+                iconContainer.className = "w-7 h-7 rounded-lg bg-red-600 text-white flex items-center justify-center font-bold text-xs";
+                bannerLabel.innerText = "Admin (Full Access)";
+                bannerLabel.className = "font-extrabold px-2 py-0.5 rounded-md bg-red-100 text-red-700";
+
+                document.getElementById('adminAddBtn').classList.remove('hidden');
+                document.getElementById('adminAddBtn').classList.add('flex');
+                document.getElementById('adminActionGroup').classList.remove('hidden');
+                document.getElementById('adminActionGroup').classList.add('flex');
+                document.getElementById('mobileAdminFooter').classList.remove('hidden');
+                document.getElementById('emptyStateAddBtn').classList.remove('hidden');
+                if (apiBtn) apiBtn.classList.remove('hidden');
+            } else {
+                badge.innerText = "USER BIASA (VIEWER)";
+                badge.className = "text-[9px] font-extrabold text-blue-600 uppercase";
+                iconContainer.className = "w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs";
+                bannerLabel.innerText = "User Biasa (Hanya View)";
+                bannerLabel.className = "font-extrabold px-2 py-0.5 rounded-md bg-blue-100 text-blue-700";
+
+                document.getElementById('adminAddBtn').classList.add('hidden');
+                document.getElementById('adminAddBtn').classList.remove('flex');
+                document.getElementById('adminActionGroup').classList.add('hidden');
+                document.getElementById('adminActionGroup').classList.remove('flex');
+                document.getElementById('mobileAdminFooter').classList.add('hidden');
+                document.getElementById('emptyStateAddBtn').classList.add('hidden');
+                if (apiBtn) apiBtn.classList.add('hidden');
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('report_viewer_user_v2');
+            document.getElementById('app').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPass').value = '';
+            currentUser = null;
+            showToast("🔒 Anda telah keluar dari aplikasi.", "info");
+        }
+
+        /** Convert Standard Google Sheet URL to Clean Embed / HTML View URL */
+        function convertToEmbedUrl(url) {
+            if (!url) return '';
+            
+            if (url.includes('/pubhtml') || url.includes('/htmlview')) {
+                return url;
+            }
+
+            const matches = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+            if (matches && matches[1]) {
+                const sheetId = matches[1];
+                const gidMatches = url.match(/[#&?]gid=([0-9]+)/);
+                const gidParam = gidMatches ? `&gid=${gidMatches[1]}` : '';
+
+                return `https://docs.google.com/spreadsheets/d/${sheetId}/htmlview?widget=true&headers=false${gidParam}`;
+            }
+
+            return url;
+        }
+
+        async function fetchReportsFromBackend() {
+            const spinIcon = document.getElementById('refreshReportsBtnIcon');
+            if (spinIcon) spinIcon.classList.add('fa-spin');
+
+            if (!webAppUrl) {
+                reports = [];
+                renderReportList();
+                showEmptyState();
+                if (spinIcon) spinIcon.classList.remove('fa-spin');
+                showToast("⚠️ URL Google Apps Script belum diatur.", "warning");
+                return;
+            }
+
+            try {
+                const res = await callGasApi("getReports");
+                if (res && res.status === "success" && Array.isArray(res.reports)) {
+                    reports = res.reports;
+                    renderReportList();
+                    if (reports.length > 0) {
+                        if (!currentActiveId || !reports.find(r => r.id === currentActiveId)) {
+                            selectReport(reports[0].id);
+                        }
+                    } else {
+                        showEmptyState();
+                    }
+                } else {
+                    showToast(`❌ Gagal memuat laporan: ${res.message || 'Respons tidak valid'}`, "error");
+                }
+            } catch (e) {
+                console.error("Gagal mengambil data dari Google Apps Script:", e);
+                showToast(`❌ Terjadi kesalahan koneksi server: ${e.message}`, "error");
+                reports = [];
+                renderReportList();
+                showEmptyState();
+            } finally {
+                if (spinIcon) spinIcon.classList.remove('fa-spin');
+            }
+        }
+
+        function renderReportList(filterText = '') {
+            const listContainer = document.getElementById('reportList');
+            listContainer.innerHTML = '';
+
+            const filtered = reports.filter(r => 
+                r.title.toLowerCase().includes(filterText.toLowerCase()) ||
+                (r.desc && r.desc.toLowerCase().includes(filterText.toLowerCase()))
+            );
+
+            if (filtered.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="p-6 text-center text-slate-400">
+                        <i class="fas fa-folder-open text-2xl mb-2"></i>
+                        <p class="text-xs font-semibold">Tidak ada laporan ditemukan</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(rep => {
+                const isActive = (rep.id === currentActiveId);
+                const item = document.createElement('div');
+                item.className = `p-3 rounded-2xl cursor-pointer transition-all border ${
+                    isActive 
+                        ? 'bg-brand-50 border-brand-200 shadow-sm' 
+                        : 'bg-white border-slate-100 hover:border-slate-200 hover:bg-slate-50'
+                }`;
+                
+                let themeBg = "bg-emerald-100 text-emerald-700";
+                if (rep.theme === 'brand') themeBg = "bg-red-100 text-red-700";
+                if (rep.theme === 'blue') themeBg = "bg-blue-100 text-blue-700";
+                if (rep.theme === 'amber') themeBg = "bg-amber-100 text-amber-700";
+
+                item.onclick = () => selectReport(rep.id);
+
+                item.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-xl ${themeBg} flex items-center justify-center shrink-0 font-bold text-xs mt-0.5">
+                            <i class="fas fa-file-excel"></i>
+                        </div>
+                        <div class="flex-1 overflow-hidden">
+                            <h4 class="text-xs font-bold text-slate-800 truncate ${isActive ? 'text-brand-900 font-extrabold' : ''}">${escapeHtml(rep.title)}</h4>
+                            <p class="text-[10px] text-slate-400 truncate mt-0.5">${escapeHtml(rep.desc || 'Google Sheet Report')}</p>
+                        </div>
+                        ${isActive ? '<i class="fas fa-chevron-right text-xs text-brand-600 self-center"></i>' : ''}
+                    </div>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        function filterReports() {
+            const query = document.getElementById('searchReport').value.trim();
+            renderReportList(query);
+        }
+
+        function selectReport(id) {
+            const rep = reports.find(r => r.id === id);
+            if (!rep) return;
+
+            currentActiveId = id;
+            renderReportList(document.getElementById('searchReport').value.trim());
+
+            document.getElementById('activeTitle').innerText = rep.title;
+            document.getElementById('activeSubtitle').innerText = rep.desc || 'Google Sheets Embed Viewer';
+
+            const iconBg = document.getElementById('activeIconContainer');
+            if (rep.theme === 'brand') iconBg.className = "w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center shrink-0";
+            else if (rep.theme === 'blue') iconBg.className = "w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0";
+            else if (rep.theme === 'amber') iconBg.className = "w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0";
+            else iconBg.className = "w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0";
+
+            document.getElementById('emptyState').classList.add('hidden');
+            showIframeLoader();
+
+            const iframe = document.getElementById('sheetIframe');
+            iframe.src = rep.embedUrl || convertToEmbedUrl(rep.rawUrl);
+        }
+
+        function showIframeLoader() {
+            const loader = document.getElementById('iframeLoader');
+            loader.style.opacity = '1';
+            loader.style.pointerEvents = 'auto';
+        }
+
+        function hideIframeLoader() {
+            const loader = document.getElementById('iframeLoader');
+            loader.style.opacity = '0';
+            loader.style.pointerEvents = 'none';
+        }
+
+        function showEmptyState() {
+            currentActiveId = null;
+            document.getElementById('sheetIframe').src = 'about:blank';
+            document.getElementById('emptyState').classList.remove('hidden');
+            document.getElementById('activeTitle').innerText = "Belum Ada Laporan";
+            document.getElementById('activeSubtitle').innerText = "Portal Google Sheets Viewer";
+            hideIframeLoader();
+            renderReportList();
+        }
+
+        function refreshActiveIframe() {
+            if (!currentActiveId) return;
+            showIframeLoader();
+            const iframe = document.getElementById('sheetIframe');
+            const currentSrc = iframe.src;
+            iframe.src = 'about:blank';
+            setTimeout(() => { iframe.src = currentSrc; }, 100);
+        }
+
+        function openActiveExternal() {
+            if (!currentActiveId) return;
+            const rep = reports.find(r => r.id === currentActiveId);
+            if (rep && rep.rawUrl) {
+                window.open(rep.rawUrl, '_blank');
+            }
+        }
+
+        function toggleFullscreen() {
+            const wrapper = document.getElementById('embedWrapper');
+            if (!document.fullscreenElement) {
+                wrapper.requestFullscreen().catch(err => {
+                    showToast(`❌ Gagal masuk layar penuh: ${err.message}`, "error");
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function openAddReportModal() {
+            document.getElementById('modalTitle').innerText = "Tambah Link Sheet Laporan";
+            document.getElementById('editReportId').value = "";
+            document.getElementById('sheetTitle').value = "";
+            document.getElementById('sheetUrl').value = "";
+            document.getElementById('sheetTheme').value = "emerald";
+            document.getElementById('sheetDesc').value = "";
+            document.getElementById('reportModal').classList.remove('hidden');
+            document.getElementById('reportModal').classList.add('flex');
+        }
+
+        function editCurrentReport() {
+            if (!currentActiveId) return;
+            const rep = reports.find(r => r.id === currentActiveId);
+            if (!rep) return;
+
+            document.getElementById('modalTitle').innerText = "Edit Link Sheet Laporan";
+            document.getElementById('editReportId').value = rep.id;
+            document.getElementById('sheetTitle').value = rep.title;
+            document.getElementById('sheetUrl').value = rep.rawUrl || rep.embedUrl;
+            document.getElementById('sheetTheme').value = rep.theme || "emerald";
+            document.getElementById('sheetDesc').value = rep.desc || "";
+
+            document.getElementById('reportModal').classList.remove('hidden');
+            document.getElementById('reportModal').classList.add('flex');
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.add('hidden');
+            document.getElementById('reportModal').classList.remove('flex');
+        }
+
+        async function saveReport() {
+            const editId = document.getElementById('editReportId').value;
+            const title = document.getElementById('sheetTitle').value.trim();
+            const rawUrl = document.getElementById('sheetUrl').value.trim();
+            const theme = document.getElementById('sheetTheme').value;
+            const desc = document.getElementById('sheetDesc').value.trim();
+
+            if (!title || !rawUrl) {
+                showToast("⚠️ Judul dan URL Google Sheet tidak boleh kosong!", "warning");
+                return;
+            }
+
+            if (!webAppUrl) {
+                showToast("⚠️ URL Google Apps Script belum diatur!", "error");
+                openApiConfigModal();
+                return;
+            }
+
+            const embedUrl = convertToEmbedUrl(rawUrl);
+            const saveBtnText = document.getElementById('saveReportBtnText');
+            const saveSpinner = document.getElementById('saveReportSpinner');
+
+            saveBtnText.innerText = "Menyimpan...";
+            saveSpinner.classList.remove('hidden');
+
+            const reportData = {
+                id: editId || ("rep-" + Date.now()),
+                title,
+                rawUrl,
+                embedUrl,
+                theme,
+                desc
+            };
+
+            try {
+                const action = editId ? "updateReport" : "addReport";
+                const res = await callGasApi(action, { report: reportData });
+                if (res && res.status === "success") {
+                    showToast(`✅ ${res.message || 'Laporan berhasil disimpan di Google Sheets!'}`, "success");
+                    await fetchReportsFromBackend();
+                    closeReportModal();
+                } else {
+                    showToast(`❌ ${res.message || 'Gagal menyimpan laporan.'}`, "error");
+                }
+            } catch (e) {
+                console.error("GAS API Sync Error:", e);
+                showToast(`❌ Gagal terhubung ke server Backend: ${e.message}`, "error");
+            } finally {
+                saveBtnText.innerText = "Simpan Laporan";
+                saveSpinner.classList.add('hidden');
+            }
+        }
+
+        function deleteCurrentReport() {
+            if (!currentActiveId) return;
+            const rep = reports.find(r => r.id === currentActiveId);
+            if (!rep) return;
+
+            reportToDeleteId = currentActiveId;
+            document.getElementById('deleteModalText').innerText = `Apakah Anda yakin ingin menghapus "${rep.title}"?`;
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteModal').classList.add('flex');
+        }
+
+        function closeDeleteModal() {
+            reportToDeleteId = null;
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.getElementById('deleteModal').classList.remove('flex');
+        }
+
+        async function confirmDeleteReport() {
+            if (!reportToDeleteId) return;
+
+            if (!webAppUrl) {
+                showToast("⚠️ URL Google Apps Script belum diatur!", "error");
+                closeDeleteModal();
+                return;
+            }
+
+            const deleteBtnText = document.getElementById('deleteBtnText');
+            const deleteBtnSpinner = document.getElementById('deleteBtnSpinner');
+
+            deleteBtnText.innerText = "Menghapus...";
+            deleteBtnSpinner.classList.remove('hidden');
+
+            try {
+                const res = await callGasApi("deleteReport", { id: reportToDeleteId });
+                if (res && res.status === "success") {
+                    showToast("🗑️ Laporan berhasil dihapus dari Google Sheets!", "success");
+                    await fetchReportsFromBackend();
+                    closeDeleteModal();
+                } else {
+                    showToast(`❌ ${res.message || 'Gagal menghapus laporan.'}`, "error");
+                }
+            } catch (e) {
+                console.error("GAS API Delete Error:", e);
+                showToast(`❌ Gagal terhubung ke server Backend: ${e.message}`, "error");
+            } finally {
+                deleteBtnText.innerText = "Hapus";
+                deleteBtnSpinner.classList.add('hidden');
+            }
+        }
+
+        function openApiConfigModal() {
+            if (!currentUser || currentUser.role !== 'admin') {
+                showToast("⚠️ Akses ditolak! Pengaturan API Backend hanya dapat dibuka oleh Admin.", "warning");
+                return;
+            }
+            document.getElementById('webAppUrlInput').value = webAppUrl;
+            document.getElementById('apiConfigModal').classList.remove('hidden');
+            document.getElementById('apiConfigModal').classList.add('flex');
+        }
+
+        function closeApiConfigModal() {
+            document.getElementById('apiConfigModal').classList.add('hidden');
+            document.getElementById('apiConfigModal').classList.remove('flex');
+        }
+
+        function saveApiUrl() {
+            const inputVal = document.getElementById('webAppUrlInput').value.trim();
+            webAppUrl = inputVal;
+            localStorage.setItem('santafe_gas_url', inputVal);
+            updateConnectionBadgeStatus();
+            closeApiConfigModal();
+            showToast("⚙️ URL Google Apps Script diperbarui!", "success");
+            fetchReportsFromBackend();
+        }
+
+        async function testApiConnection() {
+            const statusEl = document.getElementById('apiConfigStatusText');
+            const urlInput = document.getElementById('webAppUrlInput').value.trim();
+
+            if (!urlInput) {
+                statusEl.innerHTML = `<span class="text-red-500 font-bold">❌ Masukkan URL Web App!</span>`;
+                return;
+            }
+
+            statusEl.innerHTML = `<span class="text-amber-600 font-bold"><i class="fas fa-spinner fa-spin"></i> Menguji koneksi...</span>`;
+
+            try {
+                const response = await fetch(urlInput, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({ action: "ping" })
+                });
+
+                const data = await response.json();
+                if (data && data.status === "success") {
+                    statusEl.innerHTML = `<span class="text-emerald-600 font-bold"><i class="fas fa-check-circle"></i> Terhubung ke Apps Script!</span>`;
+                } else {
+                    statusEl.innerHTML = `<span class="text-red-500 font-bold">⚠️ Respons tidak valid.</span>`;
+                }
+            } catch (e) {
+                statusEl.innerHTML = `<span class="text-red-500 font-bold">❌ Gagal terhubung (CORS / URL Salah)</span>`;
+            }
+        }
+
+        function updateConnectionBadgeStatus() {
+            const loginDot = document.getElementById('loginApiDot');
+            const loginText = document.getElementById('loginApiText');
+            const appBadge = document.getElementById('appBackendStatusBadge');
+
+            if (webAppUrl) {
+                if (loginDot) loginDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500";
+                if (loginText) loginText.innerText = "Terhubung ke Google Apps Script API";
+                if (appBadge) {
+                    appBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 flex items-center gap-1";
+                    appBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Online`;
+                }
+            } else {
+                if (loginDot) loginDot.className = "w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse";
+                if (loginText) loginText.innerText = "URL Script Belum Dikonfigurasi";
+                if (appBadge) {
+                    appBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-md bg-red-100 text-red-800 flex items-center gap-1";
+                    appBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-600"></span> Belum Terhubung`;
+                }
+            }
+        }
+
+        function openAppsScriptModal() {
+            document.getElementById('appsScriptModal').classList.remove('hidden');
+            document.getElementById('appsScriptModal').classList.add('flex');
+        }
+
+        function closeAppsScriptModal() {
+            document.getElementById('appsScriptModal').classList.add('hidden');
+            document.getElementById('appsScriptModal').classList.remove('flex');
+        }
+
+        function generateAppsScriptCodeText() {
+            const code = `/**
+ * SANTAFE REPORT VIEWER - GOOGLE APPS SCRIPT BACKEND (Code.gs)
+ * Salin dan tempel kode ini di Ekstensi > Apps Script Spreadsheet Anda.
+ * Setup berjalan 100% OTOMATIS saat ada request atau saat spreadsheet dibuka.
+ */
+
+function doGet(e) {
+  return handleRequest(e);
+}
+
+function doPost(e) {
+  return handleRequest(e);
+}
+
+/** Otomatisasi saat Spreadsheet dibuka */
+function onOpen() {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    ensureSetup(ss);
+    
+    SpreadsheetApp.getUi()
+      .createMenu('Santafe Reports')
+      .addItem('⚡ Setup Database Otomatis', 'setupSheet')
+      .addItem('🔄 Refresh Data Reports', 'getReports')
+      .addToUi();
+  } catch (err) {}
+}
+
+function handleRequest(e) {
+  var lock = LockService.getScriptLock();
+  lock.tryLock(10000);
+
+  try {
+    var data = {};
+    if (e && e.postData && e.postData.contents) {
+      try {
+        data = JSON.parse(e.postData.contents);
+      } catch(err) {
+        data = e.parameter || {};
+      }
+    } else if (e && e.parameter) {
+      data = e.parameter;
+    }
+
+    var action = data.action || 'getReports';
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    
+    // Auto Setup database jika belum ada
+    ensureSetup(ss);
+
+    var response = { status: 'error', message: 'Aksi tidak dikenal' };
+
+    if (action === 'ping') {
+      response = { status: 'success', message: 'Koneksi ke Google Apps Script Berhasil!' };
+    } else if (action === 'setup') {
+      response = setupSheet(ss);
+    } else if (action === 'login') {
+      response = loginUser(ss, data.username, data.password);
+    } else if (action === 'getReports') {
+      response = getReports(ss);
+    } else if (action === 'addReport') {
+      response = addReport(ss, data.report);
+    } else if (action === 'updateReport') {
+      response = updateReport(ss, data.report);
+    } else if (action === 'deleteReport') {
+      response = deleteReport(ss, data.id);
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(response))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** Memastikan ketersediaan tab Users & Reports secara otomatis */
+function ensureSetup(ss) {
+  if (!ss) ss = SpreadsheetApp.getActiveSpreadsheet();
+  var userSheet = ss.getSheetByName('Users');
+  var repSheet = ss.getSheetByName('Reports');
+
+  if (!userSheet || !repSheet) {
+    setupSheet(ss);
+    return true;
+  }
+  return false;
+}
+
+function setupSheet(targetSs) {
+  var ss = targetSs || SpreadsheetApp.getActiveSpreadsheet();
+
+  // Tab Users
+  var userSheet = ss.getSheetByName('Users');
+  if (!userSheet) {
+    userSheet = ss.insertSheet('Users');
+    userSheet.getRange('A1:D1').setValues([['username', 'password', 'name', 'role']]);
+    userSheet.getRange('A1:D1').setFontWeight('bold').setBackground('#10b981').setFontColor('#ffffff');
+    userSheet.appendRow(['admin', 'admin123', 'Administrator WHS', 'admin']);
+    userSheet.appendRow(['user', 'user123', 'User Biasa Lapangan', 'user']);
+  }
+
+  // Tab Reports
+  var repSheet = ss.getSheetByName('Reports');
+  if (!repSheet) {
+    repSheet = ss.insertSheet('Reports');
+    repSheet.getRange('A1:F1').setValues([['id', 'title', 'theme', 'desc', 'rawUrl', 'embedUrl']]);
+    repSheet.getRange('A1:F1').setFontWeight('bold').setBackground('#ef4444').setFontColor('#ffffff');
+    repSheet.appendRow([
+      'rep-1',
+      'Laporan Ringkasan Stok & Inventaris',
+      'emerald',
+      'Data ketersediaan barang dan pergerakan stok gudang WHS',
+      'https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit#gid=0',
+      'https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/htmlview?widget=true&headers=false'
+    ]);
+  }
+
+  return { status: 'success', message: 'Database Sheet berhasil diinisialisasi secara otomatis!' };
+}
+
+function loginUser(ss, username, password) {
+  var sheet = ss.getSheetByName('Users');
+  if (!sheet) ensureSetup(ss);
+  sheet = ss.getSheetByName('Users');
+
+  var data = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]).toLowerCase() === String(username).toLowerCase() && String(data[i][1]) === String(password)) {
+      return {
+        status: 'success',
+        user: {
+          username: data[i][0],
+          name: data[i][2],
+          role: data[i][3]
+        }
+      };
+    }
+  }
+  return { status: 'error', message: 'Username atau Password salah!' };
+}
+
+function getReports(ss) {
+  var sheet = ss.getSheetByName('Reports');
+  if (!sheet) ensureSetup(ss);
+  sheet = ss.getSheetByName('Reports');
+
+  var data = sheet.getDataRange().getValues();
+  var reports = [];
+  for (var i = 1; i < data.length; i++) {
+    if (data[i][0]) {
+      reports.push({
+        id: String(data[i][0]),
+        title: String(data[i][1] || ''),
+        theme: String(data[i][2] || 'emerald'),
+        desc: String(data[i][3] || ''),
+        rawUrl: String(data[i][4] || ''),
+        embedUrl: String(data[i][5] || '')
+      });
+    }
+  }
+  return { status: 'success', reports: reports };
+}
+
+function addReport(ss, rep) {
+  var sheet = ss.getSheetByName('Reports');
+  if (!sheet) ensureSetup(ss);
+  sheet = ss.getSheetByName('Reports');
+
+  sheet.appendRow([rep.id, rep.title, rep.theme, rep.desc, rep.rawUrl, rep.embedUrl]);
+  return { status: 'success', message: 'Laporan baru berhasil ditambahkan ke Sheet!' };
+}
+
+function updateReport(ss, rep) {
+  var sheet = ss.getSheetByName('Reports');
+  if (!sheet) return { status: 'error', message: 'Sheet Reports tidak ditemukan' };
+
+  var data = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]) === String(rep.id)) {
+      sheet.getRange(i + 1, 2, 1, 5).setValues([[rep.title, rep.theme, rep.desc, rep.rawUrl, rep.embedUrl]]);
+      return { status: 'success', message: 'Laporan berhasil diperbarui di Sheet!' };
+    }
+  }
+  return { status: 'error', message: 'ID Laporan tidak ditemukan!' };
+}
+
+function deleteReport(ss, id) {
+  var sheet = ss.getSheetByName('Reports');
+  if (!sheet) return { status: 'error', message: 'Sheet Reports tidak ditemukan' };
+
+  var data = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]) === String(id)) {
+      sheet.deleteRow(i + 1);
+      return { status: 'success', message: 'Laporan berhasil dihapus dari Sheet!' };
+    }
+  }
+  return { status: 'error', message: 'ID Laporan tidak ditemukan!' };
+}`;
+
+            document.getElementById('appsScriptCodeContent').textContent = code;
+        }
+
+        function copyAppsScriptCode() {
+            const codeText = document.getElementById('appsScriptCodeContent').textContent;
+            navigator.clipboard.writeText(codeText).then(() => {
+                showToast("📋 Kode Google Apps Script disalin ke clipboard!", "success");
+            }).catch(() => {
+                showToast("❌ Gagal menyalin kode.", "error");
+            });
+        }
+
+        function showToast(msg, type = "info") {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const text = document.getElementById('toastMessage');
+
+            if (type === "success") icon.className = "fas fa-circle-check text-emerald-400";
+            else if (type === "error") icon.className = "fas fa-circle-xmark text-red-400";
+            else if (type === "warning") icon.className = "fas fa-triangle-exclamation text-amber-400";
+            else icon.className = "fas fa-circle-info text-blue-400";
+
+            text.innerText = msg;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+
+</html>
