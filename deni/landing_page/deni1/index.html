@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>De-Store - Katalog Produk & Pemesanan</title>
+    <!-- Tailwind CSS untuk styling cepat dan modern -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fb-blue { background-color: #1877F2; }
+        .fb-blue-hover:hover { background-color: #166fe5; }
+        .fb-bg { background-color: #f0f2f5; }
+    </style>
+</head>
+<body class="fb-bg font-sans antialiased min-h-screen flex flex-col justify-between">
+
+    <div>
+        <!-- Header / Navbar ala Facebook -->
+        <header class="bg-white shadow-sm sticky top-0 z-50">
+            <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl font-bold text-[#1877F2] tracking-tight">De-Store</span>
+                </div>
+                <div class="text-sm font-semibold text-gray-600">
+                    Pusat Pre-Order Resmi
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Container -->
+        <main class="max-w-5xl mx-auto px-4 py-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Kolom Katalog Produk (Kiri - 2 Kolom) -->
+            <section class="md:col-span-2 space-y-4">
+                <h2 class="text-xl font-bold text-gray-800">Katalog Produk</h2>
+                
+                <!-- Loading State / Produk Dinamis -->
+                <div id="productContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-white p-6 rounded-lg shadow-sm text-center col-span-2 text-gray-500">
+                        Memuat katalog produk...
+                    </div>
+                </div>
+            </section>
+
+            <!-- Kolom Form Checkout (Kanan - 1 Kolom) -->
+            <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 h-fit sticky top-20">
+                <h2 class="text-lg font-bold text-gray-800 border-b pb-3 mb-4">Formulir Pesanan</h2>
+                
+                <form id="orderForm" onsubmit="handleCheckout(event)" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Produk Dipilih</label>
+                        <input type="text" id="product" name="product" required readonly class="w-full bg-gray-100 border border-gray-300 rounded-md p-2 text-sm text-gray-700 focus:outline-none" placeholder="Pilih produk dari katalog...">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Nama Lengkap</label>
+                        <input type="text" id="name" name="name" required placeholder="Contoh: Budi Santoso" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-[#1877F2] focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Nomor WhatsApp</label>
+                        <input type="tel" id="phone" name="phone" required placeholder="08xxxxxxxxxx" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-[#1877F2] focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Alamat Pengiriman</label>
+                        <textarea id="address" name="address" rows="2" required placeholder="Alamat lengkap tujuan..." class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-[#1877F2] focus:outline-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Jumlah (Qty)</label>
+                        <input type="number" id="qty" name="qty" min="1" value="1" required class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-[#1877F2] focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Catatan Tambahan (Opsional)</label>
+                        <input type="text" id="note" name="note" placeholder="Misal: Warna hitam" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-[#1877F2] focus:outline-none">
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="w-full bg-[#42b72a] hover:bg-[#36a420] text-white font-bold py-2.5 rounded-md text-sm transition mt-2">
+                        Kirim Pesanan & Konfirmasi WA
+                    </button>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer dengan tautan tersembunyi Admin -->
+    <footer class="bg-white border-t border-gray-200 py-4 mt-8">
+        <div class="max-w-5xl mx-auto px-4 flex justify-between items-center text-xs text-gray-500">
+            <p>&copy; 2026 De-Store. All rights reserved.</p>
+            <button onclick="openAdminLogin()" class="hover:underline text-gray-400 hover:text-gray-700">admin</button>
+        </div>
+    </footer>
+
+    <!-- MODAL LOGIN ADMIN -->
+    <div id="adminLoginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-lg relative">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Login Admin Panel</h3>
+            <form onsubmit="handleAdminLogin(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Username</label>
+                    <input type="text" id="adminUser" required class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-[#1877F2] focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Password</label>
+                    <input type="password" id="adminPass" required class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-[#1877F2] focus:outline-none">
+                </div>
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closeAdminLogin()" class="w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 rounded-md text-sm">Batal</button>
+                    <button type="submit" class="w-1/2 fb-blue text-white font-semibold py-2 rounded-md text-sm fb-blue-hover">Masuk</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DASHBOARD ADMIN / TAMBAH PRODUK -->
+    <div id="adminPanelModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-lg w-full p-6 shadow-lg max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h3 class="text-lg font-bold text-gray-800">Admin Dashboard - Tambah Produk</h3>
+                <button onclick="closeAdminPanel()" class="text-gray-500 hover:text-gray-800 font-bold">&times;</button>
+            </div>
+            
+            <form id="addProductForm" onsubmit="handleAddProduct(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Nama Produk</label>
+                    <input type="text" id="newTitle" required placeholder="Contoh: Tas Selempang Kulit" class="w-full border border-gray-300 rounded-md p-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Harga (Angka saja atau Format Rp)</label>
+                    <input type="text" id="newPrice" required placeholder="175000 atau Rp 175.000" class="w-full border border-gray-300 rounded-md p-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">URL Gambar Produk</label>
+                    <input type="url" id="newImage" required placeholder="https://images.unsplash.com/..." class="w-full border border-gray-300 rounded-md p-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Deskripsi Singkat</label>
+                    <textarea id="newDesc" rows="2" required placeholder="Deskripsi produk..." class="w-full border border-gray-300 rounded-md p-2 text-sm"></textarea>
+                </div>
+                <button type="submit" id="addProductBtn" class="w-full bg-[#42b72a] hover:bg-[#36a420] text-white font-bold py-2.5 rounded-md text-sm transition mt-2">
+                    Simpan & Tambah ke Katalog
+                </button>
+            </form>
+            
+            <div class="mt-6 border-t pt-4">
+                <button onclick="closeAdminPanel()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 rounded-md text-sm">Tutup Panel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Client-Side -->
+    <script>
+        // CONFIGURATION: URL Web App Google Apps Script Anda
+        const API_URL = "https://script.google.com/macros/s/AKfycbzcjcgEMWrqdERwSo8HxT4m-Sxl61HNNnmSx3b6vKhryFjI0PLBYzsRAyF5K3DqGa0/exec"; 
+
+        // Load data produk saat halaman pertama kali dibuka
+        window.onload = function() {
+            fetchProducts();
+        };
+
+        function fetchProducts() {
+            // Fetch via Web App URL (GET request dengan parameter action=getProducts)
+            fetch(API_URL + "?action=getProducts")
+                .then(res => res.json())
+                .then(products => {
+                    renderProducts(products);
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('productContainer').innerHTML = '<div class="bg-white p-6 rounded-lg shadow-sm text-center col-span-2 text-red-500">Gagal memuat produk dari server. Periksa kembali URL API.</div>';
+                });
+        }
+
+        function renderProducts(products) {
+            const container = document.getElementById('productContainer');
+            if (!products || products.length === 0) {
+                container.innerHTML = '<div class="bg-white p-6 rounded-lg shadow-sm text-center col-span-2 text-gray-500">Belum ada produk di katalog. Silakan tambah melalui panel admin.</div>';
+                return;
+            }
+
+            let html = '';
+            products.forEach(p => {
+                html += `
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+                        <img src="${p.image}" alt="${p.title}" class="h-48 w-full object-cover" onerror="this.src='https://placehold.co/500x300/e2e8f0/475569?text=Produk'">
+                        <div class="p-4 flex flex-col flex-grow">
+                            <h3 class="font-bold text-gray-900 text-lg">${p.title}</h3>
+                            <p class="text-[#1877F2] font-semibold text-base mt-1">${p.price}</p>
+                            <p class="text-gray-500 text-xs mt-2 flex-grow">${p.desc}</p>
+                            <button onclick="selectProduct('${p.title.replace(/'/g, "\\'")}')" class="mt-4 w-full fb-blue text-white py-2 rounded-md font-semibold text-sm fb-blue-hover transition">
+                                Pilih Produk Ini
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function selectProduct(productName) {
+            document.getElementById('product').value = productName;
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function handleCheckout(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerText = "Memproses Pesanan...";
+
+            const data = {
+                action: 'saveOrder',
+                product: document.getElementById('product').value,
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                qty: document.getElementById('qty').value,
+                note: document.getElementById('note').value
+            };
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(response => {
+                if (response.status === "success") {
+                    alert("Pesanan berhasil dicatat!");
+                    
+                    const adminPhone = "628561510800"; 
+                    const waMessage = `Halo Admin De-Store, saya ingin memesan:%0A%0A` +
+                                      `- *Produk:* ${data.product}%0A` +
+                                      `- *Jumlah:* ${data.qty}%0A` +
+                                      `- *Nama:* ${data.name}%0A` +
+                                      `- *No. WA:* ${data.phone}%0A` +
+                                      `- *Alamat:* ${data.address}%0A` +
+                                      `- *Catatan:* ${data.note || '-'}`;
+
+                    window.open(`https://wa.me/${adminPhone}?text=${waMessage}`, '_blank');
+                    document.getElementById('orderForm').reset();
+                } else {
+                    alert("Gagal: " + response.message);
+                }
+                btn.disabled = false;
+                btn.innerText = "Kirim Pesanan & Konfirmasi WA";
+            })
+            .catch(err => {
+                alert("Terjadi kesalahan sistem: " + err.message);
+                btn.disabled = false;
+                btn.innerText = "Kirim Pesanan & Konfirmasi WA";
+            });
+        }
+
+        // Admin Modal Controls
+        function openAdminLogin() {
+            document.getElementById('adminLoginModal').classList.remove('hidden');
+        }
+        function closeAdminLogin() {
+            document.getElementById('adminLoginModal').classList.add('hidden');
+            document.getElementById('adminUser').value = '';
+            document.getElementById('adminPass').value = '';
+        }
+        function openAdminPanel() {
+            document.getElementById('adminPanelModal').classList.remove('hidden');
+        }
+        function closeAdminPanel() {
+            document.getElementById('adminPanelModal').classList.add('hidden');
+            document.getElementById('addProductForm').reset();
+            fetchProducts(); // Refresh katalog
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('adminUser').value;
+            const p = document.getElementById('adminPass').value;
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'verifyAdmin', username: u, password: p })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === "success") {
+                    closeAdminLogin();
+                    openAdminPanel();
+                } else {
+                    alert("Username atau Password salah!");
+                }
+            })
+            .catch(err => alert("Error: " + err.message));
+        }
+
+        function handleAddProduct(e) {
+            e.preventDefault();
+            const btn = document.getElementById('addProductBtn');
+            btn.disabled = true;
+            btn.innerText = "Menyimpan...";
+
+            const productData = {
+                action: 'addProduct',
+                title: document.getElementById('newTitle').value,
+                price: document.getElementById('newPrice').value,
+                image: document.getElementById('newImage').value,
+                desc: document.getElementById('newDesc').value
+            };
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify(productData)
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === "success") {
+                    alert("Produk berhasil ditambahkan ke katalog produk!");
+                    document.getElementById('addProductForm').reset();
+                } else {
+                    alert("Gagal: " + res.message);
+                }
+                btn.disabled = false;
+                btn.innerText = "Simpan & Tambah ke Katalog";
+            })
+            .catch(err => {
+                alert("Error: " + err.message);
+                btn.disabled = false;
+                btn.innerText = "Simpan & Tambah ke Katalog";
+            });
+        }
+    </script>
+</body>
+</html>
