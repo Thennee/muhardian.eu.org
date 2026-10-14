@@ -217,7 +217,7 @@
       
       <div class="mt-4 pt-1">
         <a href="https://muhardian.eu.org" target="_blank" rel="noopener noreferrer" class="text-decoration-none text-muted small fw-semibold" style="font-size: 0.75rem;">
-          &copy; 2026 ver3
+          &copy; 2026 ver4
         </a>
       </div>
     </div>
@@ -335,57 +335,54 @@
               </div>
             </div>
 
-            <div class="row g-3 mb-4">
+            <div class="row g-3 mb-3">
               <div class="col-6">
                 <label class="form-label fw-bold small d-block text-center" style="font-weight: 700; color: #1e293b;">Number of L/Van - Start</label>
                 <select id="invLocStart" class="form-select custom-select-box" required>
                   <option value="1" selected>1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
-                  <option value="7">7</option>
-                  <option value="8">8</option>
-                  <option value="9">9</option>
-                  <option value="10">10</option>
-                  <option value="11">11</option>
-                  <option value="12">12</option>
-                  <option value="13">13</option>
-                  <option value="14">14</option>
-                  <option value="15">15</option>
-                  <option value="16">16</option>
-                  <option value="17">17</option>
-                  <option value="18">18</option>
-                  <option value="19">19</option>
-                  <option value="20">20</option>
+                  <option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                  <option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
+                  <option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option>
+                  <option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option>
                 </select>
               </div>
               <div class="col-6">
                 <label class="form-label fw-bold small d-block text-center" style="font-weight: 700; color: #1e293b;">Number of L/Van - End</label>
                 <select id="invLocEnd" class="form-select custom-select-box" required>
                   <option value="1" selected>1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
-                  <option value="7">7</option>
-                  <option value="8">8</option>
-                  <option value="9">9</option>
-                  <option value="10">10</option>
-                  <option value="11">11</option>
-                  <option value="12">12</option>
-                  <option value="13">13</option>
-                  <option value="14">14</option>
-                  <option value="15">15</option>
-                  <option value="16">16</option>
-                  <option value="17">17</option>
-                  <option value="18">18</option>
-                  <option value="19">19</option>
-                  <option value="20">20</option>
+                  <option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                  <option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
+                  <option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option>
+                  <option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option>
                 </select>
               </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-800 small text-uppercase" style="font-weight: 800; color: #1e293b; letter-spacing: 0.3px;">Package</label>
+              <select id="invPackage" class="form-select custom-select-box" required>
+                <option value="Air Outbound" selected>Air Outbound</option>
+                <option value="Sea Inbound">Sea Inbound</option>
+                <option value="Sea Outbound">Sea Outbound</option>
+                <option value="Domestic Inbound">Domestic Inbound</option>
+                <option value="Domestic Outbound">Domestic Outbound</option>
+                <option value="Storage">Storage</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-800 small text-uppercase" style="font-weight: 800; color: #1e293b; letter-spacing: 0.3px;">Jenis L/Van</label>
+              <select id="invJenisVan" class="form-select custom-select-box" required>
+                <option value="BT" selected>BT</option>
+                <option value="KP">KP</option>
+                <option value="KT">KT</option>
+                <option value="Palet">Palet</option>
+              </select>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-800 small text-uppercase" style="font-weight: 800; color: #1e293b; letter-spacing: 0.3px;">Jumlah Package</label>
+              <input type="number" id="invJumlahPackage" class="form-control" placeholder="Masukkan jumlah package" min="1" value="1" required>
             </div>
 
             <button type="submit" class="btn btn-danger w-100 rounded-pill py-3 fw-bold shadow-sm" 
@@ -465,6 +462,9 @@
               location: payload.location || 'LOC-QR',
               locStart: payload.locStart || '1',
               locEnd: payload.locEnd || '1',
+              packageOpt: payload.packageOpt || 'Air Outbound',
+              jenisVan: payload.jenisVan || 'BT',
+              jumlahPackage: payload.jumlahPackage || '1',
               pic: payload.pic || 'admin',
               timestamp: new Date().toLocaleString('id-ID')
             });
@@ -666,6 +666,9 @@
         location: 'STUFFING AREA',
         locStart: '1',
         locEnd: '1',
+        packageOpt: '-',
+        jenisVan: '-',
+        jumlahPackage: '0',
         pic: currentUser ? currentUser.username : 'admin'
       };
 
@@ -697,6 +700,9 @@
 
       const locStartVal = document.getElementById('invLocStart').value;
       const locEndVal = document.getElementById('invLocEnd').value;
+      const packageVal = document.getElementById('invPackage').value;
+      const jenisVanVal = document.getElementById('invJenisVan').value;
+      const jumlahPkgVal = document.getElementById('invJumlahPackage').value;
 
       const payload = {
         type: activeModule,
@@ -704,6 +710,9 @@
         location: locationVal,
         locStart: locStartVal,
         locEnd: locEndVal,
+        packageOpt: packageVal,
+        jenisVan: jenisVanVal,
+        jumlahPackage: jumlahPkgVal,
         pic: currentUser ? currentUser.username : 'admin'
       };
 
@@ -741,6 +750,10 @@
             ? `${item.locStart} - ${item.locEnd}` 
             : (item.locStart || item.locEnd || '1');
 
+          let packageDisplay = item.packageOpt ? `<div class="text-muted small mb-1">Package: <b>${item.packageOpt}</b></div>` : '';
+          let jenisVanDisplay = item.jenisVan ? `<div class="text-muted small mb-1">Jenis L/Van: <b>${item.jenisVan}</b></div>` : '';
+          let jumlahPkgDisplay = item.jumlahPackage !== undefined ? `<div class="text-muted small mb-1">Jumlah Package: <b class="text-danger">${item.jumlahPackage}</b></div>` : '';
+
           html += `
             <div class="card border-0 shadow-sm rounded-4 mb-3 p-3" style="background: white;">
               <div class="d-flex justify-content-between align-items-center mb-2">
@@ -749,7 +762,10 @@
               </div>
               <h6 class="fw-bold mb-1">${item.barcode}</h6>
               <div class="text-muted small mb-1">PIC: <b class="text-danger">${item.pic || '-'}</b></div>
-              <div class="text-muted small mb-2">Location: <b>${item.location || '-'}</b></div>
+              <div class="text-muted small mb-1">Location: <b>${item.location || '-'}</b></div>
+              ${packageDisplay}
+              ${jenisVanDisplay}
+              ${jumlahPkgDisplay}
               <div class="pt-2 border-top d-flex justify-content-between align-items-center small text-muted">
                 <span>Number of L/Van: <b class="text-danger">${numLVanDisplay}</b></span>
               </div>
