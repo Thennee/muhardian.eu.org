@@ -217,7 +217,7 @@
       
       <div class="mt-4 pt-1">
         <a href="https://muhardian.eu.org" target="_blank" rel="noopener noreferrer" class="text-decoration-none text-muted small fw-semibold" style="font-size: 0.75rem;">
-          &copy; 2026 ver4
+          &copy; 2026 ver5
         </a>
       </div>
     </div>
@@ -382,7 +382,7 @@
 
             <div class="mb-4">
               <label class="form-label fw-800 small text-uppercase" style="font-weight: 800; color: #1e293b; letter-spacing: 0.3px;">Jumlah Package</label>
-              <input type="number" id="invJumlahPackage" class="form-control" placeholder="Masukkan jumlah package" min="1" value="1" required>
+              <input type="number" id="invJumlahPackage" class="form-control text-center fw-bold" placeholder="Masukkan jumlah package" min="1" value="1" required>
             </div>
 
             <button type="submit" class="btn btn-danger w-100 rounded-pill py-3 fw-bold shadow-sm" 
@@ -404,6 +404,19 @@
     let dbHistory = [];
     let html5QrcodeScanner = null;
     let activeScanTarget = null;
+
+    // Helper untuk memicu efek getar dan suara sukses
+    function triggerSuccessFeedback() {
+      if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200]);
+      }
+      try {
+        const audio = new Audio('https://muhardian.eu.org/whs/temp_project/iphone.wav');
+        audio.play().catch(err => console.log("Audio play prevented:", err));
+      } catch (err) {
+        console.warn("Audio error:", err);
+      }
+    }
 
     async function checkDuplicateStuffing(barcode) {
       if (!barcode) return false;
@@ -677,6 +690,7 @@
 
       const res = await apiCall('saveInventory', payload);
       if (res.success) {
+        triggerSuccessFeedback();
         Swal.fire({ icon: 'success', title: 'Berhasil Disimpan', timer: 1500, showConfirmButton: false });
       } else {
         Swal.fire('Gagal Menyimpan', res.message || 'Terjadi kesalahan', 'error');
@@ -721,6 +735,7 @@
 
       const res = await apiCall('saveInventory', payload);
       if (res.success) {
+        triggerSuccessFeedback();
         Swal.fire({ icon: 'success', title: `Data ${activeModule} Berhasil Disimpan`, timer: 1500, showConfirmButton: false });
       } else {
         Swal.fire('Gagal Menyimpan', res.message || 'Terjadi kesalahan', 'error');
@@ -750,9 +765,9 @@
             ? `${item.locStart} - ${item.locEnd}` 
             : (item.locStart || item.locEnd || '1');
 
-          let packageDisplay = item.packageOpt ? `<div class="text-muted small mb-1">Package: <b>${item.packageOpt}</b></div>` : '';
-          let jenisVanDisplay = item.jenisVan ? `<div class="text-muted small mb-1">Jenis L/Van: <b>${item.jenisVan}</b></div>` : '';
-          let jumlahPkgDisplay = item.jumlahPackage !== undefined ? `<div class="text-muted small mb-1">Jumlah Package: <b class="text-danger">${item.jumlahPackage}</b></div>` : '';
+          let packageDisplay = item.packageOpt && item.packageOpt !== '-' ? `<div class="text-muted small mb-1">Package: <b>${item.packageOpt}</b></div>` : '';
+          let jenisVanDisplay = item.jenisVan && item.jenisVan !== '-' ? `<div class="text-muted small mb-1">Jenis L/Van: <b>${item.jenisVan}</b></div>` : '';
+          let jumlahPkgDisplay = item.jumlahPackage !== undefined && item.jumlahPackage !== '0' ? `<div class="text-muted small mb-1">Jumlah Package: <b class="text-danger">${item.jumlahPackage}</b></div>` : '';
 
           html += `
             <div class="card border-0 shadow-sm rounded-4 mb-3 p-3" style="background: white;">
