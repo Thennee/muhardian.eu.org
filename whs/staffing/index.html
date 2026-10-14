@@ -1,4 +1,4 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -199,7 +199,6 @@
 </head>
 <body>
 
-  <!-- Fullscreen Loading Spinner Overlay -->
   <div id="fullPageLoader">
     <div class="spinner-border text-danger" role="status"></div>
     <p class="mt-3 fw-bold small text-danger text-uppercase" style="letter-spacing: 1px;">Memproses Data...</p>
@@ -216,10 +215,9 @@
               style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%); border: none; font-size: 1.1rem;"
               onclick="handleLogin()">Masuk Aplikasi</button>
       
-      <!-- Footer Copyright -->
       <div class="mt-4 pt-1">
         <a href="https://muhardian.eu.org" target="_blank" rel="noopener noreferrer" class="text-decoration-none text-muted small fw-semibold" style="font-size: 0.75rem;">
-          &copy; 2026 ver2
+          &copy; 2026 ver3
         </a>
       </div>
     </div>
@@ -242,11 +240,9 @@
     </div>
 
     <div class="scrollable-content" id="appContentArea">
-      <!-- DASHBOARD MENU UTAMA -->
       <div id="page-home">
         <p class="text-muted small fw-bold mb-3 uppercase" style="letter-spacing: 0.5px;">PILIH MODUL TRANSAKSI</p>
         
-        <!-- MENU 1: STUFFING -->
         <div class="menu-card" onclick="openInventoryModal('STUFFING')">
           <div class="menu-icon-box bg-soft-red">
             <i class="fa-solid fa-qrcode"></i>
@@ -257,7 +253,6 @@
           </div>
         </div>
 
-        <!-- MENU 2: PUTAWAY -->
         <div class="menu-card" onclick="openInventoryModal('PUTAWAY')">
           <div class="menu-icon-box bg-soft-rose">
             <i class="fa-solid fa-arrow-down-to-square"></i>
@@ -268,7 +263,6 @@
           </div>
         </div>
 
-        <!-- MENU 3: PICKING -->
         <div class="menu-card" onclick="openInventoryModal('PICKING')">
           <div class="menu-icon-box bg-soft-darkred">
             <i class="fa-solid fa-dolly"></i>
@@ -286,7 +280,6 @@
       </div>
     </div>
 
-    <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
       <a href="#" class="nav-item-custom active" id="navHome" onclick="showPage('home', this, 'Menu Inventory')"><i class="fa-solid fa-cubes"></i><span>Menu</span></a>
       <a href="#" class="nav-item-custom" id="navHistory" onclick="showPage('history', this, 'Riwayat Transaksi')"><i class="fa-solid fa-clock-rotate-left"></i><span>Riwayat</span></a>
@@ -301,13 +294,11 @@
           <h4 class="fw-800 mb-1" id="modalTypeTitle" style="font-weight: 800; letter-spacing: -0.5px; color: var(--dark-red);">INPUT INVENTORY</h4>
           <p class="text-muted small mb-3" id="modalInstruction">Arahkan kamera ke QR Code / Barcode.</p>
           
-          <!-- Area Scanner Camera -->
           <div id="scannerSection" class="mb-3 d-none">
             <div id="reader"></div>
             <button class="btn btn-sm btn-secondary w-100 mt-2 rounded-pill" onclick="stopScanner()">Tutup Kamera Scanner</button>
           </div>
 
-          <!-- FORM KHUSUS MENU STUFFING -->
           <form id="stuffingForm" class="d-none">
             <div class="mb-3">
               <label class="form-label fw-bold small">DESCRIPTION / QR CODE STUFFING</label>
@@ -352,6 +343,22 @@
                   <option value="2">2</option>
                   <option value="3">3</option>
                   <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                  <option value="11">11</option>
+                  <option value="12">12</option>
+                  <option value="13">13</option>
+                  <option value="14">14</option>
+                  <option value="15">15</option>
+                  <option value="16">16</option>
+                  <option value="17">17</option>
+                  <option value="18">18</option>
+                  <option value="19">19</option>
+                  <option value="20">20</option>
                 </select>
               </div>
               <div class="col-6">
@@ -393,7 +400,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Web App URL dari Google Apps Script:
     let API_URL = "https://script.google.com/macros/s/AKfycbyi6Xvxr0XFslIIwOEIhGbxzXk5gu1NEkW7kwr4qGC-7CYQ8LT3iSUF-At331wxokiR/exec";
 
     let currentUser = null;
@@ -402,12 +408,10 @@
     let html5QrcodeScanner = null;
     let activeScanTarget = null;
 
-    // Helper untuk mengecek apakah barcode STUFFING sudah pernah tercatat sebelumnya
     async function checkDuplicateStuffing(barcode) {
       if (!barcode) return false;
       const cleanTarget = barcode.trim().toUpperCase();
 
-      // 1. Cek pada riwayat memori lokal (dbHistory)
       const isLocalDuplicate = dbHistory.some(item => 
         item.type === 'STUFFING' && 
         item.barcode && 
@@ -415,7 +419,6 @@
       );
       if (isLocalDuplicate) return true;
 
-      // 2. Cek ke backend server / Google Sheets jika online
       try {
         const res = await apiCall('getHistory');
         if (res && res.success && Array.isArray(res.history)) {
@@ -446,7 +449,6 @@
         }
       }
 
-      // Offline / Mock Simulation Mode
       return new Promise((resolve) => {
         setTimeout(() => {
           if (action === 'loginUser') {
@@ -570,7 +572,6 @@
             await stopScanner();
 
             if (activeScanTarget === 'stuffingBarcode') {
-              // Validasi anti-duplikat langsung saat kamera membaca QR Code
               const isDuplicate = await checkDuplicateStuffing(decodedText);
               if (isDuplicate) {
                 if (navigator.vibrate) navigator.vibrate([150, 80, 150]);
@@ -636,7 +637,6 @@
       if (scannerSec) scannerSec.classList.add('d-none');
     }
 
-    // Submit Form STUFFING
     document.getElementById('stuffingForm').onsubmit = async function(e) {
       e.preventDefault();
       await stopScanner();
@@ -680,7 +680,6 @@
       }
     };
 
-    // Submit Form PUTAWAY & PICKING
     document.getElementById('inventoryForm').onsubmit = async function(e) {
       e.preventDefault();
       await stopScanner();
@@ -700,7 +699,7 @@
       const locEndVal = document.getElementById('invLocEnd').value;
 
       const payload = {
-        type: activeModule, // Menghasilkan 'PUTAWAY' atau 'PICKING'
+        type: activeModule,
         barcode: barcodeVal,
         location: locationVal,
         locStart: locStartVal,
@@ -734,7 +733,6 @@
             badgeClass = 'bg-dark text-white';
           }
 
-          // Normalisasi nama tipe lama jika ada di data sebelumnya
           let displayType = item.type;
           if (displayType === 'PUTAWAY - IN') displayType = 'PUTAWAY';
           if (displayType === 'PUTAWAY - OUT') displayType = 'PICKING';
