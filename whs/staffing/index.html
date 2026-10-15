@@ -199,6 +199,7 @@
 </head>
 <body>
 
+  <!-- Fullscreen Loading Spinner Overlay -->
   <div id="fullPageLoader">
     <div class="spinner-border text-danger" role="status"></div>
     <p class="mt-3 fw-bold small text-danger text-uppercase" style="letter-spacing: 1px;">Memproses Data...</p>
@@ -215,9 +216,10 @@
               style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%); border: none; font-size: 1.1rem;"
               onclick="handleLogin()">Masuk Aplikasi</button>
       
+      <!-- Footer Copyright -->
       <div class="mt-4 pt-1">
         <a href="https://muhardian.eu.org" target="_blank" rel="noopener noreferrer" class="text-decoration-none text-muted small fw-semibold" style="font-size: 0.75rem;">
-          &copy; 2026 ver5
+          &copy; 2026 ver6
         </a>
       </div>
     </div>
@@ -240,9 +242,11 @@
     </div>
 
     <div class="scrollable-content" id="appContentArea">
+      <!-- DASHBOARD MENU UTAMA -->
       <div id="page-home">
         <p class="text-muted small fw-bold mb-3 uppercase" style="letter-spacing: 0.5px;">PILIH MODUL TRANSAKSI</p>
         
+        <!-- MENU 1: STUFFING -->
         <div class="menu-card" onclick="openInventoryModal('STUFFING')">
           <div class="menu-icon-box bg-soft-red">
             <i class="fa-solid fa-qrcode"></i>
@@ -253,6 +257,7 @@
           </div>
         </div>
 
+        <!-- MENU 2: PUTAWAY -->
         <div class="menu-card" onclick="openInventoryModal('PUTAWAY')">
           <div class="menu-icon-box bg-soft-rose">
             <i class="fa-solid fa-arrow-down-to-square"></i>
@@ -263,6 +268,7 @@
           </div>
         </div>
 
+        <!-- MENU 3: PICKING -->
         <div class="menu-card" onclick="openInventoryModal('PICKING')">
           <div class="menu-icon-box bg-soft-darkred">
             <i class="fa-solid fa-dolly"></i>
@@ -280,6 +286,7 @@
       </div>
     </div>
 
+    <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
       <a href="#" class="nav-item-custom active" id="navHome" onclick="showPage('home', this, 'Menu Inventory')"><i class="fa-solid fa-cubes"></i><span>Menu</span></a>
       <a href="#" class="nav-item-custom" id="navHistory" onclick="showPage('history', this, 'Riwayat Transaksi')"><i class="fa-solid fa-clock-rotate-left"></i><span>Riwayat</span></a>
@@ -294,11 +301,13 @@
           <h4 class="fw-800 mb-1" id="modalTypeTitle" style="font-weight: 800; letter-spacing: -0.5px; color: var(--dark-red);">INPUT INVENTORY</h4>
           <p class="text-muted small mb-3" id="modalInstruction">Arahkan kamera ke QR Code / Barcode.</p>
           
+          <!-- Area Scanner Camera -->
           <div id="scannerSection" class="mb-3 d-none">
             <div id="reader"></div>
             <button class="btn btn-sm btn-secondary w-100 mt-2 rounded-pill" onclick="stopScanner()">Tutup Kamera Scanner</button>
           </div>
 
+          <!-- FORM KHUSUS MENU STUFFING -->
           <form id="stuffingForm" class="d-none">
             <div class="mb-3">
               <label class="form-label fw-bold small">DESCRIPTION / QR CODE STUFFING</label>
@@ -359,7 +368,7 @@
             </div>
 
             <div class="mb-3">
-              <label class="form-label fw-800 small text-uppercase" style="font-weight: 800; color: #1e293b; letter-spacing: 0.3px;">Package</label>
+              <label class="form-label fw-800 small text-uppercase" style="font-weight: 800; color: #1e293b; letter-spacing: 0.3px;">Mode</label>
               <select id="invPackage" class="form-select custom-select-box" required>
                 <option value="Air Outbound" selected>Air Outbound</option>
                 <option value="Sea Inbound">Sea Inbound</option>
@@ -405,7 +414,7 @@
     let html5QrcodeScanner = null;
     let activeScanTarget = null;
 
-    // Helper untuk memicu efek getar dan suara sukses
+    // Helper untuk memicu getar dan suara sukses
     function triggerSuccessFeedback() {
       if (navigator.vibrate) {
         navigator.vibrate([200, 100, 200]);
@@ -765,7 +774,7 @@
             ? `${item.locStart} - ${item.locEnd}` 
             : (item.locStart || item.locEnd || '1');
 
-          let packageDisplay = item.packageOpt && item.packageOpt !== '-' ? `<div class="text-muted small mb-1">Package: <b>${item.packageOpt}</b></div>` : '';
+          let modeDisplay = item.packageOpt && item.packageOpt !== '-' ? `<div class="text-muted small mb-1">Mode: <b>${item.packageOpt}</b></div>` : '';
           let jenisVanDisplay = item.jenisVan && item.jenisVan !== '-' ? `<div class="text-muted small mb-1">Jenis L/Van: <b>${item.jenisVan}</b></div>` : '';
           let jumlahPkgDisplay = item.jumlahPackage !== undefined && item.jumlahPackage !== '0' ? `<div class="text-muted small mb-1">Jumlah Package: <b class="text-danger">${item.jumlahPackage}</b></div>` : '';
 
@@ -778,7 +787,7 @@
               <h6 class="fw-bold mb-1">${item.barcode}</h6>
               <div class="text-muted small mb-1">PIC: <b class="text-danger">${item.pic || '-'}</b></div>
               <div class="text-muted small mb-1">Location: <b>${item.location || '-'}</b></div>
-              ${packageDisplay}
+              ${modeDisplay}
               ${jenisVanDisplay}
               ${jumlahPkgDisplay}
               <div class="pt-2 border-top d-flex justify-content-between align-items-center small text-muted">
