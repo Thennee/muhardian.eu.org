@@ -218,7 +218,7 @@
       <!-- Footer Copyright -->
       <div class="mt-4 pt-1">
         <a href="https://muhardian.eu.org" target="_blank" rel="noopener noreferrer" class="text-decoration-none text-muted small fw-semibold" style="font-size: 0.75rem;">
-          &copy; 2026 ver7
+          &copy; 2026 ver8
         </a>
       </div>
     </div>
@@ -368,8 +368,9 @@
 
             <div class="mb-3">
               <label class="form-label fw-800 small text-uppercase" style="font-weight: 800; color: #1e293b; letter-spacing: 0.3px;">Mode</label>
-              <select id="invPackage" class="form-select custom-select-box" required>
-                <option value="Air Outbound" selected>Air Outbound</option>
+              <select id="invMode" class="form-select custom-select-box" required>
+                <option value="Air Inbound" selected>Air Inbound</option>
+                <option value="Air Outbound">Air Outbound</option>
                 <option value="Sea Inbound">Sea Inbound</option>
                 <option value="Sea Outbound">Sea Outbound</option>
                 <option value="Domestic Inbound">Domestic Inbound</option>
@@ -483,7 +484,7 @@
               location: payload.location || 'LOC-QR',
               locStart: payload.locStart || '0',
               locEnd: payload.locEnd || '0',
-              packageOpt: payload.packageOpt || 'Air Outbound',
+              modeOpt: payload.modeOpt || 'Air Inbound',
               jenisVan: payload.jenisVan || 'BT',
               jumlahPackage: payload.jumlahPackage || '0',
               pic: payload.pic || 'admin',
@@ -687,7 +688,7 @@
         location: 'STUFFING AREA',
         locStart: '0',
         locEnd: '0',
-        packageOpt: '-',
+        modeOpt: '-',
         jenisVan: '-',
         jumlahPackage: '0',
         pic: currentUser ? currentUser.username : 'admin'
@@ -722,7 +723,7 @@
 
       const locStartVal = document.getElementById('invLocStart').value;
       const locEndVal = document.getElementById('invLocEnd').value;
-      const packageVal = document.getElementById('invPackage').value;
+      const modeVal = document.getElementById('invMode').value;
       const jenisVanVal = document.getElementById('invJenisVan').value;
       const jumlahPkgVal = document.getElementById('invJumlahPackage').value;
 
@@ -732,7 +733,7 @@
         location: locationVal,
         locStart: locStartVal,
         locEnd: locEndVal,
-        packageOpt: packageVal,
+        modeOpt: modeVal,
         jenisVan: jenisVanVal,
         jumlahPackage: jumlahPkgVal,
         pic: currentUser ? currentUser.username : 'admin'
@@ -773,7 +774,7 @@
             ? `${item.locStart} - ${item.locEnd}` 
             : '0 - 0';
 
-          let modeDisplay = item.packageOpt && item.packageOpt !== '-' ? `<div class="text-muted small mb-1">Mode: <b>${item.packageOpt}</b></div>` : '';
+          let modeDisplay = item.modeOpt && item.modeOpt !== '-' ? `<div class="text-muted small mb-1">Mode: <b>${item.modeOpt}</b></div>` : '';
           let jenisVanDisplay = item.jenisVan && item.jenisVan !== '-' ? `<div class="text-muted small mb-1">Jenis L/Van: <b>${item.jenisVan}</b></div>` : '';
           let jumlahPkgDisplay = item.jumlahPackage !== undefined ? `<div class="text-muted small mb-1">Jumlah Package: <b class="text-danger">${item.jumlahPackage}</b></div>` : '';
 
